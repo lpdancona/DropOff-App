@@ -26,7 +26,8 @@ const getSingleStudent = async (req, res) => {
 };
 // Create a student
 const createStudent = async (req, res) => {
-  const { name, photo, age, address } = req.body;
+  const { name, photo, age, address, parent, parentPhone, parentEmail } =
+    req.body;
   try {
     const student = await Student.create({
       name,
@@ -38,8 +39,9 @@ const createStudent = async (req, res) => {
       parentEmail,
     });
     res.status(201).json({ student });
-  } catch (err) {
-    res.status(500).json({ err });
+  } catch (error) {
+    res.status(500).json({ error });
+    console.log(error);
   }
 };
 

@@ -33,7 +33,7 @@ header img {
   margin-left: 0;
 }
 .pages {
-  max-width: 1400px;
+  width: 90%;
   padding: 20px;
   margin: 0 auto;
 }
