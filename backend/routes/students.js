@@ -3,6 +3,8 @@ const {
   createStudent,
   getAllStudents,
   getSingleStudent,
+  updateStudent,
+  deleteStudent,
 } = require("../controllers/studentController");
 const { create } = require("../models/studentModel");
 
@@ -15,12 +17,8 @@ router.get("/:id", getSingleStudent);
 // Create a student
 router.post("/", createStudent);
 // delete a student
-router.delete("/:id", (req, res) => {
-  res.json({ message: "Delete a student" });
-});
+router.delete("/:id", deleteStudent);
 // update a student
-router.patch("/:id", (req, res) => {
-  res.json({ message: "Update a student" });
-});
+router.patch("/:id", updateStudent);
 
 module.exports = router;

@@ -20,6 +20,18 @@ const studentSchema = new Schema(
       type: String,
       required: true,
     },
+    parent: {
+      type: String,
+      required: true,
+    },
+    parentPhone: {
+      type: Number,
+      required: true,
+    },
+    parentEmail: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

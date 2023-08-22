@@ -28,7 +28,15 @@ const getSingleStudent = async (req, res) => {
 const createStudent = async (req, res) => {
   const { name, photo, age, address } = req.body;
   try {
-    const student = await Student.create({ name, photo, age, address });
+    const student = await Student.create({
+      name,
+      photo,
+      age,
+      address,
+      parent,
+      parentPhone,
+      parentEmail,
+    });
     res.status(201).json({ student });
   } catch (err) {
     res.status(500).json({ err });
@@ -36,11 +44,36 @@ const createStudent = async (req, res) => {
 };
 
 // delete a student
+const deleteStudent = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ message: "Student does not exist" });
+  }
+  const student = await Student.findByIdAndRemove({ _id: id });
+  if (!student) {
+    return res.status(400).json({ message: "Student does not exist" });
+  }
+  res.status(200).json({ message: "Student deleted successfully." });
+};
 
 // update a student
+
+const updateStudent = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ message: "Student does not exist" });
+  }
+  const student = await Student.findOneAndUpdate({ _id: id }, { ...req.body });
+  if (!student) {
+    return res.status(400).json({ message: "Student does not exist" });
+  }
+  res.status(200).json({ message: "Student updated successfully." });
+};
 
 module.exports = {
   getAllStudents,
   getSingleStudent,
   createStudent,
+  deleteStudent,
+  updateStudent,
 };
