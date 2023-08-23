@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const studentsRoutes = require("./routes/students");
+const vansRoutes = require("./routes/vans");
 // express app
 const app = express();
 // middlewares
@@ -12,6 +13,7 @@ app.use((req, res, next) => {
 });
 //routes
 app.use("/api/students", studentsRoutes);
+app.use("/api/vans", vansRoutes);
 
 // connect to mongodb
 
