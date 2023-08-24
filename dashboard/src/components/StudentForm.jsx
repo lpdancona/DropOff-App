@@ -33,6 +33,7 @@ function StudentForm() {
     if (!response.ok) {
       setError(json.message);
       console.log("error", error);
+      alert("Failed to add student.");
     }
     if (response.ok) {
       setName("");
@@ -44,6 +45,7 @@ function StudentForm() {
       setParentEmail("");
       setError(null);
       console.log("new student added", json);
+      alert("New student added!");
     }
   };
 

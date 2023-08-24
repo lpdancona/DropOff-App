@@ -121,7 +121,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <AddStudent />
+        <AddStudent students={students} vans={vans} />
       </div>
     </div>
   );
