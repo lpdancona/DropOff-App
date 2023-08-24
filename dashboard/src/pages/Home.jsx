@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./Home.css";
 import StudentDetails from "../components/StudentDetails";
 import StudentForm from "../components/StudentForm";
-
+import AddStudent from "../components/AddStudent";
 export default function Home() {
   const [students, setStudents] = useState([]);
   const [vans, setVans] = useState([]);
@@ -114,13 +114,14 @@ export default function Home() {
         <h3>Vans</h3>
         <div className="van-container">
           {vans.map((van) => (
-            <div className="van">
+            <div className="van" key={van._id}>
               {van.plate}
               {van.model}
               {van.year}
             </div>
           ))}
         </div>
+        <AddStudent />
       </div>
     </div>
   );

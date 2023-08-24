@@ -14,6 +14,8 @@ const vanSchema = new Schema({
     type: Number,
     required: true,
   },
+  students: [{ type: Schema.Types.ObjectId, ref: "Student" }],
+  employees: [{ type: Schema.Types.ObjectId, ref: "Employe" }],
 });
 
 const Van = mongoose.model("Van", vanSchema);

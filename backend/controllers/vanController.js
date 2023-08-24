@@ -1,4 +1,6 @@
 const Van = require("../models/vanModel");
+const Student = require("../models/studentModel");
+const Employe = require("../models/employeModel");
 const mongoose = require("mongoose");
 // get all vans
 const getAllVans = async (req, res) => {
@@ -29,6 +31,8 @@ const createVan = async (req, res) => {
       plate,
       model,
       year,
+      students: [],
+      employees: [],
     });
     res.status(201).json({ van });
   } catch (error) {
@@ -60,10 +64,31 @@ const updateVan = async (req, res) => {
   }
   res.status(200).json({ message: "Van updated successfully." });
 };
+
+// add a student to a van
+
+const addStudentToVan = async (req, res) => {
+  try {
+    const { vanId, studentId } = req.body;
+    const van = await Van.findById(vanId);
+    const student = await Student.findById(studentId);
+    console.log(van, student);
+    if (!van || !student) {
+      return res.status(404).json({ message: "Van or student does not exist" });
+    }
+    van.students.push(studentId);
+    await van.save();
+    res.status(200).json({ message: "Student added successfully." });
+  } catch (err) {
+    res.status(500).json({ err });
+  }
+};
+
 module.exports = {
   getAllVans,
   getSingleVan,
   createVan,
   deleteVan,
   updateVan,
+  addStudentToVan,
 };
