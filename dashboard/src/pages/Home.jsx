@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "./Home.css";
-import StudentDetails from "../components/StudentDetails";
-import StudentForm from "../components/StudentForm";
 import AddStudent from "../components/AddStudent";
 export default function Home() {
   const [students, setStudents] = useState([]);
@@ -10,6 +8,8 @@ export default function Home() {
   const [ageFilter, setAgeFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
   const [addressFilter, setAddressFilter] = useState("");
+  const [selectedWeekday, setSelectedWeekday] = useState(null);
+  const [weekdays, setWeekdays] = useState([]);
   const studentsPerPage = 4;
 
   useEffect(() => {
@@ -34,6 +34,22 @@ export default function Home() {
     };
     fetchVans();
   });
+  useEffect(() => {
+    const fetchWeekdays = async () => {
+      const response = await fetch("/api/weekdays");
+      const json = await response.json();
+
+      if (response.ok) {
+        setWeekdays(json.weekdays);
+      }
+    };
+    fetchWeekdays();
+  }, []);
+
+  const handleWeekdaySelect = (event) => {
+    const selectedWeekdayId = event.target.value;
+    setSelectedWeekday(selectedWeekdayId);
+  };
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);
@@ -58,71 +74,61 @@ export default function Home() {
   });
 
   const displayedStudents = filteredStudents.slice(startIndex, endIndex);
+  const handleStudentAdded = async () => {
+    try {
+      const response = await fetch("/api/students");
+      const json = await response.json();
+
+      if (response.ok) {
+        setStudents(json.students);
+      }
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
+  };
 
   return (
-    <div className="home">
-      <div className="home-container">
-        <div className="students-container">
-          <h3>Students</h3>
-          <div className="filters">
-            <input
-              type="text"
-              placeholder="Filter by Name"
-              value={nameFilter}
-              onChange={(e) => setNameFilter(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Filter by Age"
-              value={ageFilter}
-              onChange={(e) => setAgeFilter(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Filter by Address"
-              value={addressFilter}
-              onChange={(e) => setAddressFilter(e.target.value)}
-            />
-          </div>
-          <div className="student">
-            {displayedStudents.map((student) => (
-              <StudentDetails key={student._id} student={student} />
+    <div className="home-main">
+      <div className="home">
+        <div className="home-container"></div>
+        <div className="vans-container">
+          <h3>Vans</h3>
+          <div className="van-container">
+            {vans.map((van) => (
+              <div className="van" key={van._id}>
+                {van.plate}
+                {van.model}
+                {van.year}
+              </div>
             ))}
           </div>
-          <div className="pagination">
-            <button
-              onClick={handlePrevPage}
-              disabled={currentPage === 1}
-              className="btn"
-            >
-              Previous
-            </button>
-            <button
-              onClick={handleNextPage}
-              disabled={endIndex >= filteredStudents.length}
-              className="btn"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-        <div className="left-container">
-          <StudentForm />
+          <AddStudent students={students} vans={vans} />
         </div>
       </div>
-      <div className="vans-container">
-        <h3>Vans</h3>
-        <div className="van-container">
-          {vans.map((van) => (
-            <div className="van" key={van._id}>
-              {van.plate}
-              {van.model}
-              {van.year}
-            </div>
+      <h3>Weekday Vans</h3>
+      <div className="weekday-selector">
+        <select onChange={handleWeekdaySelect}>
+          <option value="">Select a Weekday</option>
+          {weekdays.map((weekday) => (
+            <option key={weekday._id} value={weekday._id}>
+              {weekday.weekday}
+            </option>
           ))}
-        </div>
-        <AddStudent students={students} vans={vans} />
+        </select>
       </div>
+      {/* Display vans associated with the selected weekday */}
+      {selectedWeekday && (
+        <div className="vans-for-weekday">
+          <h4>Vans for {selectedWeekday.weekday}</h4>
+          <ul>
+            {selectedWeekday.vans.map((van) => (
+              <li key={van._id}>
+                {van.plate} {van.model} {van.year}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./StudentForm.css";
-function StudentForm() {
+function StudentForm({ onStudentAdded }) {
   const [name, setName] = useState("");
   const [photo, setPhoto] = useState("");
   const [age, setAge] = useState("");
@@ -46,6 +46,7 @@ function StudentForm() {
       setError(null);
       console.log("new student added", json);
       alert("New student added!");
+      onStudentAdded();
     }
   };
 

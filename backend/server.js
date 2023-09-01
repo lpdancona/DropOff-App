@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const studentsRoutes = require("./routes/students");
 const vansRoutes = require("./routes/vans");
 const employesRoutes = require("./routes/employes");
+const weekdaysRoutes = require("./routes/weekdays");
 // express app
 const app = express();
 // middlewares
@@ -16,7 +17,7 @@ app.use((req, res, next) => {
 app.use("/api/students", studentsRoutes);
 app.use("/api/vans", vansRoutes);
 app.use("/api/employes", employesRoutes);
-
+app.use("/api/weekdays", weekdaysRoutes);
 // connect to mongodb
 
 mongoose
