@@ -1,7 +1,15 @@
 import { useRef, useMemo, useState, useEffect } from "react";
-import { View, Text, useWindowDimensions, ActivityIndicator, Pressable, Button, TextInput } from "react-native";
+import { 
+  View, 
+  Text, 
+  useWindowDimensions, 
+  ActivityIndicator, 
+  Image, 
+  TouchableOpacity,
+  Linking 
+} from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { FontAwesome5, Fontisto, Entypo, MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import vans from '../../../assets/data/vans.json';
 import orders from '../../../assets/data/orders.json';
 import styles from './styles';
@@ -28,8 +36,10 @@ const gbLocation = {latitude: 49.263527201707745, longitude: -123.10070015042552
 //const deliveryLocation = {latitude: order.User.lat, longitude: order.User.lng}
 
 
-const HomeScreen = () => {
+const HomeScreen = ({route}) => {
   
+  const { address } = route.params;
+  console.log (address)
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -82,7 +92,7 @@ const HomeScreen = () => {
   }
   
   return (
-    <View style={styles.container}>
+    <View style={styles.mapContainer}>
       <MapView 
         ref={mapRef}
         provider={MapView.PROVIDER_GOOGLE}
@@ -115,7 +125,7 @@ const HomeScreen = () => {
         /> */}
         <MapViewDirections
           origin={driverLocation} // Start from the first waypoint
-          destination={van.waypoints[3]} //{van.waypoints[van.waypoints.length - 1]} // End at the last waypoint
+          destination={van.waypoints[address]} //{van.waypoints[van.waypoints.length - 1]} // End at the last waypoint
           //waypoints={van.waypoints} // Exclude the start and end waypoints
           strokeWidth={7}
           strokeColor='black'
@@ -148,8 +158,8 @@ const HomeScreen = () => {
             latitude: driverLocation.latitude, 
             longitude: driverLocation.longitude
           }}
-          title={"Driver"}
-          description={"Driver Van"}
+          title={"Gracie Barra Van"}
+          description={van.name}
         >
           <View style={{padding: 5}}>
             <FontAwesome5 name='map-marker-alt' size={30} color='red' />
@@ -157,11 +167,11 @@ const HomeScreen = () => {
         </Marker>
         <Marker
           coordinate={{
-            latitude: van.waypoints[3].latitude, 
-            longitude: van.waypoints[3].longitude
+            latitude: van.waypoints[address].latitude, 
+            longitude: van.waypoints[address].longitude
           }}
-          title={order.User.name}
-          description={order.User.address}
+          title={van.kidsInRoute[address].first_name + " " +van.kidsInRoute[address].last_name + "  House's"} 
+          //description={}
         >
            <View style={{padding: 5}}>
             <FontAwesome5 name='map-marker-alt' size={30} color='green' />
@@ -177,59 +187,71 @@ const HomeScreen = () => {
           style={{top: 40, left: 15, position: 'absolute'}}
         />
       )}
-     
       <BottomSheet 
         ref={bottomSheetRef} 
         snapPoints={snapPoints} 
         handleIndicatorStyle={styles.handleIndicator}
       >
         <View style = {styles.handleIndicatorContainer}>
-          <Text style={styles.routeDetailsText}>{totalMinutes.toFixed(0)} min</Text>
+          <Text style={styles.routeDetailsText}> ETA - {totalMinutes.toFixed(0)} min</Text>
             <FontAwesome5
-              name="shopping-bag"
+              name="bus"
               size={30}
               color="#3fc060"
               style={{marginHorizontal: 10}}
             />
           <Text style={styles.routeDetailsText}>{totalKm.toFixed(2)} Km</Text>
           </View>
-          <View style={styles.deliveryDetailsContainer}>
-            <FlatList
-              data={van.kidsInRoute}
-              renderItem={({ item }) => <Text>{item}</Text>} // Render each string directly
-              keyExtractor={(item, index) => index.toString()} // Use the index as the key
-            />
-            {/* <View style={styles.addressContainer}> 
-              <Fontisto 
-                name='shopping-store' 
-                size={22} 
-                color='grey'
-              />
-              <Text 
-                style={styles.addressText}>
-                {order.Restaurant.address}
-              </Text>
+          <View style={{padding:5, marginBottom: 1}} >
+            <Text>Kids on the Route ({van.name} - {van.model})</Text>
+       <FlatList
+          data={van.kidsInRoute} 
+          renderItem={({ item }) => (
+            <View>
+              <View style={{ backgroundColor: 'white', padding: 10 }}>
+                <Text style={{ fontSize: 20 }}>{item.id} - {item.first_name} {item.last_name}</Text>
+              </View>
             </View>
-            <View style={styles.addressContainer}> 
-              <FontAwesome5
-                name="map-marker-alt"
-                size={30}
-                color='grey'
-              />
-              <Text 
-                style={styles.addressText}>
-                {order.User.address}
-              </Text>
-           </View>
-            <View style={styles.orderDetailsContainer}>
-              <Text style={styles.orderItemText}>Onion Rings x1</Text>
-              <Text style={styles.orderItemText}>Big Mac x3</Text>
-              <Text style={styles.orderItemText}>Big Tasty x2</Text>
-              <Text style={styles.orderItemText}>Coca-Cola x1</Text>
-            </View> */}
-          </View>
+          )}
+          keyExtractor={(item) => item.id.toString()} 
+          contentContainerStyle={{ paddingBottom: 20 }} 
+          ListFooterComponent={() => (
+            <View>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ paddingRight: 130, paddingLeft: 30 }}>Driver: Tais</Text>
+                <Text>Helper: Elaine</Text>
+              </View>
+              <View style={styles.container}>
+                <Image source={require('../../../assets/img/Tais.jpeg')} style={styles.image} />
+                <Image source={require('../../../assets/img/Elaine.jpeg')} style={styles.image} />
+              </View>
+              <View style={{ alignItems: 'center', marginTop: 1 }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    const phoneNumber = '2368652297'; // Replace with the actual phone number of the helper
+                    const phoneNumberWithPrefix = `tel:${phoneNumber}`;
+
+                    Linking.canOpenURL(phoneNumberWithPrefix)
+                      .then((supported) => {
+                        if (!supported) {
+                          console.error('Phone number not supported');
+                        } else {
+                          return Linking.openURL(phoneNumberWithPrefix);
+                        }
+                      })
+                      .catch((error) => console.error(error));
+                  }}
+                  style={{ backgroundColor: 'green', padding: 10, borderRadius: 10 }}
+                >
+                  <Text style={{ color: 'white', fontSize: 20 }}>Call Us</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        />
+           
+        </View>
       </BottomSheet>
-      
     </View>
   );
 }

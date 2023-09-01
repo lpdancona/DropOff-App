@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-  container: {
+  mapContainer: {
     backgroundColor: "lightblue", 
     flex: 1,
   },
@@ -10,11 +10,10 @@ export default StyleSheet.create({
     width: 100
   },
   handleIndicatorContainer:{
-    marginTop: 20,
     flexDirection: "row", 
     alignItems: 'center', 
     justifyContent: 'center', 
-    marginBottom: 20
+    paddingBottom: 50,
   },
   routeDetailsText: {
     fontSize: 25, 
@@ -67,5 +66,18 @@ export default StyleSheet.create({
     fontWeight: '500', 
     textAlign: 'center', 
     letterSpacing: 0.5
-  }
+  },
+  container: {
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    padding: 16,
+  },
+  image: {
+    width: 180,
+    height: 200,
+    flex: 1,
+    resizeMode: 'cover',
+    borderRadius: 2,
+    marginRight: 16, 
+  },
 })

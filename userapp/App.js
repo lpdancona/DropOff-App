@@ -11,10 +11,8 @@ function App() {
   return (
     <NavigationContainer>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <HomeScreen />
-        {/* <RootNavigator /> */}
+        <RootNavigator />
       </GestureHandlerRootView>
-      
       <StatusBar style="light"/>
     </NavigationContainer>
   );
