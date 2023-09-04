@@ -62,3 +62,21 @@
   width: 90%;
   margin: auto;
 }
+.student-details-btn {
+  margin-right: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.update-student input {
+  margin: 15px auto;
+}
+.update-student {
+  margin-top: 40px;
+}
+.btn-student-edit {
+  background-color: orange;
+}
+.btn-student-delete {
+  background-color: red;
+}

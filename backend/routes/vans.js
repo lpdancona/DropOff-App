@@ -6,6 +6,7 @@ const {
   updateVan,
   deleteVan,
   addStudentToVan,
+  addEmployeToVan,
 } = require("../controllers/vanController");
 const { create } = require("../models/vanModel");
 
@@ -23,4 +24,6 @@ router.delete("/:id", deleteVan);
 router.patch("/:id", updateVan);
 // add a student to a van
 router.post("/addStudent", addStudentToVan);
+// add a employee to van
+router.post("/addEmployee", addEmployeToVan);
 module.exports = router;

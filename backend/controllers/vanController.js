@@ -67,18 +67,59 @@ const updateVan = async (req, res) => {
 
 // add a student to a van
 
+// add a student to a van
 const addStudentToVan = async (req, res) => {
+  const { vanId, studentId } = req.body; // Extract van ID and student ID from request body
+
   try {
-    const { vanId, studentId } = req.body;
-    const van = await Van.findById(vanId);
-    const student = await Student.findById(studentId);
-    console.log(van, student);
-    if (!van || !student) {
-      return res.status(404).json({ message: "Van or student does not exist" });
+    if (!mongoose.Types.ObjectId.isValid(vanId)) {
+      return res.status(404).json({ message: "Van does not exist" });
     }
-    van.students.push(studentId);
+
+    if (!mongoose.Types.ObjectId.isValid(studentId)) {
+      return res.status(404).json({ message: "Student does not exist" });
+    }
+
+    // Find the student and van by their IDs
+    const student = await Student.findById(studentId);
+    const van = await Van.findById(vanId);
+
+    if (!student || !van) {
+      return res.status(404).json({ message: "Student or van does not exist" });
+    }
+
+    // Assign the student to the van
+    van.students.push(student._id);
     await van.save();
-    res.status(200).json({ message: "Student added successfully." });
+
+    res.status(201).json({ student, van });
+  } catch (error) {
+    res.status(500).json({ error });
+    console.log(error);
+  }
+};
+
+// add an employe to van
+
+// add an employe to van
+const addEmployeToVan = async (req, res) => {
+  try {
+    const { vanId, employeId } = req.body;
+    const van = await Van.findById(vanId);
+    const employe = await Employe.findById(employeId);
+
+    if (!van || !employe) {
+      return res
+        .status(404)
+        .json({ message: "Van or employee does not exist" });
+    }
+
+    // Push the employeId into van.employees
+    van.employees.push(employeId);
+
+    await van.save();
+
+    res.status(200).json({ message: "Employee added successfully." });
   } catch (err) {
     res.status(500).json({ err });
   }
@@ -91,4 +132,5 @@ module.exports = {
   deleteVan,
   updateVan,
   addStudentToVan,
+  addEmployeToVan,
 };

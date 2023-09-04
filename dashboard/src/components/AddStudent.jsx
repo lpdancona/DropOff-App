@@ -1,98 +1,102 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./AddStudent.css";
 
-export default function AddStudent({ students, vans }) {
-  const [searchStudent, setSearchStudent] = useState("");
-  const [searchVan, setSearchVan] = useState("");
-  const [message, setMessage] = useState("");
+const AddStudentToVan = () => {
+  const [formData, setFormData] = useState({
+    studentId: "",
+    vanId: "",
+  });
 
-  const handleStudentSelect = (studentId) => {
-    setSearchStudent(studentId);
-  };
+  const [students, setStudents] = useState([]);
+  const [vans, setVans] = useState([]);
+  const [selectedVanStudents, setSelectedVanStudents] = useState([]);
+  const [nameFilter, setNameFilter] = useState("");
 
-  const handleVanSelect = (vanId) => {
-    setSearchVan(vanId);
+  useEffect(() => {
+    // Fetch the list of students and vans from your API
+    const fetchStudentsAndVans = async () => {
+      try {
+        const studentsResponse = await axios.get("/api/students");
+        const vansResponse = await axios.get("/api/vans");
+
+        setStudents(studentsResponse.data.students);
+        setVans(vansResponse.data.vans);
+      } catch (error) {
+        console.error(error.response.data);
+      }
+    };
+
+    fetchStudentsAndVans();
+  }, []);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+
+    if (e.target.name === "vanId") {
+      const selectedVan = vans.find((van) => van._id === e.target.value);
+      setSelectedVanStudents(selectedVan ? selectedVan.students : []);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("/api/vans/addStudent", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ vanId: searchVan, studentId: searchStudent }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setMessage("Failed to add student to van.");
-    }
-    if (response.ok) {
-      setSearchVan("");
-      setSearchStudent("");
-      alert("Student added to van!");
+    try {
+      const response = await axios.post("/api/vans/addStudent", formData);
+      console.log(response.data); // Handle success
+    } catch (error) {
+      console.error(error.response.data); // Handle errors
     }
   };
 
+  // Filter students by name
+  const filteredStudents = students.filter((student) =>
+    student.name.toLowerCase().includes(nameFilter.toLowerCase())
+  );
+
   return (
     <div className="add-student-container">
-      <h3>Add Student to Van</h3>
-      <form className="add-student-form" onSubmit={handleSubmit}>
-        <div className="search-bar">
-          <label>Search for Student:</label>
-          <input
-            className="search-bar"
-            type="text"
-            value={searchStudent}
-            onChange={(e) => setSearchStudent(e.target.value)}
-          />
-          <ul className="search-results">
-            {students
-              .filter((student) =>
-                student.name.toLowerCase().includes(searchStudent.toLowerCase())
-              )
-              .map((student) => (
-                <li
-                  key={student._id}
-                  onClick={() => handleStudentSelect(student._id)}
-                  className="search-student"
-                >
-                  <div className="search-student-div">
-                    <div>{student.name}</div>
-                    <div>{student.address}</div>
-                  </div>
-                </li>
-              ))}
-          </ul>
-        </div>
-        <div className="search-bar">
-          <label>Search for Van:</label>
-          <input
-            className="search-bar"
-            type="text"
-            value={searchVan}
-            onChange={(e) => setSearchVan(e.target.value)}
-          />
-          <ul className="search-results">
-            {vans
-              .filter((van) =>
-                van.plate.toLowerCase().includes(searchVan.toLowerCase())
-              )
-              .map((van) => (
-                <li key={van._id} onClick={() => handleVanSelect(van._id)}>
-                  {van.plate}
-                </li>
-              ))}
-          </ul>
-        </div>
-        <button className="btn-add" type="submit">
-          Add Student to Van
+      <h2>Add Student to Van</h2>
+      <div className="filter-inputs">
+        <input
+          type="text"
+          placeholder="Filter by Name"
+          value={nameFilter}
+          onChange={(e) => setNameFilter(e.target.value)}
+        />
+      </div>
+      <form onSubmit={handleSubmit}>
+        <select
+          className="sel"
+          name="studentId"
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select a Student</option>
+          {filteredStudents.map((student) => (
+            <option key={student._id} value={student._id}>
+              {student.name}
+            </option>
+          ))}
+        </select>
+        <select className="sel" name="vanId" onChange={handleChange} required>
+          <option value="">Select a Van</option>
+          {vans.map((van) => (
+            <option key={van._id} value={van._id}>
+              {van.model} - {van.plate}
+            </option>
+          ))}
+        </select>
+        <button className="sel-btn sel" type="submit">
+          Assign Student to Van
         </button>
       </form>
-      {message && <p className="message">{message}</p>}
     </div>
   );
-}
+};
+
+export default AddStudentToVan;

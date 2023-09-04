@@ -5,6 +5,7 @@ const studentsRoutes = require("./routes/students");
 const vansRoutes = require("./routes/vans");
 const employesRoutes = require("./routes/employes");
 const weekdaysRoutes = require("./routes/weekdays");
+const cors = require("cors");
 // express app
 const app = express();
 // middlewares
@@ -13,6 +14,7 @@ app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
 });
+app.use(cors());
 //routes
 app.use("/api/students", studentsRoutes);
 app.use("/api/vans", vansRoutes);

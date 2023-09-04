@@ -40,3 +40,9 @@ header a :hover {
   color: red;
   border-bottom: solid red 3px;
 }
+.link-header-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 30%;
+}

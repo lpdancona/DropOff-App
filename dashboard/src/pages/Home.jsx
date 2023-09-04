@@ -24,17 +24,6 @@ export default function Home() {
     fetchStudents();
   }, []);
   useEffect(() => {
-    const fetchVans = async () => {
-      const response = await fetch("/api/vans");
-      const json = await response.json();
-
-      if (response.ok) {
-        setVans(json.vans);
-      }
-    };
-    fetchVans();
-  });
-  useEffect(() => {
     const fetchWeekdays = async () => {
       const response = await fetch("/api/weekdays");
       const json = await response.json();
@@ -48,7 +37,10 @@ export default function Home() {
 
   const handleWeekdaySelect = (event) => {
     const selectedWeekdayId = event.target.value;
-    setSelectedWeekday(selectedWeekdayId);
+    const selectedWeekdayObj = weekdays.find(
+      (weekday) => weekday._id === selectedWeekdayId
+    );
+    setSelectedWeekday(selectedWeekdayObj);
   };
 
   const handleNextPage = () => {
@@ -89,22 +81,6 @@ export default function Home() {
 
   return (
     <div className="home-main">
-      <div className="home">
-        <div className="home-container"></div>
-        <div className="vans-container">
-          <h3>Vans</h3>
-          <div className="van-container">
-            {vans.map((van) => (
-              <div className="van" key={van._id}>
-                {van.plate}
-                {van.model}
-                {van.year}
-              </div>
-            ))}
-          </div>
-          <AddStudent students={students} vans={vans} />
-        </div>
-      </div>
       <h3>Weekday Vans</h3>
       <div className="weekday-selector">
         <select onChange={handleWeekdaySelect}>
@@ -121,11 +97,12 @@ export default function Home() {
         <div className="vans-for-weekday">
           <h4>Vans for {selectedWeekday.weekday}</h4>
           <ul>
-            {selectedWeekday.vans.map((van) => (
-              <li key={van._id}>
-                {van.plate} {van.model} {van.year}
-              </li>
-            ))}
+            {selectedWeekday.vans &&
+              selectedWeekday.vans.map((van) => (
+                <li key={van._id}>
+                  {van.plate} {van.model} {van.year}
+                </li>
+              ))}
           </ul>
         </div>
       )}

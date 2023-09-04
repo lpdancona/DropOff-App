@@ -17,6 +17,9 @@ export default function Navbar() {
           <Link to="/students">
             <h2>Students</h2>
           </Link>
+          <Link to="/vans">
+            <h2>Vans</h2>
+          </Link>
         </div>
       </div>
     </header>

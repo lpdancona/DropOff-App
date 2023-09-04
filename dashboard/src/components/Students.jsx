@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./Students.css";
 import StudentForm from "../components/StudentForm";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
 function Students() {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -154,11 +155,16 @@ function Students() {
                       <div className="student-details">
                         <div className="student-name">{student.name}</div>
                         <div className="student-address">{student.address}</div>
+                      </div>
+                      <div className="student-details-btn">
                         <button
                           onClick={() => handleStudentClick(student)}
-                          className="btn"
+                          className="btn btn-student-edit"
                         >
-                          edit
+                          <FontAwesomeIcon icon={faPenToSquare} />
+                        </button>
+                        <button className="btn btn-student-delete">
+                          <FontAwesomeIcon icon={faTrash} />
                         </button>
                       </div>
                     </div>
@@ -184,7 +190,7 @@ function Students() {
             )}
             {mode === "details" && selectedStudent && (
               <div className="update-student-container">
-                <h3>Update Student</h3>
+                <h2>Update Student</h2>
                 <div className="update-student">
                   <h4>{selectedStudent.name}</h4>
                   <form onSubmit={handleUpdateStudent}>
