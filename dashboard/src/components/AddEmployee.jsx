@@ -2,34 +2,33 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./AddStudent.css";
 
-const AddStudentToVan = () => {
+const AddEmployeeToVan = () => {
   const [formData, setFormData] = useState({
-    studentId: "",
+    employeId: "",
     vanId: "",
   });
 
-  const [students, setStudents] = useState([]);
+  const [employes, setEmployes] = useState([]); // Corrected variable name here
   const [vans, setVans] = useState([]);
-  const [selectedVanStudents, setSelectedVanStudents] = useState([]);
+  const [selectedVanEmployes, setSelectedVanEmployes] = useState([]);
   const [nameFilter, setNameFilter] = useState("");
-
+  const [successMessage, setSuccessMessage] = useState("");
   useEffect(() => {
-    // Fetch the list of students and vans from your API
-    const fetchStudentsAndVans = async () => {
+    // Fetch the list of employes and vans from your API
+    const fetchEmployesAndVans = async () => {
       try {
-        const studentsResponse = await axios.get("/api/students");
+        const employesResponse = await axios.get("/api/employes");
         const vansResponse = await axios.get("/api/vans");
 
-        setStudents(studentsResponse.data.students);
+        setEmployes(employesResponse.data.employes); // Corrected variable name here
         setVans(vansResponse.data.vans);
       } catch (error) {
         console.error(error.response.data);
       }
     };
 
-    fetchStudentsAndVans();
+    fetchEmployesAndVans();
   }, []);
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -38,7 +37,7 @@ const AddStudentToVan = () => {
 
     if (e.target.name === "vanId") {
       const selectedVan = vans.find((van) => van._id === e.target.value);
-      setSelectedVanStudents(selectedVan ? selectedVan.students : []);
+      setSelectedVanEmployes(selectedVan ? selectedVan.employes : []);
     }
   };
 
@@ -46,21 +45,23 @@ const AddStudentToVan = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/vans/addStudent", formData);
+      const response = await axios.post("/api/vans/addEmployee", formData);
+      setSuccessMessage("Employee has been successfully added!");
       console.log(response.data); // Handle success
+      alert("Employee has been added to van");
     } catch (error) {
       console.error(error.response.data); // Handle errors
     }
   };
 
   // Filter students by name
-  const filteredStudents = students.filter((student) =>
-    student.name.toLowerCase().includes(nameFilter.toLowerCase())
+  const filteredEmployes = employes.filter((employe) =>
+    employe.name.toLowerCase().includes(nameFilter.toLowerCase())
   );
 
   return (
-    <div className="add-student-container">
-      <h2>Add Student to Van</h2>
+    <div className="add-employee-container">
+      <h2>Add Employee to Van</h2>
       <div className="filter-inputs">
         <input
           type="text"
@@ -72,14 +73,14 @@ const AddStudentToVan = () => {
       <form onSubmit={handleSubmit}>
         <select
           className="sel"
-          name="studentId"
+          name="employeId"
           onChange={handleChange}
           required
         >
-          <option value="">Select a Student</option>
-          {filteredStudents.map((student) => (
-            <option key={student._id} value={student._id}>
-              {student.name}
+          <option value="">Select a Employee</option>
+          {filteredEmployes.map((employe) => (
+            <option key={employe._id} value={employe._id}>
+              {employe.name}
             </option>
           ))}
         </select>
@@ -92,11 +93,12 @@ const AddStudentToVan = () => {
           ))}
         </select>
         <button className="sel-btn sel" type="submit">
-          Assign Student to Van
+          Assign Employee to Van
         </button>
+        {successMessage && <p className="success-message">{successMessage}</p>}
       </form>
     </div>
   );
 };
 
-export default AddStudentToVan;
+export default AddEmployeeToVan;

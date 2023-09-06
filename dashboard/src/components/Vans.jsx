@@ -48,6 +48,7 @@ function Vans() {
     <div className="home">
       <div className="home-container"></div>
       <div className="vans-container">
+        <div className="vans">Vans</div>
         <div className="add-van-info">
           <div className="add-student">
             <AddStudent students={students} vans={vans} />

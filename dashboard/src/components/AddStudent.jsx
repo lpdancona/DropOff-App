@@ -12,7 +12,7 @@ const AddStudentToVan = () => {
   const [vans, setVans] = useState([]);
   const [selectedVanStudents, setSelectedVanStudents] = useState([]);
   const [nameFilter, setNameFilter] = useState("");
-
+  const [successMessage, setSuccessMessage] = useState("");
   useEffect(() => {
     // Fetch the list of students and vans from your API
     const fetchStudentsAndVans = async () => {
@@ -47,7 +47,9 @@ const AddStudentToVan = () => {
 
     try {
       const response = await axios.post("/api/vans/addStudent", formData);
+      setSuccessMessage("Employee has been successfully added!");
       console.log(response.data); // Handle success
+      alert("Employee has been added to van");
     } catch (error) {
       console.error(error.response.data); // Handle errors
     }
@@ -94,6 +96,7 @@ const AddStudentToVan = () => {
         <button className="sel-btn sel" type="submit">
           Assign Student to Van
         </button>
+        {successMessage && <p className="success-message">{successMessage}</p>}
       </form>
     </div>
   );

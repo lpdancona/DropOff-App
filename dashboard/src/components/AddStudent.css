@@ -1,13 +1,22 @@
-/* AddStudentToVan.css */
+/* /* AddStudentToVan.css
 
 /* Style the main container */
 .add-student-container {
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  margin: 20px;
   width: 400px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  height: 350px;
+}
+.add-employee-container {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 400px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  height: 350px;
+  margin-top: 20px;
 }
 
 /* Style form elements */
