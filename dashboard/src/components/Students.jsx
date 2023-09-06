@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import "./Students.css";
 import StudentForm from "../components/StudentForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPenToSquare,
+  faTrash,
+  faArrowRight,
+  faArrowLeft,
+} from "@fortawesome/free-solid-svg-icons";
 function Students() {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -176,14 +181,14 @@ function Students() {
                     disabled={currentPage === 1}
                     className="btn"
                   >
-                    Previous
+                    <FontAwesomeIcon icon={faArrowLeft} beat />
                   </button>
                   <button
                     onClick={handleNextPage}
                     disabled={endIndex >= filteredStudents.length}
                     className="btn"
                   >
-                    Next
+                    <FontAwesomeIcon icon={faArrowRight} beat />
                   </button>
                 </div>
               </div>

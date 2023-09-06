@@ -32,7 +32,7 @@ const createVan = async (req, res) => {
       model,
       year,
       students: [],
-      employees: [],
+      employes: [],
     });
     res.status(201).json({ van });
   } catch (error) {
@@ -103,25 +103,34 @@ const addStudentToVan = async (req, res) => {
 
 // add an employe to van
 const addEmployeToVan = async (req, res) => {
+  const { vanId, employeId } = req.body;
   try {
-    const { vanId, employeId } = req.body;
-    const van = await Van.findById(vanId);
-    const employe = await Employe.findById(employeId);
-
-    if (!van || !employe) {
-      return res
-        .status(404)
-        .json({ message: "Van or employee does not exist" });
+    if (!mongoose.Types.ObjectId.isValid(vanId)) {
+      return res.status(404).json({ message: "Van does not exist" });
     }
 
-    // Push the employeId into van.employees
-    van.employees.push(employeId);
+    if (!mongoose.Types.ObjectId.isValid(employeId)) {
+      return res.status(404).json({ message: "Employee does not exist" });
+    }
 
+    // Find the student and van by their IDs
+    const employe = await Employe.findById(employeId);
+    const van = await Van.findById(vanId);
+
+    if (!employe || !van) {
+      return res
+        .status(404)
+        .json({ message: "Employee or van does not exist" });
+    }
+
+    // Assign the student to the van
+    van.employes.push(employe._id);
     await van.save();
 
-    res.status(200).json({ message: "Employee added successfully." });
-  } catch (err) {
-    res.status(500).json({ err });
+    res.status(201).json({ employe, van });
+  } catch (error) {
+    res.status(500).json({ error });
+    console.log(error);
   }
 };
 
