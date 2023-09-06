@@ -47,6 +47,7 @@ const AddEmployeeToVan = () => {
     try {
       const response = await axios.post("/api/vans/addEmployee", formData);
       setSuccessMessage("Employee has been successfully added!");
+      window.location.reload();
       console.log(response.data); // Handle success
       alert("Employee has been added to van");
     } catch (error) {

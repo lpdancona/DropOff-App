@@ -18,5 +18,67 @@
 .vans {
   width: 65%;
   height: 800px;
-  border: 1px solid black;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Vans.css */
+.create-van-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.create-new-van-form {
+  position: absolute;
+  top: 80%;
+  left: 0;
+  right: 20%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 1;
+  width: 200px;
+}
+
+.create-van-dropdown .create-new-van-form.active {
+  display: block;
+}
+
+.create-van-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 20px 30px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  width: 220px;
+}
+
+.create-van-button:hover {
+  background-color: #0056b3;
+}
+
+.create-new-van-form h3 {
+  margin-top: 0;
+}
+
+.create-new-van-form input {
+  margin: 5px 0;
+  width: 100%;
+  padding: 5px;
+}
+
+.create-new-van-form button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.create-new-van-form button:hover {
+  background-color: #0056b3;
 }
