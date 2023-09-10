@@ -44,5 +44,5 @@ header a :hover {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 30%;
+  gap: 20%;
 }

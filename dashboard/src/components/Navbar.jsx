@@ -20,6 +20,9 @@ export default function Navbar() {
           <Link to="/vans">
             <h2>Vans</h2>
           </Link>
+          <Link to="/employees">
+            <h2>Employees</h2>
+          </Link>
         </div>
       </div>
     </header>

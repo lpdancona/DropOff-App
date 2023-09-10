@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import "./Vans.css";
 import AddStudent from "../components/AddStudent";
 import AddEmployee from "../components/AddEmployee";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserXmark } from "@fortawesome/free-solid-svg-icons";
 
 function Vans() {
   const [students, setStudents] = useState([]);
   const [vans, setVans] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [selectedVanModel, setSelectedVanModel] = useState(""); // Track the selected van model
-  const [selectedVan, setSelectedVan] = useState(null); // Track the selected van
-  const [showNewVanForm, setShowNewVanForm] = useState(false); // Track whether to show the new van form
+  const [selectedVanModel, setSelectedVanModel] = useState("");
+  const [selectedVan, setSelectedVan] = useState(null);
+  const [showNewVanForm, setShowNewVanForm] = useState(false);
   const [newVanData, setNewVanData] = useState({
     plate: "",
     model: "",
@@ -96,6 +98,60 @@ function Vans() {
       console.error("Error creating a new van:", error);
     }
   };
+  const handleUnaddStudent = async (studentId) => {
+    try {
+      const response = await fetch(
+        `/api/vans/${selectedVan._id}/unadd-student`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ studentId }),
+        }
+      );
+
+      if (response.ok) {
+        // Update the selected van's data after unadding
+        const updatedVan = { ...selectedVan };
+        updatedVan.students = updatedVan.students.filter(
+          (id) => id !== studentId
+        );
+        setSelectedVan(updatedVan);
+      } else {
+        console.error("Failed to unadd student from the van.");
+      }
+    } catch (error) {
+      console.error("Error unadding student from the van:", error);
+    }
+  };
+  const handleUnaddEmployee = async (employeId) => {
+    try {
+      const response = await fetch(
+        `/api/vans/${selectedVan._id}/unadd-employe`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ employeId }),
+        }
+      );
+
+      if (response.ok) {
+        // Update the selected van's data after unadding
+        const updatedVan = { ...selectedVan };
+        updatedVan.employes = updatedVan.employes.filter(
+          (id) => id !== employeId
+        );
+        setSelectedVan(updatedVan);
+      } else {
+        console.error("Failed to unadd employee from the van.");
+      }
+    } catch (error) {
+      console.error("Error unadding employee from the van:", error);
+    }
+  };
 
   return (
     <div className="home">
@@ -139,7 +195,11 @@ function Vans() {
         <div className="vans">
           <h2>Vans</h2>
           <label>Select a Van Model: </label>
-          <select value={selectedVanModel} onChange={handleVanModelSelect}>
+          <select
+            value={selectedVanModel}
+            onChange={handleVanModelSelect}
+            className="model-select"
+          >
             <option value="">Select a Model</option>
             {vans.map((van) => (
               <option key={van._id} value={van.model}>
@@ -150,19 +210,42 @@ function Vans() {
 
           {selectedVan && (
             <div className="selected-van-info">
-              <h3>Selected Van: {selectedVan.plate}</h3>
-              <h4>Students:</h4>
-              <ul>
-                {selectedVan.students.map((studentId) => {
-                  const student = students.find((s) => s._id === studentId);
-                  return <li key={student._id}>{student.name}</li>;
-                })}
-              </ul>
+              <h3>Selected Van: {selectedVan.model}</h3>
               <h4>Employees:</h4>
-              <ul>
+              <ul className="van-employees">
                 {selectedVan.employes.map((employeeId) => {
                   const employee = employees.find((e) => e._id === employeeId);
-                  return <li key={employee._id}>{employee.name}</li>;
+                  return (
+                    <li key={employee._id} className="van-employee">
+                      <img src={employee.photo} alt="" />
+                      <div>{employee.name}</div>
+                      <div>{employee.role}</div>
+                      <button onClick={() => handleUnaddEmployee(employee._id)}>
+                        Remove
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+              <h4>Students:</h4>
+              <ul className="van-students">
+                {selectedVan.students.map((studentId) => {
+                  const student = students.find((s) => s._id === studentId);
+                  return (
+                    <li key={student._id} className="van-student">
+                      <img src={student.photo} alt="" />
+
+                      <div className="van-student-info">
+                        <div className="van-student-name">{student.name}</div>
+                        <div className="van-student-address">
+                          {student.address}
+                        </div>
+                      </div>
+                      <button onClick={() => handleUnaddStudent(student._id)}>
+                        <FontAwesomeIcon icon={faUserXmark} />
+                      </button>
+                    </li>
+                  );
                 })}
               </ul>
             </div>

@@ -50,7 +50,7 @@ const AddStudentToVan = () => {
       setSuccessMessage("Student has been successfully added!");
       window.location.reload();
       console.log(response.data); // Handle success
-      alert("Employee has been added to van");
+      alert("Student has been added to van");
     } catch (error) {
       console.error(error.response.data); // Handle errors
     }

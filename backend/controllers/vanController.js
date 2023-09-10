@@ -133,6 +133,54 @@ const addEmployeToVan = async (req, res) => {
     console.log(error);
   }
 };
+const unaddStudent = async (req, res) => {
+  try {
+    const vanId = req.params.id;
+    const studentId = req.body.studentId;
+
+    // Find the van by ID
+    const van = await Van.findById(vanId);
+
+    if (!van) {
+      return res.status(404).json({ message: "Van not found" });
+    }
+
+    // Remove the student from the van's students array
+    van.students = van.students.filter((id) => id.toString() !== studentId);
+
+    // Save the updated van
+    await van.save();
+
+    res.json({ message: "Student removed from the van" });
+  } catch (error) {
+    console.error("Error unadding student from van:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+const unaddEmploye = async (req, res) => {
+  try {
+    const vanId = req.params.id;
+    const employeId = req.body.employeId;
+
+    // Find the van by ID
+    const van = await Van.findById(vanId);
+
+    if (!van) {
+      return res.status(404).json({ message: "Van not found" });
+    }
+
+    // Remove the employee from the van's employees array
+    van.employes = van.employes.filter((id) => id.toString() !== employeId);
+
+    // Save the updated van
+    await van.save();
+
+    res.json({ message: "Employee removed from the van" });
+  } catch (error) {
+    console.error("Error unadding employee from van:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 module.exports = {
   getAllVans,
@@ -142,4 +190,6 @@ module.exports = {
   updateVan,
   addStudentToVan,
   addEmployeToVan,
+  unaddStudent,
+  unaddEmploye,
 };

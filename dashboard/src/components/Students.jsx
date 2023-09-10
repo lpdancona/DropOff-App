@@ -8,6 +8,7 @@ import {
   faArrowRight,
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
+import avatar from "../docs/avatar-image.png";
 function Students() {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -20,6 +21,7 @@ function Students() {
   const [updatedAge, setUpdatedAge] = useState("");
   const [updatedParentNumber, setUpdatedParentNumber] = useState("");
   const [updatedParentEmail, setUpdatedParentEmail] = useState("");
+  const [updatedPhoto, setUpdatedPhoto] = useState("");
   const studentsPerPage = 4;
 
   useEffect(() => {
@@ -63,7 +65,32 @@ function Students() {
     setUpdatedAge(student.age);
     setUpdatedParentNumber(student.parentPhone);
     setUpdatedParentEmail(student.parentEmail);
+    setUpdatedPhoto(student.photo);
     setMode("details");
+  };
+  const handleDeleteClick = (student) => {
+    setSelectedStudent(student);
+    setMode("delete");
+  };
+  const handleDeleteStudent = async () => {
+    try {
+      const response = await fetch(`/api/students/${selectedStudent._id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        const updatedStudents = students.filter(
+          (student) => student._id !== selectedStudent._id
+        );
+        setStudents(updatedStudents);
+        setSelectedStudent(null);
+        setMode("list");
+      } else {
+        console.error("Failed to delete student.");
+      }
+    } catch (error) {
+      console.error("Error deleting student:", error);
+    }
   };
 
   const handleUpdateStudent = async () => {
@@ -79,6 +106,7 @@ function Students() {
           age: updatedAge,
           parentNumber: updatedParentNumber,
           parentEmail: updatedParentEmail,
+          photo: updatedPhoto,
         }),
       });
 
@@ -92,6 +120,7 @@ function Students() {
                 age: updatedAge,
                 parentNumber: updatedParentNumber,
                 parentEmail: updatedParentEmail,
+                photo: updatedPhoto,
               }
             : student
         );
@@ -104,6 +133,7 @@ function Students() {
         setUpdatedAge("");
         setUpdatedParentNumber("");
         setUpdatedParentEmail("");
+        setUpdatedPhoto("");
       } else {
         console.error("Failed to update student.");
       }
@@ -154,7 +184,7 @@ function Students() {
                     >
                       <img
                         src={student.photo}
-                        alt=""
+                        alt={avatar}
                         className="student-photo"
                       />
                       <div className="student-details">
@@ -168,7 +198,12 @@ function Students() {
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>
-                        <button className="btn btn-student-delete">
+                        <button
+                          className="btn btn-student-delete"
+                          onClick={() => {
+                            handleDeleteClick(student);
+                          }}
+                        >
                           <FontAwesomeIcon icon={faTrash} />
                         </button>
                       </div>
@@ -205,6 +240,12 @@ function Students() {
                       value={updatedName}
                       onChange={(e) => setUpdatedName(e.target.value)}
                     />
+                    <label>Photo:</label>
+                    <input
+                      type="text"
+                      value={updatedPhoto}
+                      onChange={(e) => setUpdatedParentEmail(e.target.value)}
+                    />
                     <label>Address:</label>
                     <input
                       type="text"
@@ -236,6 +277,21 @@ function Students() {
                       Back to List
                     </button>
                   </form>
+                </div>
+              </div>
+            )}
+            {mode === "delete" && selectedStudent && (
+              <div className="delete-student-container">
+                <h2>Delete Student</h2>
+                <div className="delete-student">
+                  <h4>{selectedStudent.name}</h4>
+                  <p>Are you sure you want to delete this student?</p>
+                  <button onClick={handleDeleteStudent} className="btn">
+                    Yes
+                  </button>
+                  <button onClick={() => setMode("list")} className="btn">
+                    No
+                  </button>
                 </div>
               </div>
             )}

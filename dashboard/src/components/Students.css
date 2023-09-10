@@ -18,12 +18,14 @@
   width: 80%;
 }
 .student-photo {
-  width: 70px;
-  height: 70px;
+  width: 90px;
+  height: 90px;
   margin: 0;
   padding: 0;
   float: left;
   margin-left: 20px;
+  border-radius: 50%;
+  object-fit: contain;
 }
 .students-container {
   width: 70%;
