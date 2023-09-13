@@ -8,7 +8,7 @@ export default function Navbar() {
       <div className="navbar-container">
         <div className="asp">
           <img src={gbLogo} alt="" className="gb-logo" />
-          <Link to="/">
+          <Link to="/weekdays">
             <h1>ASP Drop Off</h1>
           </Link>
         </div>

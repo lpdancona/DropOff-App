@@ -3,7 +3,12 @@ import "./Vans.css";
 import AddStudent from "../components/AddStudent";
 import AddEmployee from "../components/AddEmployee";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUserXmark,
+  faArrowUpRightFromSquare,
+} from "@fortawesome/free-solid-svg-icons";
+import AddVan from "./AddVan";
+import { Link } from "react-router-dom";
 
 function Vans() {
   const [students, setStudents] = useState([]);
@@ -210,7 +215,15 @@ function Vans() {
 
           {selectedVan && (
             <div className="selected-van-info">
-              <h3>Selected Van: {selectedVan.model}</h3>
+              <div className="share-van">
+                <h3>Selected Van: {selectedVan.model}</h3>{" "}
+                <Link
+                  to={`/vans/${selectedVan._id}`}
+                  className="view-details-button"
+                >
+                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                </Link>
+              </div>
               <h4>Employees:</h4>
               <ul className="van-employees">
                 {selectedVan.employes.map((employeeId) => {
@@ -257,6 +270,9 @@ function Vans() {
           </div>
           <div className="add-employee">
             <AddEmployee employees={employees} vans={vans} />
+          </div>
+          <div className="add-van">
+            <AddVan />
           </div>
         </div>
       </div>

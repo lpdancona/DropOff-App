@@ -65,8 +65,14 @@ const updateWeekday = async (req, res) => {
 // add a student to a van
 
 const addVanToWeekday = async (req, res) => {
+  const { weekdayId, vanId } = req.body;
   try {
-    const { weekdayId, vanId } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(weekdayId)) {
+      return res.status(404).json({ message: "Weekday does not exist" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(vanId)) {
+      return res.status(404).json({ message: "Van does not exist" });
+    }
     const weekday = await Weekday.findById(weekdayId);
     const van = await Van.findById(vanId);
 
@@ -81,6 +87,32 @@ const addVanToWeekday = async (req, res) => {
     res.status(500).json({ err });
   }
 };
+const getVansForWeekday = async (req, res) => {
+  const { selectedWeekday } = req.params;
+
+  // Check if the selectedWeekday is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(selectedWeekday)) {
+    return res.status(400).json({ message: "Invalid weekday ID" });
+  }
+
+  try {
+    // Find the weekday by its ID
+    const weekday = await Weekday.findById(selectedWeekday);
+
+    // Check if the weekday exists
+    if (!weekday) {
+      return res.status(404).json({ message: "Weekday not found" });
+    }
+
+    // Fetch the vans associated with the weekday
+    const vans = await Van.find({ _id: { $in: weekday.vans } });
+
+    res.status(200).json({ vans });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 module.exports = {
   getAllWeekdays,
@@ -89,4 +121,5 @@ module.exports = {
   deleteWeekday,
   updateWeekday,
   addVanToWeekday,
+  getVansForWeekday,
 };

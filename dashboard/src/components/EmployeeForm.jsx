@@ -63,7 +63,7 @@ function EmployeeForm({ onEmployeeAdded }) {
           />
         </div>
         <div className="form-item">
-          <label>Student Role:</label>
+          <label>Employee Role:</label>
           <input
             type="text"
             onChange={(e) => {

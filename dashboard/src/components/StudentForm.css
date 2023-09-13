@@ -24,7 +24,7 @@ input {
   padding: 10px;
   border-radius: 10px;
   border: none;
-  background-color: var(--primary);
+  background-color: #ed3337;
   color: #fff;
   font-size: 1rem;
   cursor: pointer;

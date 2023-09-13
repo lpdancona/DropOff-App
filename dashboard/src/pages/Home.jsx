@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "./Home.css";
-import AddStudent from "../components/AddStudent";
-export default function Home() {
-  const [students, setStudents] = useState([]);
-  const [vans, setVans] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [ageFilter, setAgeFilter] = useState("");
-  const [nameFilter, setNameFilter] = useState("");
-  const [addressFilter, setAddressFilter] = useState("");
-  const [selectedWeekday, setSelectedWeekday] = useState(null);
-  const [weekdays, setWeekdays] = useState([]);
-  const studentsPerPage = 4;
+import Navbar from "../components/Navbar";
 
+export default function Home() {
+  const [weekdays, setWeekdays] = useState([]);
+  const [selectedWeekday, setSelectedWeekday] = useState("");
+  const [vans, setVans] = useState([]);
+  const [students, setStudents] = useState([]);
+  useEffect(() => {
+    axios.get("/api/weekdays").then((response) => {
+      setWeekdays(response.data.weekdays);
+    });
+  }, []);
   useEffect(() => {
     const fetchStudents = async () => {
       const response = await fetch("/api/students");
@@ -23,86 +24,64 @@ export default function Home() {
     };
     fetchStudents();
   }, []);
-  useEffect(() => {
-    const fetchWeekdays = async () => {
-      const response = await fetch("/api/weekdays");
-      const json = await response.json();
-
-      if (response.ok) {
-        setWeekdays(json.weekdays);
-      }
-    };
-    fetchWeekdays();
-  }, []);
 
   const handleWeekdaySelect = (event) => {
-    const selectedWeekdayId = event.target.value;
-    const selectedWeekdayObj = weekdays.find(
-      (weekday) => weekday._id === selectedWeekdayId
-    );
-    setSelectedWeekday(selectedWeekdayObj);
-  };
+    const selectedId = event.target.value;
+    setSelectedWeekday(selectedId);
 
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
-
-  const startIndex = (currentPage - 1) * studentsPerPage;
-  const endIndex = startIndex + studentsPerPage;
-
-  // Apply filters
-  const filteredStudents = students.filter((student) => {
-    return (
-      (ageFilter === "" || student.age === parseInt(ageFilter)) &&
-      (nameFilter === "" ||
-        student.name.toLowerCase().includes(nameFilter.toLowerCase())) &&
-      (addressFilter === "" ||
-        student.address.toLowerCase().includes(addressFilter.toLowerCase()))
-    );
-  });
-
-  const displayedStudents = filteredStudents.slice(startIndex, endIndex);
-  const handleStudentAdded = async () => {
-    try {
-      const response = await fetch("/api/students");
-      const json = await response.json();
-
-      if (response.ok) {
-        setStudents(json.students);
-      }
-    } catch (error) {
-      console.error("Error fetching students:", error);
+    // Fetch the vans for the selected weekday
+    if (selectedId) {
+      axios.get(`/api/weekdays/${selectedId}/vans`).then((response) => {
+        setVans(response.data.vans);
+      });
+    } else {
+      // Clear the vans when no weekday is selected
+      setVans([]);
     }
   };
 
   return (
     <div className="home-main">
-      <h3>Weekday Vans</h3>
-      <div className="weekday-selector">
-        <select onChange={handleWeekdaySelect}>
-          <option value="">Select a Weekday</option>
-          {weekdays.map((weekday) => (
-            <option key={weekday._id} value={weekday._id}>
-              {weekday.weekday}
-            </option>
-          ))}
-        </select>
-      </div>
-      {/* Display vans associated with the selected weekday */}
+      <h1>Select a Weekday</h1>
+      <select onChange={handleWeekdaySelect} value={selectedWeekday}>
+        <option value="">Select a Weekday</option>
+        {weekdays.map((weekday) => (
+          <option key={weekday._id} value={weekday._id}>
+            {weekday.weekday}
+          </option>
+        ))}
+      </select>
+
       {selectedWeekday && (
-        <div className="vans-for-weekday">
-          <h4>Vans for {selectedWeekday.weekday}</h4>
+        <div>
+          <h2>
+            Vans for{" "}
+            {weekdays.find((day) => day._id === selectedWeekday)?.weekday}
+          </h2>
           <ul>
-            {selectedWeekday.vans &&
-              selectedWeekday.vans.map((van) => (
-                <li key={van._id}>
-                  {van.plate} {van.model} {van.year}
-                </li>
-              ))}
+            {vans.map((van) => (
+              <li key={van._id}>
+                {van.model}
+                <h4>Students</h4>
+                <ul className="van-students">
+                  {van.students.map((studentId) => {
+                    const student = students.find((s) => s._id === studentId);
+                    return (
+                      <li key={student._id} className="van-student">
+                        <img src={student.photo} alt="" />
+
+                        <div className="van-student-info">
+                          <div className="van-student-name">{student.name}</div>
+                          <div className="van-student-address">
+                            {student.address}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ))}
           </ul>
         </div>
       )}

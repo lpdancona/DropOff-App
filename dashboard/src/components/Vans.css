@@ -166,3 +166,13 @@
 .van-student-address {
   font-size: small;
 }
+.share-van {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3%;
+}
+.view-details-button {
+  font-size: 20px;
+  color: blue;
+}

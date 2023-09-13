@@ -6,6 +6,7 @@ const {
   updateWeekday,
   deleteWeekday,
   addVanToWeekday,
+  getVansForWeekday,
 } = require("../controllers/weekdayController");
 const { create } = require("../models/weekdayModel");
 
@@ -23,4 +24,6 @@ router.delete("/:id", deleteWeekday);
 router.patch("/:id", updateWeekday);
 // add a student to a van
 router.post("/addVan", addVanToWeekday);
+// get vans for a weekday
+router.get("/:selectedWeekday/vans", getVansForWeekday);
 module.exports = router;
