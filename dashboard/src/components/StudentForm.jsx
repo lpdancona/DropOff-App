@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./StudentForm.css";
+import GoogleMapsAutocomplete from "./GoogleMapsAutocomplete";
 function StudentForm({ onStudentAdded }) {
   const [name, setName] = useState("");
   const [photo, setPhoto] = useState("");
@@ -9,6 +10,7 @@ function StudentForm({ onStudentAdded }) {
   const [parentPhone, setParentPhone] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [error, setError] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +18,7 @@ function StudentForm({ onStudentAdded }) {
       name,
       photo,
       age,
-      address,
+      address: selectedAddress,
       parent,
       parentPhone,
       parentEmail,
@@ -48,6 +50,9 @@ function StudentForm({ onStudentAdded }) {
       alert("New student added!");
       onStudentAdded();
     }
+  };
+  const handleAddressSelect = (selectedPlace) => {
+    setSelectedAddress(selectedPlace.formatted_address);
   };
 
   return (
@@ -86,13 +91,7 @@ function StudentForm({ onStudentAdded }) {
         </div>
         <div className="form-item">
           <label>Student Address:</label>
-          <input
-            type="text"
-            onChange={(e) => {
-              setAddress(e.target.value);
-            }}
-            value={address}
-          />
+          <GoogleMapsAutocomplete onPlaceSelect={handleAddressSelect} />
         </div>
         <div className="form-item">
           <label>Parent Name:</label>
