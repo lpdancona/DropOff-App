@@ -6,7 +6,6 @@ import Students from "./components/Students";
 import Vans from "./components/Vans";
 import Employees from "./components/Employees";
 import VanDetailPage from "./pages/VanDetailPage";
-
 function App() {
   return (
     <div className="App">

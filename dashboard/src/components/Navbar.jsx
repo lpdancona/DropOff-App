@@ -1,11 +1,21 @@
-import React from "react";
+import { useState } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 import gbLogo from "../docs/gb-logo.svg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTv } from "@fortawesome/free-solid-svg-icons";
 export default function Navbar() {
+  const [view, setView] = useState("navbar-container");
+  const toggleView = () => {
+    if (view === "navbar-container") {
+      setView("navbar-container-tv");
+    } else {
+      setView("navbar-container");
+    }
+  };
   return (
     <header>
-      <div className="navbar-container">
+      <div className={view}>
         <div className="asp">
           <img src={gbLogo} alt="" className="gb-logo" />
           <Link to="/weekdays">
@@ -25,6 +35,9 @@ export default function Navbar() {
           </Link>
         </div>
       </div>
+      <button onClick={toggleView}>
+        <FontAwesomeIcon icon={faTv} />
+      </button>
     </header>
   );
 }

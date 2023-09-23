@@ -42,39 +42,37 @@ export default function Home() {
 
   return (
     <div className="home-main">
-      <h1>Select a Weekday</h1>
-      <select onChange={handleWeekdaySelect} value={selectedWeekday}>
-        <option value="">Select a Weekday</option>
-        {weekdays.map((weekday) => (
-          <option key={weekday._id} value={weekday._id}>
-            {weekday.weekday}
-          </option>
-        ))}
-      </select>
+      <div className="home-header">
+        <h1>Select a Weekday</h1>
+        <select onChange={handleWeekdaySelect} value={selectedWeekday}>
+          <option value="">Select a Weekday</option>
+          {weekdays.map((weekday) => (
+            <option key={weekday._id} value={weekday._id}>
+              {weekday.weekday}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {selectedWeekday && (
         <div>
           <h2>
-            Vans for{" "}
-            {weekdays.find((day) => day._id === selectedWeekday)?.weekday}
+            {/* Vans for{" "}
+            {weekdays.find((day) => day._id === selectedWeekday)?.weekday} */}
           </h2>
-          <ul>
+          <ul className="weekday-van-list">
             {vans.map((van) => (
-              <li key={van._id}>
+              <li key={van._id} className="weekday-van-item">
                 {van.model}
-                <h4>Students</h4>
-                <ul className="van-students">
+                <ul className="van-students-weekday">
                   {van.students.map((studentId) => {
                     const student = students.find((s) => s._id === studentId);
                     return (
-                      <li key={student._id} className="van-student">
+                      <li key={student._id} className="van-student-weekday">
                         <img src={student.photo} alt="" />
 
-                        <div className="van-student-info">
-                          <div className="van-student-name">{student.name}</div>
-                          <div className="van-student-address">
-                            {student.address}
-                          </div>
+                        <div className="weekday-van-student">
+                          {student.name}
                         </div>
                       </li>
                     );

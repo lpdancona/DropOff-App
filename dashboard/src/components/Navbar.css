@@ -1,11 +1,15 @@
 .navbar-container {
   display: flex;
+  width: 96%;
   justify-content: flex-start;
   align-items: center;
   max-width: 1400px;
   margin: 0 auto;
   padding: 10px 20px;
   gap: 40%;
+}
+.navbar-container-tv {
+  display: none;
 }
 
 .asp {
@@ -46,6 +50,19 @@ header a :hover {
   justify-content: flex-start;
   align-items: center;
   gap: 20%;
+}
+header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+header button {
+  width: 4%;
+  margin-right: 10px;
+  background-color: #fff;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
 }
 @media screen and (max-width: 768px) {
   .navbar-container {

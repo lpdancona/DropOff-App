@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import "./VanDetailPage.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMapLocation } from "@fortawesome/free-solid-svg-icons";
 
 function VanDetailPage() {
   const { vanId } = useParams();
@@ -87,6 +89,20 @@ function VanDetailPage() {
                   <div className="detail-student-name">{student.name}</div>
                   <div className="detail-student-address">
                     {student.address}
+                    <Link
+                      to={`https://www.google.com/maps/place/${encodeURIComponent(
+                        student.address
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <button className="address-icon">
+                        <FontAwesomeIcon
+                          icon={faMapLocation}
+                          className="address-icon"
+                        />
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </li>

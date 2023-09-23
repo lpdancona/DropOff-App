@@ -5,6 +5,7 @@ function GoogleMapsAutocomplete({ onPlaceSelect }) {
   const libInjectionRequired = useRef(!Boolean(window.google));
   const libLoading = useRef(false);
   const [autocomplete, setAutocomplete] = useState();
+  console.log(process.env.REACT_APP_GOOGLEMAPS_APIKEY);
   const handlePlaceSelect = useCallback(() => {
     const selectedPlace = autocomplete.getPlace();
     if (selectedPlace) {

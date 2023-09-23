@@ -244,7 +244,7 @@ function Students() {
                     <input
                       type="text"
                       value={updatedPhoto}
-                      onChange={(e) => setUpdatedParentEmail(e.target.value)}
+                      onChange={(e) => setUpdatedPhoto(e.target.value)}
                     />
                     <label>Address:</label>
                     <input
