@@ -26,7 +26,9 @@ function Students() {
 
   useEffect(() => {
     const fetchStudents = async () => {
-      const response = await fetch("/api/students");
+      const response = await fetch(
+        "https://drop-off-app-dere.onrender.com/api/students"
+      );
       const json = await response.json();
 
       if (response.ok) {
