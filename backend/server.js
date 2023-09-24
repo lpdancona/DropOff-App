@@ -14,7 +14,12 @@ app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
 });
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
+
 //routes
 app.use("/api/students", studentsRoutes);
 app.use("/api/vans", vansRoutes);
