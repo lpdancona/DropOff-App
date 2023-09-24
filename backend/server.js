@@ -7,7 +7,7 @@ const employesRoutes = require("./routes/employes");
 const weekdaysRoutes = require("./routes/weekdays");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-router.use(bodyParser.json());
+
 // express app
 const app = express();
 // middlewares
