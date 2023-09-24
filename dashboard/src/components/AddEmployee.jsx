@@ -17,8 +17,12 @@ const AddEmployeeToVan = () => {
     // Fetch the list of employes and vans from your API
     const fetchEmployesAndVans = async () => {
       try {
-        const employesResponse = await axios.get("/api/employes");
-        const vansResponse = await axios.get("/api/vans");
+        const employesResponse = await axios.get(
+          "https://drop-off-app-dere.onrender.com/api/employes"
+        );
+        const vansResponse = await axios.get(
+          "https://drop-off-app-dere.onrender.com/api/vans"
+        );
 
         setEmployes(employesResponse.data.employes); // Corrected variable name here
         setVans(vansResponse.data.vans);
@@ -45,7 +49,10 @@ const AddEmployeeToVan = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/vans/addEmployee", formData);
+      const response = await axios.post(
+        "https://drop-off-app-dere.onrender.com/api/vans/addEmployee",
+        formData
+      );
       setSuccessMessage("Employee has been successfully added!");
       window.location.reload();
       console.log(response.data); // Handle success

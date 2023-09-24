@@ -23,13 +23,16 @@ function StudentForm({ onStudentAdded }) {
       parentPhone,
       parentEmail,
     };
-    const response = await fetch("/api/students", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(student),
-    });
+    const response = await fetch(
+      "https://drop-off-app-dere.onrender.com/api/students",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(student),
+      }
+    );
     const json = await response.json();
 
     if (!response.ok) {

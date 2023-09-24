@@ -15,8 +15,12 @@ const AddVan = () => {
     // Fetch the list of weekdays and vans from your API
     const fetchWeekdaysAndVans = async () => {
       try {
-        const weekdaysResponse = await axios.get("/api/weekdays");
-        const vansResponse = await axios.get("/api/vans");
+        const weekdaysResponse = await axios.get(
+          "https://drop-off-app-dere.onrender.com/api/weekdays"
+        );
+        const vansResponse = await axios.get(
+          "https://drop-off-app-dere.onrender.com/api/vans"
+        );
 
         setWeekdays(weekdaysResponse.data.weekdays);
         setVans(vansResponse.data.vans);
@@ -39,7 +43,10 @@ const AddVan = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/weekdays/addVan", formData);
+      const response = await axios.post(
+        "https://drop-off-app-dere.onrender.com/api/weekdays/addVan",
+        formData
+      );
       setSuccessMessage("Van has been successfully added to the weekday!");
       console.log(response.data); // Handle success
       alert("Van has been added to the weekday");

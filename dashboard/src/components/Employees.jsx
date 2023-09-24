@@ -21,7 +21,9 @@ function Employees() {
 
   useEffect(() => {
     const fetchEmployees = async () => {
-      const response = await fetch("/api/employes");
+      const response = await fetch(
+        "https://drop-off-app-dere.onrender.com/api/employes"
+      );
       const json = await response.json();
 
       if (response.ok) {
@@ -64,9 +66,12 @@ function Employees() {
   };
   const handleDeleteEmployee = async () => {
     try {
-      const response = await fetch(`/api/employes/${selectedEmployee._id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `https://drop-off-app-dere.onrender.com/api/employes/${selectedEmployee._id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         const updatedEmployees = employees.filter(
@@ -85,17 +90,20 @@ function Employees() {
 
   const handleUpdateEmployee = async () => {
     try {
-      const response = await fetch(`/api/employes/${selectedEmployee._id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: updatedName,
-          photo: updatedPhoto,
-          role: updatedRole,
-        }),
-      });
+      const response = await fetch(
+        `https://drop-off-app-dere.onrender.com/api/employes/${selectedEmployee._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: updatedName,
+            photo: updatedPhoto,
+            role: updatedRole,
+          }),
+        }
+      );
 
       if (response.ok) {
         const updatedEmployees = employees.map((employee) =>
@@ -125,7 +133,9 @@ function Employees() {
 
   const handleEmployeeAdded = async () => {
     try {
-      const response = await fetch("/api/employes");
+      const response = await fetch(
+        "https://drop-off-app-dere.onrender.com/api/employes"
+      );
       const json = await response.json();
 
       if (response.ok) {

@@ -13,13 +13,16 @@ function EmployeeForm({ onEmployeeAdded }) {
       photo,
       role,
     };
-    const response = await fetch("/api/employes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(employe),
-    });
+    const response = await fetch(
+      "https://drop-off-app-dere.onrender.com/api/employes",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(employe),
+      }
+    );
     const json = await response.json();
 
     if (!response.ok) {

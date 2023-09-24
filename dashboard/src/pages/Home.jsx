@@ -9,13 +9,17 @@ export default function Home() {
   const [vans, setVans] = useState([]);
   const [students, setStudents] = useState([]);
   useEffect(() => {
-    axios.get("/api/weekdays").then((response) => {
-      setWeekdays(response.data.weekdays);
-    });
+    axios
+      .get("https://drop-off-app-dere.onrender.com/api/weekdays")
+      .then((response) => {
+        setWeekdays(response.data.weekdays);
+      });
   }, []);
   useEffect(() => {
     const fetchStudents = async () => {
-      const response = await fetch("/api/students");
+      const response = await fetch(
+        "https://drop-off-app-dere.onrender.com/api/students"
+      );
       const json = await response.json();
 
       if (response.ok) {
@@ -31,9 +35,13 @@ export default function Home() {
 
     // Fetch the vans for the selected weekday
     if (selectedId) {
-      axios.get(`/api/weekdays/${selectedId}/vans`).then((response) => {
-        setVans(response.data.vans);
-      });
+      axios
+        .get(
+          `https://drop-off-app-dere.onrender.com/api/weekdays/${selectedId}/vans`
+        )
+        .then((response) => {
+          setVans(response.data.vans);
+        });
     } else {
       // Clear the vans when no weekday is selected
       setVans([]);

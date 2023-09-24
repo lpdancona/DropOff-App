@@ -17,8 +17,12 @@ const AddStudentToVan = () => {
     // Fetch the list of students and vans from your API
     const fetchStudentsAndVans = async () => {
       try {
-        const studentsResponse = await axios.get("/api/students");
-        const vansResponse = await axios.get("/api/vans");
+        const studentsResponse = await axios.get(
+          "https://drop-off-app-dere.onrender.com/api/students"
+        );
+        const vansResponse = await axios.get(
+          "https://drop-off-app-dere.onrender.com/api/vans"
+        );
 
         setStudents(studentsResponse.data.students);
         setVans(vansResponse.data.vans);
@@ -46,7 +50,10 @@ const AddStudentToVan = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/vans/addStudent", formData);
+      const response = await axios.post(
+        "https://drop-off-app-dere.onrender.com/api/vans/addStudent",
+        formData
+      );
       setSuccessMessage("Student has been successfully added!");
       window.location.reload();
       console.log(response.data); // Handle success

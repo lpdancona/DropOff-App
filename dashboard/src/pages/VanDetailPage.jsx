@@ -13,7 +13,9 @@ function VanDetailPage() {
   useEffect(() => {
     const fetchVanDetails = async () => {
       try {
-        const response = await axios.get(`/api/vans/${vanId}`);
+        const response = await axios.get(
+          `https://drop-off-app-dere.onrender.com/api/vans/${vanId}`
+        );
         if (response.status === 200) {
           setVan(response.data.van);
         } else {
@@ -28,7 +30,9 @@ function VanDetailPage() {
   }, [vanId]);
   useEffect(() => {
     const fetchStudents = async () => {
-      const response = await fetch("/api/students");
+      const response = await fetch(
+        "https://drop-off-app-dere.onrender.com/api/students"
+      );
       const json = await response.json();
 
       if (response.ok) {
@@ -39,7 +43,9 @@ function VanDetailPage() {
   }, []);
   useEffect(() => {
     const fetchEmployees = async () => {
-      const response = await fetch("/api/employes");
+      const response = await fetch(
+        "https://drop-off-app-dere.onrender.com/api/employes"
+      );
       const json = await response.json();
 
       if (response.ok) {

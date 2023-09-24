@@ -26,7 +26,9 @@ function Vans() {
   useEffect(() => {
     const fetchVans = async () => {
       try {
-        const response = await fetch("/api/vans");
+        const response = await fetch(
+          "https://drop-off-app-dere.onrender.com/api/vans"
+        );
         if (response.ok) {
           const json = await response.json();
           setVans(json.vans);
@@ -42,7 +44,9 @@ function Vans() {
 
   useEffect(() => {
     const fetchStudents = async () => {
-      const response = await fetch("/api/students");
+      const response = await fetch(
+        "https://drop-off-app-dere.onrender.com/api/students"
+      );
       const json = await response.json();
 
       if (response.ok) {
@@ -54,7 +58,9 @@ function Vans() {
 
   useEffect(() => {
     const fetchEmployees = async () => {
-      const response = await fetch("/api/employes");
+      const response = await fetch(
+        "https://drop-off-app-dere.onrender.com/api/employes"
+      );
       const json = await response.json();
 
       if (response.ok) {
@@ -85,13 +91,16 @@ function Vans() {
 
   const createNewVan = async () => {
     try {
-      const response = await fetch("/api/vans", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newVanData),
-      });
+      const response = await fetch(
+        "https://drop-off-app-dere.onrender.com/api/vans",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newVanData),
+        }
+      );
 
       if (response.ok) {
         // Refresh the page after creating a new van
@@ -106,7 +115,7 @@ function Vans() {
   const handleUnaddStudent = async (studentId) => {
     try {
       const response = await fetch(
-        `/api/vans/${selectedVan._id}/unadd-student`,
+        `https://drop-off-app-dere.onrender.com/api/vans/${selectedVan._id}/unadd-student`,
         {
           method: "PATCH",
           headers: {
@@ -133,7 +142,7 @@ function Vans() {
   const handleUnaddEmployee = async (employeId) => {
     try {
       const response = await fetch(
-        `/api/vans/${selectedVan._id}/unadd-employe`,
+        `https://drop-off-app-dere.onrender.com/api/vans/${selectedVan._id}/unadd-employe`,
         {
           method: "PATCH",
           headers: {
