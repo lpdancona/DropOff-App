@@ -76,9 +76,12 @@ function Students() {
   };
   const handleDeleteStudent = async () => {
     try {
-      const response = await fetch(`/api/students/${selectedStudent._id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `https://drop-off-app-dere.onrender.com/api/students/${selectedStudent._id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         const updatedStudents = students.filter(
@@ -97,20 +100,23 @@ function Students() {
 
   const handleUpdateStudent = async () => {
     try {
-      const response = await fetch(`/api/students/${selectedStudent._id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: updatedName,
-          address: updatedAddress,
-          age: updatedAge,
-          parentNumber: updatedParentNumber,
-          parentEmail: updatedParentEmail,
-          photo: updatedPhoto,
-        }),
-      });
+      const response = await fetch(
+        `https://drop-off-app-dere.onrender.com/api/students/${selectedStudent._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: updatedName,
+            address: updatedAddress,
+            age: updatedAge,
+            parentNumber: updatedParentNumber,
+            parentEmail: updatedParentEmail,
+            photo: updatedPhoto,
+          }),
+        }
+      );
 
       if (response.ok) {
         const updatedStudents = students.map((student) =>
@@ -146,7 +152,9 @@ function Students() {
 
   const handleStudentAdded = async () => {
     try {
-      const response = await fetch("/api/students");
+      const response = await fetch(
+        "https://drop-off-app-dere.onrender.com/api/students"
+      );
       const json = await response.json();
 
       if (response.ok) {
