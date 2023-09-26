@@ -19,6 +19,8 @@ import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import { FlatList } from "react-native-gesture-handler";
+import { DataStore } from 'aws-amplify';
+
 
 const van = vans[0];
 // const order = orders[0];
@@ -38,7 +40,8 @@ const gbLocation = {latitude: 49.263527201707745, longitude: -123.10070015042552
 
 const HomeScreen = ({route}) => {
   
-  const { address } = route.params;
+  
+  const { address } = {address: 1} // van.waypoint[0] // '' //route.params;
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -46,7 +49,7 @@ const HomeScreen = ({route}) => {
   const [driverLocation, setDriverLocation] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
-  const [deliveryStatus, setDeliveryStatus] = useState(ORDER_STATUSES.READY_FOR_PICKUP)
+  //const [deliveryStatus, setDeliveryStatus] = useState(ORDER_STATUSES.READY_FOR_PICKUP)
   
   const [isDriverClose, setIsDriverClose] = useState(false);
 
@@ -55,6 +58,9 @@ const HomeScreen = ({route}) => {
   //const routeWaypoints = van.waypoints.slice(1);
 
 
+  useEffect (() => {
+
+  },[])
 
   useEffect (() => {
     (async () => {
@@ -186,7 +192,7 @@ const HomeScreen = ({route}) => {
           </View>
         </Marker>
       </MapView>
-      {deliveryStatus === ORDER_STATUSES.READY_FOR_PICKUP && (
+      {/* {deliveryStatus === ORDER_STATUSES.READY_FOR_PICKUP && (
         <Ionicons 
           onPress={() => navigation.goBack()}
           name='arrow-back-circle'
@@ -194,7 +200,7 @@ const HomeScreen = ({route}) => {
           color='black'
           style={{top: 40, left: 15, position: 'absolute'}}
         />
-      )}
+      )} */}
       <BottomSheet 
         ref={bottomSheetRef} 
         snapPoints={snapPoints} 

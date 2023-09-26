@@ -52,10 +52,7 @@ type EagerUser = {
   readonly name: string;
   readonly userType?: UserTypes | keyof typeof UserTypes | null;
   readonly unitNumber?: string | null;
-  readonly streetAddress: string;
-  readonly city: string;
-  readonly province: string;
-  readonly postalCode?: string | null;
+  readonly address: string;
   readonly lng: number;
   readonly lat: number;
   readonly phoneNumber?: string | null;
@@ -73,10 +70,7 @@ type LazyUser = {
   readonly name: string;
   readonly userType?: UserTypes | keyof typeof UserTypes | null;
   readonly unitNumber?: string | null;
-  readonly streetAddress: string;
-  readonly city: string;
-  readonly province: string;
-  readonly postalCode?: string | null;
+  readonly address: string;
   readonly lng: number;
   readonly lat: number;
   readonly phoneNumber?: string | null;

@@ -113,32 +113,11 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "streetAddress": {
-                    "name": "streetAddress",
+                "address": {
+                    "name": "address",
                     "isArray": false,
                     "type": "String",
                     "isRequired": true,
-                    "attributes": []
-                },
-                "city": {
-                    "name": "city",
-                    "isArray": false,
-                    "type": "String",
-                    "isRequired": true,
-                    "attributes": []
-                },
-                "province": {
-                    "name": "province",
-                    "isArray": false,
-                    "type": "String",
-                    "isRequired": true,
-                    "attributes": []
-                },
-                "postalCode": {
-                    "name": "postalCode",
-                    "isArray": false,
-                    "type": "String",
-                    "isRequired": false,
                     "attributes": []
                 },
                 "lng": {
@@ -217,5 +196,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "07c47d130d3c5eb27ab6da07f60fe8fa"
+    "version": "2a8702753106fd41bd4bedd41b3d3a9f"
 };
