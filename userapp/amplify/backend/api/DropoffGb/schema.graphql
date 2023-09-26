@@ -1,0 +1,28 @@
+type Kid @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  parent1Email: String
+  parent2Email: String
+}
+
+enum UserTypes {
+  PARENT
+  STAFF
+  DRIVER
+}
+
+type User @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  sub: String!
+  name: String!
+  userType: UserTypes
+  unitNumber: String
+  streetAddress: String!
+  city: String!
+  province: String!
+  postalCode: String
+  lng: Float!
+  lat: Float!
+  phoneNumber: String
+}
+ 

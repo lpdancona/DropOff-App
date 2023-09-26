@@ -21,13 +21,13 @@ import { useNavigation } from "@react-navigation/native";
 import { FlatList } from "react-native-gesture-handler";
 
 const van = vans[0];
-const order = orders[0];
+// const order = orders[0];
 
-const ORDER_STATUSES = {
-  READY_FOR_PICKUP: "READY_FOR_PICKUP",
-  ACCEPTED: "ACCEPTED",
-  PICKED_UP: "PICKED_UP",
-}
+// const ORDER_STATUSES = {
+//   READY_FOR_PICKUP: "READY_FOR_PICKUP",
+//   ACCEPTED: "ACCEPTED",
+//   PICKED_UP: "PICKED_UP",
+// }
 
 const gbLocation = {latitude: 49.263527201707745, longitude: -123.10070015042552}; // gb location (we can import from the database in future)
 
@@ -39,7 +39,6 @@ const gbLocation = {latitude: 49.263527201707745, longitude: -123.10070015042552
 const HomeScreen = ({route}) => {
   
   const { address } = route.params;
-  console.log (address)
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -93,6 +92,15 @@ const HomeScreen = ({route}) => {
   
   return (
     <View style={styles.mapContainer}>
+      <View style={styles.infoOverlay}>
+        <Text style={styles.infoText}>
+          Your kids are on their way! More information below.
+        </Text>
+        <Text style={styles.infoText}>
+          Our routes are pre-made for safety and speed, and we prioritize
+          your child's security.
+        </Text>
+      </View>
       <MapView 
         ref={mapRef}
         provider={MapView.PROVIDER_GOOGLE}
@@ -174,7 +182,7 @@ const HomeScreen = ({route}) => {
           //description={}
         >
            <View style={{padding: 5}}>
-            <FontAwesome5 name='map-marker-alt' size={30} color='green' />
+            <FontAwesome5 name='home' size={30} color='green' />
           </View>
         </Marker>
       </MapView>
@@ -209,7 +217,7 @@ const HomeScreen = ({route}) => {
           renderItem={({ item }) => (
             <View>
               <View style={{ backgroundColor: 'white', padding: 10 }}>
-                <Text style={{ fontSize: 20 }}>{item.id} - {item.first_name} {item.last_name}</Text>
+                <Text style={{ fontSize: 20 }}> {item.first_name} {item.last_name}</Text>
               </View>
             </View>
           )}

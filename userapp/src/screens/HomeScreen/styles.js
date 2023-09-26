@@ -22,6 +22,20 @@ export default StyleSheet.create({
   deliveryDetailsContainer: {
     paddingHorizontal: 20,
   },
+    infoOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    zIndex: 1,
+    elevation: 2, // Android elevation for shadow
+  },
+  infoText: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
   restaurantName:{
     fontSize: 25, 
     letterSpacing: 1, 

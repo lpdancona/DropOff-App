@@ -1,0 +1,160 @@
+[{
+    "id": "1",
+    "name":"BUS 1",
+    "model":"Ford Transit",
+    "driver":"Geovanni",
+    "helper": "Lorena",
+    "routeDate": "2023-02-10",
+    "driverEmail":"geovanni@graciebarra.ca",
+    "waypoints": [
+      {
+        "id" : 1,
+        "kidName": "Noah Saldanha",
+        "parentName": "Carolina Saldanha",
+        "parentPhoneNumber" : "160-389-3231",
+        "streetAddress": "9123 Leroy Circle",
+        "unitNumber": "15",
+        "city": "Birmingham",
+        "province": "Alabama",
+        "postalCode": "35285",
+        "commentsAddress": "beside a hotel",
+        "latitude": 49.26591216725993, 
+        "longitude": -123.11406275817299
+      },
+      {
+        "id" : 2,
+        "kidName": "Bliss Benoiton",
+        "parentName": "Agretha Thorndale",
+        "parentPhoneNumber": "256-614-4343",
+        "streetAddress": "5813 Morning Court",
+        "unitNumber": "89",
+        "city": "Huntsville",
+        "province": "Alabama",
+        "postalCode": "35895",
+        "commentsAddress": "buzzer is 3558",
+        "latitude": 49.25153376265179, 
+        "longitude": -123.06864128905133
+      },
+      {
+        "id" : 3,
+        "kidName": "Bran Ceschi",
+        "parentName": "Konstanze Trickey",
+        "parentPhoneNumber": "205-673-2903",
+        "streetAddress": "0 Loftsgordon Park",
+        "unitNumber": "215",
+        "city": "Birmingham",
+        "province": "Alabama",
+        "postalCode": "35205",
+        "commentsAddress": "Know the buzzer",
+        "latitude": 49.2099818844277, 
+        "longitude": -123.07221551625828
+      },
+      {
+        "id" : 4,
+        "kidName": "Aretha Magrannell",
+        "parentName": "Dixie Bemlott",
+        "parentPhoneNumber": "205-650-2188",
+        "streetAddress": "17601 Packers Lane",
+        "unitNumber": "155",
+        "city": "Birmingham",
+        "province": "Alabama",
+        "postalCode": "35242",
+        "commentsAddress": "Can park on the backalley",
+        "latitude": 49.238633716629996, 
+        "longitude": -123.08295790490318
+      }
+    ],
+    "kidsInRoute": [
+      {
+        "id":"1",
+        "first_name":"Noah",
+        "last_name":"Saldanha",
+        "gender":"Male",
+        "streetAddress":"1 West Place",
+        "unitNumber":"5898",
+        "commentsAddress":"Can park on the backalley",
+        "zipCode":"4830-264",
+        "lat":41.5331853,
+        "lng":-8.2524001,
+        "parents": [
+          {
+          "id":"1",
+            "first_name":"Carolina",
+            "last_name":"Saldanha",
+            "phoneNumber":"266-207-9078",
+            "email": "carol@gmail.com"
+          }
+        ]
+      },{
+        "id":"2",
+        "first_name":"Bliss",
+        "last_name":"Benoiton",
+        "gender":"Female",
+        "streetAddress":"86 Hallows Plaza",
+        "unitNumber":"",
+        "commentsAddress":"",
+        "zipCode":null,
+        "lat":-8.4437183,
+        "lng":118.8305489,
+        "parents": [ 
+          {
+            "id":"2",
+            "first_name":"Gabriela",
+            "last_name":"Halifax",
+            "phoneNumber":"160-389-3231",
+            "email": "gabriella@gmail.com"
+          }
+        ]
+      },{
+        "id":"3",
+        "first_name":"Bran",
+        "last_name":"Ceschi",
+        "gender":"Male",
+        "streetAddress":"93998 Blaine Court",
+        "zipCode":"370-2466",
+        "unitNumber":"1588",
+        "commentsAddress":"",
+        "lat":36.2469586,
+        "lng":138.8138456,
+        "parents": [{"id":"3","first_name":"Nilson","last_name":"Wilce","phoneNumber":"768-764-7412"} ]
+      },{
+        "id":"4",
+        "first_name":"Aretha",
+        "last_name":"Magrannell",
+        "gender":"Female",
+        "streetAddress":"8299 Transport Hill",
+        "unitNumber":"1984",
+        "commentsAddress":"Yellow House",
+        "zipCode":null,
+        "lat":31.7053821,
+        "lng":35.2024425,
+        "parents": [{"id":"4","first_name":"Bobby","last_name":"Ravenscroft","phoneNumber":"873-816-1676"}]
+      },{
+        "id":"5",
+        "first_name":"Wallis",
+        "last_name":"Burgess",
+        "gender":"Male",
+        "streetAddress":"396 Donald Junction",
+        "unitNumber":"15",
+        "commentsAddress":"Know the buzzer",
+        "zipCode":"952-3421",
+        "lat":38.0775948,
+        "lng":138.439631,
+        "parents": [{"id":"5","first_name":"Trent","last_name":"McQuilty","phoneNumber":"670-423-2637"}]
+      },{
+        "id":"6",
+        "first_name":"Josheph",
+        "last_name":"Guzman",
+        "gender":"Male",
+        "streetAddress":"396 Donald Junction",
+        "unitNumber":"15",
+        "commentsAddress":"Know the buzzer",
+        "zipCode":"952-3421",
+        "lat":38.0775948,
+        "lng":138.439631,
+        "parents": [{"id":"5","first_name":"Trent","last_name":"McQuilty","phoneNumber":"670-423-2637"}]
+      }
+    ]
+  }
+] 
+ 
