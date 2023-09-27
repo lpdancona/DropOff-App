@@ -19,6 +19,10 @@ type EagerKid = {
   readonly name: string;
   readonly parent1Email?: string | null;
   readonly parent2Email?: string | null;
+  readonly dropOffAddress?: string | null;
+  readonly lat?: number | null;
+  readonly lng?: number | null;
+  readonly birthDate?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -32,6 +36,10 @@ type LazyKid = {
   readonly name: string;
   readonly parent1Email?: string | null;
   readonly parent2Email?: string | null;
+  readonly dropOffAddress?: string | null;
+  readonly lat?: number | null;
+  readonly lng?: number | null;
+  readonly birthDate?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

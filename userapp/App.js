@@ -4,6 +4,7 @@ import RootNavigator from './src/navigation';
 import { NavigationContainer } from '@react-navigation/native'
 import { withAuthenticator, useAuthenticator } from '@aws-amplify/ui-react-native';
 import AuthContextProvider from './src/contexts/AuthContext';
+//import UserContextProvider from "./src/contexts/UserContext";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 //import HomeScreen from "./src/screens/HomeScreen";
 import registerNNPushToken from 'native-notify';
@@ -19,9 +20,11 @@ function App() {
   return (
     <NavigationContainer>
       <AuthContextProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <RootNavigator />
-        </GestureHandlerRootView>
+        {/* <UserContextProvider> */}
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <RootNavigator />
+          </GestureHandlerRootView>
+        {/* </UserContextProvider> */}
         <StatusBar style="light"/>
       </AuthContextProvider>
     </NavigationContainer>

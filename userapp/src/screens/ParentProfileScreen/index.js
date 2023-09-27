@@ -9,7 +9,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import PhoneInput from "react-native-phone-number-input";
 
-const Profile = () => {
+const ParentProfileScreen = () => {
   const { dbUser, userEmail } = useAuthContext();
   
   const [name, setName] = useState(dbUser?.name || "");
@@ -322,4 +322,4 @@ const autoComplete = {
     fontSize: 18,
   },
 };
-export default Profile;
+export default ParentProfileScreen;

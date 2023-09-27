@@ -11,7 +11,6 @@ import {
 import BottomSheet from "@gorhom/bottom-sheet";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import vans from '../../../assets/data/vans.json';
-import orders from '../../../assets/data/orders.json';
 import styles from './styles';
 import MapView, { Marker , PROVIDER_GOOGLE} from "react-native-maps";
 import * as Location from 'expo-location';
@@ -20,28 +19,25 @@ import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import { FlatList } from "react-native-gesture-handler";
 import { DataStore } from 'aws-amplify';
+import { useAuthContext } from '../../contexts/AuthContext';
 
 
 const van = vans[0];
-// const order = orders[0];
 
-// const ORDER_STATUSES = {
-//   READY_FOR_PICKUP: "READY_FOR_PICKUP",
-//   ACCEPTED: "ACCEPTED",
-//   PICKED_UP: "PICKED_UP",
-// }
 
 const gbLocation = {latitude: 49.263527201707745, longitude: -123.10070015042552}; // gb location (we can import from the database in future)
 
 
-
-//const deliveryLocation = {latitude: order.User.lat, longitude: order.User.lng}
-
-
-const HomeScreen = ({route}) => {
+const ParentHomeScreen = ({route}) => {
   
+  const {kids} = useAuthContext();
+  const [dropOffAddress, setDropOffAddress] = useState(null);
   
-  const { address } = {address: 1} // van.waypoint[0] // '' //route.params;
+  //console.log(kids);
+
+  
+
+  //{address: 1} // van.waypoint[0] // '' //route.params;
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -89,21 +85,33 @@ const HomeScreen = ({route}) => {
   }, []);
   //console.log(address)
   //console.warn(driverLocation);
-  if (!driverLocation) {
-   
+  //console.log(dropOffAddress);
+
+  useEffect(() => {
+    //console.log(kids)
+    if (kids) {
+      setDropOffAddress({latitude : kids[0]?.lat, longitude: kids[0]?.lng})
+    }
+  },[kids]);
+  //console.log(dropOffAddress)
+  if (!driverLocation || !dropOffAddress) {
     return <ActivityIndicator style={{padding: 50}} size={'large'}/>
   }
-  
+  //console.log('driver location ',driverLocation);
+  //console.log('dropOffAddress ',dropOffAddress);
+
   return (
     <View style={styles.mapContainer}>
       <View style={styles.infoOverlay}>
-        <Text style={styles.infoText}>
-          Your kids are on their way! More information below.
-        </Text>
-        <Text style={styles.infoText}>
-          Our routes are pre-made for safety and speed, and we prioritize
-          your child's security.
-        </Text>
+        <View style={styles.infoBoard}>
+          <Text style={styles.infoText}>
+            Your kids are on their way! More information below.
+          </Text>
+          <Text style={styles.infoText}>
+            Our routes are pre-made for safety and speed, and we prioritize
+            your child's security.
+          </Text>
+       </View>
       </View>
       <MapView 
         ref={mapRef}
@@ -137,7 +145,7 @@ const HomeScreen = ({route}) => {
         /> */}
         <MapViewDirections
           origin={driverLocation} // Start from the first waypoint
-          destination={van.waypoints[address]} //{van.waypoints[van.waypoints.length - 1]} // End at the last waypoint
+          destination={dropOffAddress} //{van.waypoints[van.waypoints.length - 1]} // End at the last waypoint
           //waypoints={van.waypoints} // Exclude the start and end waypoints
           strokeWidth={7}
           strokeColor='black'
@@ -179,11 +187,11 @@ const HomeScreen = ({route}) => {
         </Marker>
         <Marker
           coordinate={{
-            latitude: van.waypoints[address].latitude, 
-            longitude: van.waypoints[address].longitude
+            latitude: dropOffAddress.latitude, 
+            longitude: dropOffAddress.longitude, //van.waypoints[address].longitude
           }}
-          title={van.kidsInRoute[address].first_name + " " +van.kidsInRoute[address].last_name + "  House's"} 
-          //description={}
+          title={`${kids.map((kid, index) => `${kid.name}`).join(' - ')} House's`} //{kids[0].name} //van.kidsInRoute[address].first_name + " " +van.kidsInRoute[address].last_name + "  House's"} 
+          description={kids[0].dropOffAddress}
         >
            <View style={{padding: 5}}>
             <FontAwesome5 name='home' size={30} color='green' />
@@ -268,4 +276,4 @@ const HomeScreen = ({route}) => {
   );
 }
 
-export default HomeScreen;
+export default ParentHomeScreen;

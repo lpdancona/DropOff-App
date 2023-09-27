@@ -3,6 +3,10 @@ type Kid @model @auth(rules: [{allow: public}]) {
   name: String!
   parent1Email: String
   parent2Email: String
+  dropOffAddress: String
+  lat: Float
+  lng: Float
+  birthDate: AWSDate
 }
 
 enum UserTypes {

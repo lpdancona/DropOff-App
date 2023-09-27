@@ -31,6 +31,34 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "dropOffAddress": {
+                    "name": "dropOffAddress",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "lat": {
+                    "name": "lat",
+                    "isArray": false,
+                    "type": "Float",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "lng": {
+                    "name": "lng",
+                    "isArray": false,
+                    "type": "Float",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "birthDate": {
+                    "name": "birthDate",
+                    "isArray": false,
+                    "type": "AWSDate",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -196,5 +224,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "2a8702753106fd41bd4bedd41b3d3a9f"
+    "version": "691fc7a2179f66962716d097b1612f59"
 };
