@@ -8,10 +8,10 @@ function StudentForm({ onStudentAdded }) {
   const [parent1Email, setParent1Email] = useState("");
   const [parent2Email, setParent2Email] = useState("");
   const [dropOffAddress, setDropOffAddress] = useState("");
-  const [lat, setLat] = useState(null);
-  const [lng, setLng] = useState(null);
-  const [birthDate, setBirthDate] = useState(null);
-  const [photo, setPhoto] = useState(null);
+  const [lat, setLat] = useState("");
+  const [lng, setLng] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [photo, setPhoto] = useState("");
   const [error, setError] = useState(null);
   const handleSubmit = async (e) => {
     e.preventDefault();

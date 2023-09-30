@@ -76,92 +76,75 @@ function Students() {
     setMode("delete");
   };
   const handleDeleteStudent = async () => {
+    if (!selectedStudent) {
+      return;
+    }
+
     try {
-      const response = await fetch(
-        `https://drop-off-app-dere.onrender.com/api/students/${selectedStudent._id}`,
-        {
-          method: "DELETE",
-        }
+      // Use DataStore.delete to delete the Kid
+      await DataStore.delete(Kid, selectedStudent.id);
+
+      // Filter out the deleted Kid from the students state
+      const updatedStudents = students.filter(
+        (student) => student.id !== selectedStudent.id
       );
 
-      if (response.ok) {
-        const updatedStudents = students.filter(
-          (student) => student._id !== selectedStudent._id
-        );
-        setStudents(updatedStudents);
-        setSelectedStudent(null);
-        setMode("list");
-      } else {
-        console.error("Failed to delete student.");
-      }
+      setStudents(updatedStudents);
+      setSelectedStudent(null);
+      setMode("list");
     } catch (error) {
       console.error("Error deleting student:", error);
     }
   };
 
   const handleUpdateStudent = async () => {
-    // try {
-    //   const response = await fetch(
-    //     `https://drop-off-app-dere.onrender.com/api/students/${selectedStudent._id}`,
-    //     {
-    //       method: "PATCH",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: JSON.stringify({
-    //         name: updatedName,
-    //         address: updatedAddress,
-    //         age: updatedAge,
-    //         parentNumber: updatedParentNumber,
-    //         parentEmail: updatedParentEmail,
-    //         photo: updatedPhoto,
-    //       }),
-    //     }
-    //   );
-    //   if (response.ok) {
-    //     const updatedStudents = students.map((student) =>
-    //       student._id === selectedStudent._id
-    //         ? {
-    //             ...student,
-    //             name: updatedName,
-    //             address: updatedAddress,
-    //             age: updatedAge,
-    //             parentNumber: updatedParentNumber,
-    //             parentEmail: updatedParentEmail,
-    //             photo: updatedPhoto,
-    //           }
-    //         : student
-    //     );
-    //     setStudents(updatedStudents);
-    //     setSelectedStudent(null);
-    //     setMode("list");
-    //     setUpdatedName("");
-    //     setUpdatedAddress("");
-    //     setUpdatedAge("");
-    //     setUpdatedParentNumber("");
-    //     setUpdatedParentEmail("");
-    //     setUpdatedPhoto("");
-    //   } else {
-    //     console.error("Failed to update student.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error updating student:", error);
-    // }
+    if (!selectedStudent) {
+      return;
+    }
+    try {
+      console.log("Updating student...");
+      // Use DataStore.save to update the Kid
+      const updatedKid = await DataStore.save(
+        Kid.copyOf(selectedStudent, (updated) => {
+          updated.name = updatedName;
+          updated.address = updatedAddress;
+          updated.age = updatedAge;
+          updated.parent1Email = updatedParent1Email;
+          updated.parent2Email = updatedParent2Email;
+          updated.photo = updatedPhoto;
+        })
+      );
+      // Update the students state with the updatedKid
+      const updatedStudents = students.map((student) =>
+        student.id === updatedKid.id ? updatedKid : student
+      );
+      setStudents(updatedStudents);
+      setSelectedStudent(null);
+      setMode("list");
+      setUpdatedName("");
+      setUpdatedAddress("");
+      setUpdatedAge("");
+      setUpdatedParent1Email("");
+      setUpdatedParent2Email("");
+      setUpdatedPhoto("");
+      console.log("Student updated successfully!");
+    } catch (error) {
+      console.error("Error updating student:", error);
+    }
   };
 
   const handleStudentAdded = async () => {
     try {
-      const response = await fetch(
-        "https://drop-off-app-dere.onrender.com/api/students"
-      );
-      const json = await response.json();
-
-      if (response.ok) {
-        setStudents(json.students);
-      }
+      // Use DataStore.query to fetch students
+      const studentsData = await DataStore.query(Kid);
+      setStudents(studentsData);
     } catch (error) {
       console.error("Error fetching students:", error);
     }
+  };
+  const handleBackToList = (e) => {
+    e.preventDefault();
+    setMode("list");
   };
   return (
     <div className="home-main">
@@ -187,10 +170,7 @@ function Students() {
                 </div>
                 <div className="student">
                   {displayedStudents.map((student) => (
-                    <div
-                      className="student-details-container"
-                      key={student._id}
-                    >
+                    <div className="student-details-container" key={student.id}>
                       <img src={student.photo} className="student-photo" />
                       <div className="student-details">
                         <div className="student-name">{student.name}</div>
@@ -268,19 +248,19 @@ function Students() {
                     <label>Parent 1 Email:</label>
                     <input
                       type="text"
-                      value={updatedParent1Email}
+                      value={updatedParent1Email || ""}
                       onChange={(e) => setUpdatedParent1Email(e.target.value)}
                     />
                     <label>Parent 2 Email:</label>
                     <input
                       type="text"
-                      value={updatedParent2Email}
+                      value={updatedParent2Email || ""}
                       onChange={(e) => setUpdatedParent2Email(e.target.value)}
                     />
                     <button type="submit" className="btn">
                       Update Student
                     </button>
-                    <button onClick={() => setMode("list")} className="btn">
+                    <button onClick={handleBackToList} className="btn">
                       Back to List
                     </button>
                   </form>
