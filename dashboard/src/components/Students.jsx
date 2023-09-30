@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { DataStore } from "@aws-amplify/datastore";
+import { Kid } from "../models";
 import "./Students.css";
 import StudentForm from "../components/StudentForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,7 +10,6 @@ import {
   faArrowRight,
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
-import avatar from "../docs/avatar-image.png";
 function Students() {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -19,23 +20,21 @@ function Students() {
   const [updatedName, setUpdatedName] = useState("");
   const [updatedAddress, setUpdatedAddress] = useState("");
   const [updatedAge, setUpdatedAge] = useState("");
-  const [updatedParentNumber, setUpdatedParentNumber] = useState("");
-  const [updatedParentEmail, setUpdatedParentEmail] = useState("");
+  const [updatedParent2Email, setUpdatedParent2Email] = useState("");
+  const [updatedParent1Email, setUpdatedParent1Email] = useState("");
   const [updatedPhoto, setUpdatedPhoto] = useState("");
   const studentsPerPage = 4;
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      const response = await fetch(
-        "https://drop-off-app-dere.onrender.com/api/students"
-      );
-      const json = await response.json();
-
-      if (response.ok) {
-        setStudents(json.students);
+    const fetchKids = async () => {
+      try {
+        const kidsData = await DataStore.query(Kid);
+        setStudents(kidsData);
+      } catch (error) {
+        console.error("Error fetching kids", error);
       }
     };
-    fetchStudents();
+    fetchKids();
   }, []);
 
   const handleNextPage = () => {
@@ -54,7 +53,9 @@ function Students() {
       (nameFilter === "" ||
         student.name.toLowerCase().includes(nameFilter.toLowerCase())) &&
       (addressFilter === "" ||
-        student.address.toLowerCase().includes(addressFilter.toLowerCase()))
+        student.dropOffAddress
+          .toLowerCase()
+          .includes(addressFilter.toLowerCase()))
     );
   });
 
@@ -63,10 +64,10 @@ function Students() {
   const handleStudentClick = (student) => {
     setSelectedStudent(student);
     setUpdatedName(student.name);
-    setUpdatedAddress(student.address);
-    setUpdatedAge(student.age);
-    setUpdatedParentNumber(student.parentPhone);
-    setUpdatedParentEmail(student.parentEmail);
+    setUpdatedAddress(student.dropOffAddress);
+    setUpdatedAge(student.birthDate);
+    setUpdatedParent1Email(student.parent1Email);
+    setUpdatedParent2Email(student.parent2Email);
     setUpdatedPhoto(student.photo);
     setMode("details");
   };
@@ -99,55 +100,53 @@ function Students() {
   };
 
   const handleUpdateStudent = async () => {
-    try {
-      const response = await fetch(
-        `https://drop-off-app-dere.onrender.com/api/students/${selectedStudent._id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: updatedName,
-            address: updatedAddress,
-            age: updatedAge,
-            parentNumber: updatedParentNumber,
-            parentEmail: updatedParentEmail,
-            photo: updatedPhoto,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        const updatedStudents = students.map((student) =>
-          student._id === selectedStudent._id
-            ? {
-                ...student,
-                name: updatedName,
-                address: updatedAddress,
-                age: updatedAge,
-                parentNumber: updatedParentNumber,
-                parentEmail: updatedParentEmail,
-                photo: updatedPhoto,
-              }
-            : student
-        );
-        setStudents(updatedStudents);
-
-        setSelectedStudent(null);
-        setMode("list");
-        setUpdatedName("");
-        setUpdatedAddress("");
-        setUpdatedAge("");
-        setUpdatedParentNumber("");
-        setUpdatedParentEmail("");
-        setUpdatedPhoto("");
-      } else {
-        console.error("Failed to update student.");
-      }
-    } catch (error) {
-      console.error("Error updating student:", error);
-    }
+    // try {
+    //   const response = await fetch(
+    //     `https://drop-off-app-dere.onrender.com/api/students/${selectedStudent._id}`,
+    //     {
+    //       method: "PATCH",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify({
+    //         name: updatedName,
+    //         address: updatedAddress,
+    //         age: updatedAge,
+    //         parentNumber: updatedParentNumber,
+    //         parentEmail: updatedParentEmail,
+    //         photo: updatedPhoto,
+    //       }),
+    //     }
+    //   );
+    //   if (response.ok) {
+    //     const updatedStudents = students.map((student) =>
+    //       student._id === selectedStudent._id
+    //         ? {
+    //             ...student,
+    //             name: updatedName,
+    //             address: updatedAddress,
+    //             age: updatedAge,
+    //             parentNumber: updatedParentNumber,
+    //             parentEmail: updatedParentEmail,
+    //             photo: updatedPhoto,
+    //           }
+    //         : student
+    //     );
+    //     setStudents(updatedStudents);
+    //     setSelectedStudent(null);
+    //     setMode("list");
+    //     setUpdatedName("");
+    //     setUpdatedAddress("");
+    //     setUpdatedAge("");
+    //     setUpdatedParentNumber("");
+    //     setUpdatedParentEmail("");
+    //     setUpdatedPhoto("");
+    //   } else {
+    //     console.error("Failed to update student.");
+    //   }
+    // } catch (error) {
+    //   console.error("Error updating student:", error);
+    // }
   };
 
   const handleStudentAdded = async () => {
@@ -192,14 +191,12 @@ function Students() {
                       className="student-details-container"
                       key={student._id}
                     >
-                      <img
-                        src={student.photo}
-                        alt={avatar}
-                        className="student-photo"
-                      />
+                      <img src={student.photo} className="student-photo" />
                       <div className="student-details">
                         <div className="student-name">{student.name}</div>
-                        <div className="student-address">{student.address}</div>
+                        <div className="student-address">
+                          {student.dropOffAddress}
+                        </div>
                       </div>
                       <div className="student-details-btn">
                         <button
@@ -268,17 +265,17 @@ function Students() {
                       value={updatedAge}
                       onChange={(e) => setUpdatedAge(e.target.value)}
                     />
-                    <label>Parent Number:</label>
+                    <label>Parent 1 Email:</label>
                     <input
                       type="text"
-                      value={updatedParentNumber}
-                      onChange={(e) => setUpdatedParentNumber(e.target.value)}
+                      value={updatedParent1Email}
+                      onChange={(e) => setUpdatedParent1Email(e.target.value)}
                     />
-                    <label>Parent Email:</label>
+                    <label>Parent 2 Email:</label>
                     <input
                       type="text"
-                      value={updatedParentEmail}
-                      onChange={(e) => setUpdatedParentEmail(e.target.value)}
+                      value={updatedParent2Email}
+                      onChange={(e) => setUpdatedParent2Email(e.target.value)}
                     />
                     <button type="submit" className="btn">
                       Update Student
