@@ -1,0 +1,53 @@
+type Van @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  image: String
+  plate: String
+  model: String
+  year: String
+  seats: String
+  bosterSeats: String
+}
+
+type Route @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  van: String
+  date: String
+  departTime: String
+  lat: Float
+  lng: Float
+  driver: String
+  helper: String
+  route: String
+}
+
+type Kid @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  parent1Email: String
+  parent2Email: String
+  dropOffAddress: String
+  lat: Float
+  lng: Float
+  birthDate: AWSDate
+  photo: String
+}
+
+enum UserTypes {
+  PARENT
+  STAFF
+  DRIVER
+}
+
+type User @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  sub: String!
+  name: String!
+  userType: UserTypes
+  unitNumber: String
+  address: String!
+  lng: Float!
+  lat: Float!
+  phoneNumber: String
+}
+ 

@@ -1,4 +1,5 @@
 import "./App.css";
+import { Amplify } from "aws-amplify";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
@@ -6,6 +7,8 @@ import Students from "./components/Students";
 import Vans from "./components/Vans";
 import Employees from "./components/Employees";
 import VanDetailPage from "./pages/VanDetailPage";
+import awsExports from "./aws-exports";
+Amplify.configure(awsExports);
 function App() {
   return (
     <div className="App">
