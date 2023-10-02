@@ -6,7 +6,14 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SelectField,
+  TextAreaField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
 import { Route } from "../models";
 import { fetchByPath, validateField } from "./utils";
@@ -24,7 +31,6 @@ export default function RouteUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    van: "",
     date: "",
     departTime: "",
     lat: "",
@@ -32,8 +38,8 @@ export default function RouteUpdateForm(props) {
     driver: "",
     helper: "",
     route: "",
+    status: "",
   };
-  const [van, setVan] = React.useState(initialValues.van);
   const [date, setDate] = React.useState(initialValues.date);
   const [departTime, setDepartTime] = React.useState(initialValues.departTime);
   const [lat, setLat] = React.useState(initialValues.lat);
@@ -41,19 +47,24 @@ export default function RouteUpdateForm(props) {
   const [driver, setDriver] = React.useState(initialValues.driver);
   const [helper, setHelper] = React.useState(initialValues.helper);
   const [route, setRoute] = React.useState(initialValues.route);
+  const [status, setStatus] = React.useState(initialValues.status);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = routeRecord
       ? { ...initialValues, ...routeRecord }
       : initialValues;
-    setVan(cleanValues.van);
     setDate(cleanValues.date);
     setDepartTime(cleanValues.departTime);
     setLat(cleanValues.lat);
     setLng(cleanValues.lng);
     setDriver(cleanValues.driver);
     setHelper(cleanValues.helper);
-    setRoute(cleanValues.route);
+    setRoute(
+      typeof cleanValues.route === "string" || cleanValues.route === null
+        ? cleanValues.route
+        : JSON.stringify(cleanValues.route)
+    );
+    setStatus(cleanValues.status);
     setErrors({});
   };
   const [routeRecord, setRouteRecord] = React.useState(routeModelProp);
@@ -68,14 +79,14 @@ export default function RouteUpdateForm(props) {
   }, [idProp, routeModelProp]);
   React.useEffect(resetStateValues, [routeRecord]);
   const validations = {
-    van: [],
     date: [],
     departTime: [],
     lat: [],
     lng: [],
     driver: [],
     helper: [],
-    route: [],
+    route: [{ type: "JSON" }],
+    status: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -103,7 +114,6 @@ export default function RouteUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          van,
           date,
           departTime,
           lat,
@@ -111,6 +121,7 @@ export default function RouteUpdateForm(props) {
           driver,
           helper,
           route,
+          status,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -158,37 +169,6 @@ export default function RouteUpdateForm(props) {
       {...rest}
     >
       <TextField
-        label="Van"
-        isRequired={false}
-        isReadOnly={false}
-        value={van}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              van: value,
-              date,
-              departTime,
-              lat,
-              lng,
-              driver,
-              helper,
-              route,
-            };
-            const result = onChange(modelFields);
-            value = result?.van ?? value;
-          }
-          if (errors.van?.hasError) {
-            runValidationTasks("van", value);
-          }
-          setVan(value);
-        }}
-        onBlur={() => runValidationTasks("van", van)}
-        errorMessage={errors.van?.errorMessage}
-        hasError={errors.van?.hasError}
-        {...getOverrideProps(overrides, "van")}
-      ></TextField>
-      <TextField
         label="Date"
         isRequired={false}
         isReadOnly={false}
@@ -197,7 +177,6 @@ export default function RouteUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              van,
               date: value,
               departTime,
               lat,
@@ -205,6 +184,7 @@ export default function RouteUpdateForm(props) {
               driver,
               helper,
               route,
+              status,
             };
             const result = onChange(modelFields);
             value = result?.date ?? value;
@@ -228,7 +208,6 @@ export default function RouteUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              van,
               date,
               departTime: value,
               lat,
@@ -236,6 +215,7 @@ export default function RouteUpdateForm(props) {
               driver,
               helper,
               route,
+              status,
             };
             const result = onChange(modelFields);
             value = result?.departTime ?? value;
@@ -263,7 +243,6 @@ export default function RouteUpdateForm(props) {
             : parseFloat(e.target.value);
           if (onChange) {
             const modelFields = {
-              van,
               date,
               departTime,
               lat: value,
@@ -271,6 +250,7 @@ export default function RouteUpdateForm(props) {
               driver,
               helper,
               route,
+              status,
             };
             const result = onChange(modelFields);
             value = result?.lat ?? value;
@@ -298,7 +278,6 @@ export default function RouteUpdateForm(props) {
             : parseFloat(e.target.value);
           if (onChange) {
             const modelFields = {
-              van,
               date,
               departTime,
               lat,
@@ -306,6 +285,7 @@ export default function RouteUpdateForm(props) {
               driver,
               helper,
               route,
+              status,
             };
             const result = onChange(modelFields);
             value = result?.lng ?? value;
@@ -329,7 +309,6 @@ export default function RouteUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              van,
               date,
               departTime,
               lat,
@@ -337,6 +316,7 @@ export default function RouteUpdateForm(props) {
               driver: value,
               helper,
               route,
+              status,
             };
             const result = onChange(modelFields);
             value = result?.driver ?? value;
@@ -360,7 +340,6 @@ export default function RouteUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              van,
               date,
               departTime,
               lat,
@@ -368,6 +347,7 @@ export default function RouteUpdateForm(props) {
               driver,
               helper: value,
               route,
+              status,
             };
             const result = onChange(modelFields);
             value = result?.helper ?? value;
@@ -382,7 +362,7 @@ export default function RouteUpdateForm(props) {
         hasError={errors.helper?.hasError}
         {...getOverrideProps(overrides, "helper")}
       ></TextField>
-      <TextField
+      <TextAreaField
         label="Route"
         isRequired={false}
         isReadOnly={false}
@@ -391,7 +371,6 @@ export default function RouteUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              van,
               date,
               departTime,
               lat,
@@ -399,6 +378,7 @@ export default function RouteUpdateForm(props) {
               driver,
               helper,
               route: value,
+              status,
             };
             const result = onChange(modelFields);
             value = result?.route ?? value;
@@ -412,7 +392,54 @@ export default function RouteUpdateForm(props) {
         errorMessage={errors.route?.errorMessage}
         hasError={errors.route?.hasError}
         {...getOverrideProps(overrides, "route")}
-      ></TextField>
+      ></TextAreaField>
+      <SelectField
+        label="Status"
+        placeholder="Please select an option"
+        isDisabled={false}
+        value={status}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              date,
+              departTime,
+              lat,
+              lng,
+              driver,
+              helper,
+              route,
+              status: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.status ?? value;
+          }
+          if (errors.status?.hasError) {
+            runValidationTasks("status", value);
+          }
+          setStatus(value);
+        }}
+        onBlur={() => runValidationTasks("status", status)}
+        errorMessage={errors.status?.errorMessage}
+        hasError={errors.status?.hasError}
+        {...getOverrideProps(overrides, "status")}
+      >
+        <option
+          children="In progress"
+          value="IN_PROGRESS"
+          {...getOverrideProps(overrides, "statusoption0")}
+        ></option>
+        <option
+          children="Finished"
+          value="FINISHED"
+          {...getOverrideProps(overrides, "statusoption1")}
+        ></option>
+        <option
+          children="Waiting to start"
+          value="WAITING_TO_START"
+          {...getOverrideProps(overrides, "statusoption2")}
+        ></option>
+      </SelectField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

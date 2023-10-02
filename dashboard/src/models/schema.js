@@ -1,5 +1,64 @@
 export const schema = {
     "models": {
+        "Weekday": {
+            "name": "Weekday",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "name": {
+                    "name": "name",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                }
+            },
+            "syncable": true,
+            "pluralName": "Weekdays",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
         "Van": {
             "name": "Van",
             "fields": {
@@ -59,6 +118,22 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "Kids": {
+                    "name": "Kids",
+                    "isArray": true,
+                    "type": {
+                        "model": "Kid"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "vans"
+                        ]
+                    }
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -111,13 +186,6 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "van": {
-                    "name": "van",
-                    "isArray": false,
-                    "type": "String",
-                    "isRequired": false,
-                    "attributes": []
-                },
                 "date": {
                     "name": "date",
                     "isArray": false,
@@ -163,7 +231,34 @@ export const schema = {
                 "route": {
                     "name": "route",
                     "isArray": false,
-                    "type": "String",
+                    "type": "AWSJSON",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "Van": {
+                    "name": "Van",
+                    "isArray": false,
+                    "type": {
+                        "model": "Van"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "HAS_ONE",
+                        "associatedWith": [
+                            "id"
+                        ],
+                        "targetNames": [
+                            "routeVanId"
+                        ]
+                    }
+                },
+                "status": {
+                    "name": "status",
+                    "isArray": false,
+                    "type": {
+                        "enum": "RouteStatus"
+                    },
                     "isRequired": false,
                     "attributes": []
                 },
@@ -182,6 +277,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
+                },
+                "routeVanId": {
+                    "name": "routeVanId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
                 }
             },
             "syncable": true,
@@ -275,6 +377,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "vans": {
+                    "name": "vans",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -298,6 +407,15 @@ export const schema = {
                 {
                     "type": "model",
                     "properties": {}
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "byVan",
+                        "fields": [
+                            "vans"
+                        ]
+                    }
                 },
                 {
                     "type": "auth",
@@ -429,6 +547,14 @@ export const schema = {
         }
     },
     "enums": {
+        "RouteStatus": {
+            "name": "RouteStatus",
+            "values": [
+                "IN_PROGRESS",
+                "FINISHED",
+                "WAITING_TO_START"
+            ]
+        },
         "UserTypes": {
             "name": "UserTypes",
             "values": [
@@ -440,5 +566,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "fa5e79b8dde72d2bc27217833eebd240"
+    "version": "bc95661781552135d5adc19a918fe037"
 };

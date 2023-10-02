@@ -1,6 +1,12 @@
 import { ModelInit, MutableModel, __modelMeta__, ManagedIdentifier } from "@aws-amplify/datastore";
 // @ts-ignore
-import { LazyLoading, LazyLoadingDisabled } from "@aws-amplify/datastore";
+import { LazyLoading, LazyLoadingDisabled, AsyncCollection, AsyncItem } from "@aws-amplify/datastore";
+
+export enum RouteStatus {
+  IN_PROGRESS = "IN_PROGRESS",
+  FINISHED = "FINISHED",
+  WAITING_TO_START = "WAITING_TO_START"
+}
 
 export enum UserTypes {
   PARENT = "PARENT",
@@ -9,6 +15,34 @@ export enum UserTypes {
 }
 
 
+
+type EagerWeekday = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Weekday, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly name?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyWeekday = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Weekday, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly name?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type Weekday = LazyLoading extends LazyLoadingDisabled ? EagerWeekday : LazyWeekday
+
+export declare const Weekday: (new (init: ModelInit<Weekday>) => Weekday) & {
+  copyOf(source: Weekday, mutator: (draft: MutableModel<Weekday>) => MutableModel<Weekday> | void): Weekday;
+}
 
 type EagerVan = {
   readonly [__modelMeta__]: {
@@ -23,6 +57,7 @@ type EagerVan = {
   readonly year?: string | null;
   readonly seats?: string | null;
   readonly bosterSeats?: string | null;
+  readonly Kids?: (Kid | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -40,6 +75,7 @@ type LazyVan = {
   readonly year?: string | null;
   readonly seats?: string | null;
   readonly bosterSeats?: string | null;
+  readonly Kids: AsyncCollection<Kid>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -56,7 +92,6 @@ type EagerRoute = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly van?: string | null;
   readonly date?: string | null;
   readonly departTime?: string | null;
   readonly lat?: number | null;
@@ -64,8 +99,11 @@ type EagerRoute = {
   readonly driver?: string | null;
   readonly helper?: string | null;
   readonly route?: string | null;
+  readonly Van?: Van | null;
+  readonly status?: RouteStatus | keyof typeof RouteStatus | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
+  readonly routeVanId?: string | null;
 }
 
 type LazyRoute = {
@@ -74,7 +112,6 @@ type LazyRoute = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly van?: string | null;
   readonly date?: string | null;
   readonly departTime?: string | null;
   readonly lat?: number | null;
@@ -82,8 +119,11 @@ type LazyRoute = {
   readonly driver?: string | null;
   readonly helper?: string | null;
   readonly route?: string | null;
+  readonly Van: AsyncItem<Van | undefined>;
+  readonly status?: RouteStatus | keyof typeof RouteStatus | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
+  readonly routeVanId?: string | null;
 }
 
 export declare type Route = LazyLoading extends LazyLoadingDisabled ? EagerRoute : LazyRoute
@@ -106,6 +146,7 @@ type EagerKid = {
   readonly lng?: number | null;
   readonly birthDate?: string | null;
   readonly photo?: string | null;
+  readonly vans?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -124,6 +165,7 @@ type LazyKid = {
   readonly lng?: number | null;
   readonly birthDate?: string | null;
   readonly photo?: string | null;
+  readonly vans?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

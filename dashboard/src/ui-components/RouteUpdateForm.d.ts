@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SelectFieldProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
 import { Route } from "../models";
 export declare type ValidationResponse = {
@@ -14,7 +14,6 @@ export declare type ValidationResponse = {
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type RouteUpdateFormInputValues = {
-    van?: string;
     date?: string;
     departTime?: string;
     lat?: number;
@@ -22,9 +21,9 @@ export declare type RouteUpdateFormInputValues = {
     driver?: string;
     helper?: string;
     route?: string;
+    status?: string;
 };
 export declare type RouteUpdateFormValidationValues = {
-    van?: ValidationFunction<string>;
     date?: ValidationFunction<string>;
     departTime?: ValidationFunction<string>;
     lat?: ValidationFunction<number>;
@@ -32,18 +31,19 @@ export declare type RouteUpdateFormValidationValues = {
     driver?: ValidationFunction<string>;
     helper?: ValidationFunction<string>;
     route?: ValidationFunction<string>;
+    status?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type RouteUpdateFormOverridesProps = {
     RouteUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
-    van?: PrimitiveOverrideProps<TextFieldProps>;
     date?: PrimitiveOverrideProps<TextFieldProps>;
     departTime?: PrimitiveOverrideProps<TextFieldProps>;
     lat?: PrimitiveOverrideProps<TextFieldProps>;
     lng?: PrimitiveOverrideProps<TextFieldProps>;
     driver?: PrimitiveOverrideProps<TextFieldProps>;
     helper?: PrimitiveOverrideProps<TextFieldProps>;
-    route?: PrimitiveOverrideProps<TextFieldProps>;
+    route?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    status?: PrimitiveOverrideProps<SelectFieldProps>;
 } & EscapeHatchProps;
 export declare type RouteUpdateFormProps = React.PropsWithChildren<{
     overrides?: RouteUpdateFormOverridesProps | undefined | null;

@@ -4,6 +4,7 @@
  * Any changes to this file will be overwritten when running amplify pull. *
  **************************************************************************/
 
+export { default as AddKidVan } from "./AddKidVan";
 export { default as KidCreateForm } from "./KidCreateForm";
 export { default as KidUpdateForm } from "./KidUpdateForm";
 export { default as RouteCreateForm } from "./RouteCreateForm";
@@ -12,4 +13,6 @@ export { default as UserCreateForm } from "./UserCreateForm";
 export { default as UserUpdateForm } from "./UserUpdateForm";
 export { default as VanCreateForm } from "./VanCreateForm";
 export { default as VanUpdateForm } from "./VanUpdateForm";
+export { default as WeekdayCreateForm } from "./WeekdayCreateForm";
+export { default as WeekdayUpdateForm } from "./WeekdayUpdateForm";
 export { default as studioTheme } from "./studioTheme";

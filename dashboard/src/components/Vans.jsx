@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./Vans.css";
 import AddStudent from "../components/AddStudent";
 import AddEmployee from "../components/AddEmployee";
+import { DataStore } from "@aws-amplify/datastore";
+import { Van } from "../models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserXmark,
@@ -91,23 +93,12 @@ function Vans() {
 
   const createNewVan = async () => {
     try {
-      const response = await fetch(
-        "https://drop-off-app-dere.onrender.com/api/vans",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newVanData),
-        }
+      await DataStore.save(
+        new Van(newVanData) // Create a new Van object with the provided data
       );
 
-      if (response.ok) {
-        // Refresh the page after creating a new van
-        window.location.reload();
-      } else {
-        console.error("Failed to create a new van");
-      }
+      // Refresh the page after creating a new van
+      // window.location.reload();
     } catch (error) {
       console.error("Error creating a new van:", error);
     }
