@@ -10,6 +10,88 @@ export enum UserTypes {
 
 
 
+type EagerVan = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Van, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly name?: string | null;
+  readonly image?: string | null;
+  readonly plate?: string | null;
+  readonly model?: string | null;
+  readonly year?: string | null;
+  readonly seats?: string | null;
+  readonly bosterSeats?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyVan = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Van, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly name?: string | null;
+  readonly image?: string | null;
+  readonly plate?: string | null;
+  readonly model?: string | null;
+  readonly year?: string | null;
+  readonly seats?: string | null;
+  readonly bosterSeats?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type Van = LazyLoading extends LazyLoadingDisabled ? EagerVan : LazyVan
+
+export declare const Van: (new (init: ModelInit<Van>) => Van) & {
+  copyOf(source: Van, mutator: (draft: MutableModel<Van>) => MutableModel<Van> | void): Van;
+}
+
+type EagerRoute = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Route, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly van?: string | null;
+  readonly date?: string | null;
+  readonly departTime?: string | null;
+  readonly lat?: number | null;
+  readonly lng?: number | null;
+  readonly driver?: string | null;
+  readonly helper?: string | null;
+  readonly route?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyRoute = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Route, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly van?: string | null;
+  readonly date?: string | null;
+  readonly departTime?: string | null;
+  readonly lat?: number | null;
+  readonly lng?: number | null;
+  readonly driver?: string | null;
+  readonly helper?: string | null;
+  readonly route?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type Route = LazyLoading extends LazyLoadingDisabled ? EagerRoute : LazyRoute
+
+export declare const Route: (new (init: ModelInit<Route>) => Route) & {
+  copyOf(source: Route, mutator: (draft: MutableModel<Route>) => MutableModel<Route> | void): Route;
+}
+
 type EagerKid = {
   readonly [__modelMeta__]: {
     identifier: ManagedIdentifier<Kid, 'id'>;
