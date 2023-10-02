@@ -1,3 +1,9 @@
+enum RouteStatus {
+  IN_PROGRESS
+  FINISHED
+  WAITING_TO_START
+}
+
 type Weekday @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String
@@ -17,7 +23,6 @@ type Van @model @auth(rules: [{allow: public}]) {
 
 type Route @model @auth(rules: [{allow: public}]) {
   id: ID!
-  van: String
   date: String
   departTime: String
   lat: Float
@@ -25,6 +30,8 @@ type Route @model @auth(rules: [{allow: public}]) {
   driver: String
   helper: String
   route: AWSJSON
+  Van: Van @hasOne
+  status: RouteStatus
 }
 
 type Kid @model @auth(rules: [{allow: public}]) {

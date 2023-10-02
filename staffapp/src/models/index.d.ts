@@ -1,6 +1,12 @@
 import { ModelInit, MutableModel, __modelMeta__, ManagedIdentifier } from "@aws-amplify/datastore";
 // @ts-ignore
-import { LazyLoading, LazyLoadingDisabled, AsyncCollection } from "@aws-amplify/datastore";
+import { LazyLoading, LazyLoadingDisabled, AsyncCollection, AsyncItem } from "@aws-amplify/datastore";
+
+export enum RouteStatus {
+  IN_PROGRESS = "IN_PROGRESS",
+  FINISHED = "FINISHED",
+  WAITING_TO_START = "WAITING_TO_START"
+}
 
 export enum UserTypes {
   PARENT = "PARENT",
@@ -86,7 +92,6 @@ type EagerRoute = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly van?: string | null;
   readonly date?: string | null;
   readonly departTime?: string | null;
   readonly lat?: number | null;
@@ -94,8 +99,11 @@ type EagerRoute = {
   readonly driver?: string | null;
   readonly helper?: string | null;
   readonly route?: string | null;
+  readonly Van?: Van | null;
+  readonly status?: RouteStatus | keyof typeof RouteStatus | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
+  readonly routeVanId?: string | null;
 }
 
 type LazyRoute = {
@@ -104,7 +112,6 @@ type LazyRoute = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly van?: string | null;
   readonly date?: string | null;
   readonly departTime?: string | null;
   readonly lat?: number | null;
@@ -112,8 +119,11 @@ type LazyRoute = {
   readonly driver?: string | null;
   readonly helper?: string | null;
   readonly route?: string | null;
+  readonly Van: AsyncItem<Van | undefined>;
+  readonly status?: RouteStatus | keyof typeof RouteStatus | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
+  readonly routeVanId?: string | null;
 }
 
 export declare type Route = LazyLoading extends LazyLoadingDisabled ? EagerRoute : LazyRoute

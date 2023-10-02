@@ -2,12 +2,14 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   mapContainer: {
+    //top:50,
     backgroundColor: "lightblue", 
     flex: 1,
+    position:'relative'
   },
   handleIndicator: {
     backgroundColor: "grey", 
-    width: 100
+    width: 100,
   },
   handleIndicatorContainer:{
     flexDirection: "row", 
@@ -22,19 +24,25 @@ export default StyleSheet.create({
   deliveryDetailsContainer: {
     paddingHorizontal: 20,
   },
-    infoOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    zIndex: 1,
-    elevation: 2, // Android elevation for shadow
+  infoOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      //zIndex: 2, // Higher zIndex to be on top of the map
+      padding: 10,
+      zIndex: 1,
+  },
+  infoBoard: {
+      backgroundColor: "rgba(255, 255, 255, 0.9)",
+      padding: 15,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: "#ddd",
   },
   infoText: {
-    fontSize: 16,
-    marginBottom: 8,
+      fontSize: 16,
+      marginBottom: 10,
   },
   restaurantName:{
     fontSize: 25, 

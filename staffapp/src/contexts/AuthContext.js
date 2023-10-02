@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { DataStore } from 'aws-amplify';
 import { Auth } from 'aws-amplify'; 
-import { User, Kid } from '../models';
+import { User } from '../models';
 
 const AuthContext = createContext({});
 
@@ -11,8 +11,6 @@ const AuthContextProvider = ({children}) => {
   const sub = authUser?.attributes?.sub;
   const [userEmail, setUserEmail] = useState(null); //authUser?.attributes?.email
   const [isEmailVerified, setIsEmailVerified] = useState(false); //authUser?.attributes?.email_verified
-  const [isParent,setIsParent] = useState(false)
-  const [kids, setKids] = useState([]);
   const [userPassword,setUserPassword ] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -53,33 +51,9 @@ const AuthContextProvider = ({children}) => {
     );
   },[sub]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (userEmail) {
-        //console.log(userEmail.toString())
-        const queryResult = await DataStore.query(Kid, (s) =>
-          s.or(s => [
-            s.parent1Email.eq(userEmail),
-            s.parent2Email.eq(userEmail)
-          ])
-        );
-        
-        // Assuming queryResult is an array, you can check if it contains any items
-        if (queryResult.length > 0) {
-          setIsParent(true);
-          setKids(queryResult)
-        }
-        
-        // You can also log the queryResult if needed
-        //console.log(queryResult);
-      }
-    };
-
-    fetchData();
-  }, [isEmailVerified, userEmail]);
 
   return (
-    <AuthContext.Provider value={{ authUser, dbUser, sub, setDbUser, userEmail, isParent, kids, userPassword, loading }}>
+    <AuthContext.Provider value={{ authUser, dbUser, sub, setDbUser, userEmail, userPassword, loading }}>
       {children}
     </AuthContext.Provider>
   );

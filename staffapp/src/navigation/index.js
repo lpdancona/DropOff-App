@@ -1,14 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useAuthContext } from "../contexts/AuthContext";
+import { ActivityIndicator } from "react-native";
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import LoginScreen from '../screens/LoginScreen';
-//import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-// import { DataStore } from 'aws-amplify';
-// import { Kid } from '../models';
-//import { Foundation, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
-import { useAuthContext } from "../contexts/AuthContext";
-//import { useEffect, useState } from "react";
-import { ActivityIndicator } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,7 +22,7 @@ const RootNavigator = () => {
         />
         ):(
         <Stack.Screen 
-          name="ParentLogin" 
+          name="StaffLogin" 
           component={ProfileScreen} 
         />
         )
