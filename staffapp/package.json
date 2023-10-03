@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@apollo/client": "^3.8.4",
     "@aws-amplify/ui-react-native": "^1.2.28",
     "@gorhom/bottom-sheet": "^4.4.7",
     "@react-native-async-storage/async-storage": "1.18.2",
@@ -35,8 +36,10 @@
     "expo-sqlite": "~11.3.3",
     "expo-status-bar": "~1.6.0",
     "expo-updates": "~0.18.14",
+    "graphql": "^16.8.1",
     "native-notify": "^3.0.9",
     "react": "18.2.0",
+    "react-apollo": "^3.1.5",
     "react-native": "0.72.5",
     "react-native-dotenv": "^3.4.9",
     "react-native-gesture-handler": "~2.12.0",

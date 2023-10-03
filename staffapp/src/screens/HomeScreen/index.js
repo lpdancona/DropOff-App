@@ -24,12 +24,14 @@ import RouteInfoComponent from "../../components/RouteInfo";
 import { DataStore } from "aws-amplify";
 import { Route, Van, Kid, User } from '../../models';
 import { useAuthContext } from "../../contexts/AuthContext";
-
+import { API, graphqlOperation } from 'aws-amplify';
+import { updateRoute } from "../../graphql/mutations";
 
 // import * as Notifications from 'expo-notifications'
 // import * as Permissions from 'expo-permissions'
 // import * as Device from 'expo-device';
 import axios from 'axios';
+
 
 
 const sendNotification = async (notificationTitle,notificationBody) => {
@@ -84,18 +86,19 @@ const HomeScreen = () => {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-  const [dbRoute, setDbRoute] = useState([]);
+  const [dbRoute, setDbRoute] = useState(null);
   const [vans, setVans] = useState([]);
   const [kids, setKids] = useState([]);
   const [helper, setHelper] = useState([]);
   const [driver, setDriver] = useState([]);
   const [routeCoords, setRouteCoords] = useState([]);
+  const [updatePerformed, setUpdatePerformed] = useState(false);
 
   const fetchRoute = async () => {
     try {
       // Fetch Route data
       const routeDetails = await DataStore.query(Route, (r) => r.status.eq("WAITING_TO_START"));
-      setDbRoute(routeDetails);
+      setDbRoute(routeDetails[0]);
       // Fetch associated Van data using the route's van ID
       const vanData = await DataStore.query(Van, routeDetails[0].routeVanId);
       setVans(vanData);
@@ -132,11 +135,12 @@ const HomeScreen = () => {
         await fetchRoute();
       }
     }
-    //console.log(kids)
+    //console.log(dbRoute)
     fetchData();
-    if (dbRoute && dbRoute.length > 0) {
-      setRouteCoords(dbRoute[0].route.routeData);
-    }
+    //if (dbRoute && dbRoute.length >= 0) {
+      setRouteCoords(dbRoute?.route.routeData);
+    //}
+    //console.log('route coords', routeCoords)
   },[dbRoute,vans,driver,helper,routeCoords,kids]);
 
 
@@ -163,20 +167,27 @@ const HomeScreen = () => {
   };
 
   
-  useEffect(() => {
-    if (!driverLocation || !dbRoute ||! (dbRoute instanceof Route)) {
-      return;
+  useEffect(() => { // user effect to update the location 
+    if (!driverLocation){
+       return;
     }
-    
-    try {
-      DataStore.save(Route.copyOf(dbRoute, (updated) => {
-        updated.lat = driverLocation.latitude
-        updated.lng = driverLocation.longitude
-      }));
-    } catch(error) {
-      console.error('Error saving route:', error);
-    }
-  },[driverLocation, dbRoute])
+    API.updateRoute({
+      input: {
+        id: dbRoute.id,
+        lat: driverLocation.latitude,
+        lng: driverLocation.longitude
+      }
+     }).then(response => {
+      console.log('Route updated successfully', response);
+     })
+    // console.log('drive location lat', driverLocation);
+    // //console.log('dbRoute',dbRoute);
+    // DataStore.save(Route.copyOf(dbRoute, (updated) => {
+    //   updated.lat = driverLocation.latitude
+    //   updated.lng = driverLocation.longitude
+    // }));
+    // //console.log('Location saved successfully!');
+  },[driverLocation])
   
   useEffect (() => {
     (async () => {
@@ -191,12 +202,16 @@ const HomeScreen = () => {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude
       });
+      // setDbRoute({...dbRoute,
+      //   lat : location.coords.latitude,
+      //   lng : location.coords.longitude
+      // })
     })();
 
     const foregroundSubscription = Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.BestForNavigation,
-        distanceInterval: 5,
+        distanceInterval: 10,
       }, (updatedLocation) => {
         setDriverLocation({
           latitude: updatedLocation.coords.latitude,

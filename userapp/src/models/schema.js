@@ -186,13 +186,6 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "van": {
-                    "name": "van",
-                    "isArray": false,
-                    "type": "String",
-                    "isRequired": false,
-                    "attributes": []
-                },
                 "date": {
                     "name": "date",
                     "isArray": false,
@@ -242,6 +235,49 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "Van": {
+                    "name": "Van",
+                    "isArray": false,
+                    "type": {
+                        "model": "Van"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "HAS_ONE",
+                        "associatedWith": [
+                            "id"
+                        ],
+                        "targetNames": [
+                            "routeVanId"
+                        ]
+                    }
+                },
+                "status": {
+                    "name": "status",
+                    "isArray": false,
+                    "type": {
+                        "enum": "RouteStatus"
+                    },
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "Kids": {
+                    "name": "Kids",
+                    "isArray": true,
+                    "type": {
+                        "model": "Kid"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "routeID"
+                        ]
+                    }
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -257,6 +293,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
+                },
+                "routeVanId": {
+                    "name": "routeVanId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
                 }
             },
             "syncable": true,
@@ -357,6 +400,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "routeID": {
+                    "name": "routeID",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -387,6 +437,15 @@ export const schema = {
                         "name": "byVan",
                         "fields": [
                             "vans"
+                        ]
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "byRoute",
+                        "fields": [
+                            "routeID"
                         ]
                     }
                 },
@@ -432,12 +491,10 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "userType": {
-                    "name": "userType",
+                "email": {
+                    "name": "email",
                     "isArray": false,
-                    "type": {
-                        "enum": "UserTypes"
-                    },
+                    "type": "String",
                     "isRequired": false,
                     "attributes": []
                 },
@@ -473,6 +530,15 @@ export const schema = {
                     "name": "phoneNumber",
                     "isArray": false,
                     "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "userType": {
+                    "name": "userType",
+                    "isArray": false,
+                    "type": {
+                        "enum": "UserTypes"
+                    },
                     "isRequired": false,
                     "attributes": []
                 },
@@ -520,6 +586,14 @@ export const schema = {
         }
     },
     "enums": {
+        "RouteStatus": {
+            "name": "RouteStatus",
+            "values": [
+                "IN_PROGRESS",
+                "FINISHED",
+                "WAITING_TO_START"
+            ]
+        },
         "UserTypes": {
             "name": "UserTypes",
             "values": [
@@ -531,5 +605,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "11f54624da06afddd55cf84e66a63b01"
+    "version": "b64d97f6d319e612489805af3725bd57"
 };

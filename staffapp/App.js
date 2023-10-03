@@ -8,6 +8,7 @@ import AuthContextProvider from './src/contexts/AuthContext';
 import RootNavigator from './src/navigation';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import registerNNPushToken from 'native-notify';
+import { API, graphqlOperation } from 'aws-amplify';
 
 // Aws Amplify config 
 import { Amplify } from 'aws-amplify';

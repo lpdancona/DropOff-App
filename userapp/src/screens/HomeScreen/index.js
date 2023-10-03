@@ -22,6 +22,7 @@ import { FlatList } from "react-native-gesture-handler";
 import { DataStore } from 'aws-amplify';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { Auth } from "aws-amplify";
+import { Route } from "../../models";
 
 
 const van = vans[0];
@@ -45,6 +46,7 @@ const HomeScreen = ({route}) => {
 
   const {width, height} = useWindowDimensions();
   const [driverLocation, setDriverLocation] = useState(null);
+  const [vanLocation, setVanLocation] = useState(null)
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
   //const [deliveryStatus, setDeliveryStatus] = useState(ORDER_STATUSES.READY_FOR_PICKUP)
@@ -54,7 +56,30 @@ const HomeScreen = ({route}) => {
   const snapPoints = useMemo(() => ["12%", "95%"],[])
   const navigation = useNavigation();
   //const routeWaypoints = van.waypoints.slice(1);
+  const getVanLocation = async () =>  {
+    const vanLocationData = await DataStore.query(Route);
+    //console.log(vanLocationData);
+    setVanLocation(vanLocationData);
+  }
+  useEffect(() => {
+    getVanLocation();
+    //console.log(vanLocation.lat);    
+  },[vanLocation]);
 
+
+  useEffect(() => {
+    //console.log(vanLocation)
+    //console.log(vanLocation)
+    if (!vanLocation) {
+      return;
+    }
+    const subscription = DataStore.observe(Route).subscribe(msg => {
+    if (msg.opType ==='UPDATE') {r
+      setDriver(msg.element);
+    }
+    });
+    return () => subscription.unsubscribe();
+  },[vanLocation]);
 
 
   useEffect (() => {
@@ -75,7 +100,7 @@ const HomeScreen = ({route}) => {
     const foregroundSubscription = Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        distanceInterval: 100
+        distanceInterval: 5
       }, (updatedLocation) => {
         setDriverLocation({
           latitude: updatedLocation.coords.latitude,
@@ -95,8 +120,8 @@ const HomeScreen = ({route}) => {
       setDropOffAddress({latitude : kids[0]?.lat, longitude: kids[0]?.lng})
     }
   },[kids]);
-  //console.log(dropOffAddress)
-  if (!driverLocation || !dropOffAddress) {
+  //console.log(vanLocation);
+  if (!driverLocation || !dropOffAddress || !vanLocation) {
     return <ActivityIndicator style={{padding: 50}} size={'large'}/>
   }
   //console.log('driver location ',driverLocation);
@@ -152,11 +177,11 @@ const HomeScreen = ({route}) => {
         ref={mapRef}
         provider={MapView.PROVIDER_GOOGLE}
         style={{width, height}}
-        //showsUserLocation={true} 
+        showsUserLocation={true} 
         //followsUserLocation={true}
         initialRegion={{
-          latitude: driverLocation.latitude,
-          longitude: driverLocation.longitude,
+          latitude: vanLocation[0].lat,
+          longitude: vanLocation[0].lng,
           latitudeDelta: 0.007,
           longitudeDelta: 0.007
         }}
@@ -179,7 +204,7 @@ const HomeScreen = ({route}) => {
           }}
         /> */}
         <MapViewDirections
-          origin={driverLocation} // Start from the first waypoint
+          origin={[vanLocation[0].lat,vanLocation[0].lng]} // Start from the first waypoint
           destination={dropOffAddress} //{van.waypoints[van.waypoints.length - 1]} // End at the last waypoint
           //waypoints={van.waypoints} // Exclude the start and end waypoints
           strokeWidth={7}
@@ -210,8 +235,8 @@ const HomeScreen = ({route}) => {
         ))} */}
         <Marker
           coordinate={{
-            latitude: driverLocation.latitude, 
-            longitude: driverLocation.longitude
+            latitude: vanLocation[0].lat, 
+            longitude: vanLocation[0].lng
           }}
           title={"Gracie Barra Van"}
           description={van.name}
