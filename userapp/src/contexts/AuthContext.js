@@ -2,6 +2,8 @@ import { createContext, useState, useEffect, useContext } from "react";
 import { DataStore } from 'aws-amplify';
 import { Auth } from 'aws-amplify'; 
 import { User, Kid } from '../models';
+import { API, graphqlOperation } from 'aws-amplify';
+import { listUsers } from '../../queries'
 
 const AuthContext = createContext({});
 
@@ -41,19 +43,29 @@ const AuthContextProvider = ({children}) => {
   //     setUserPassword()
   //   }
   // },[authUser]);
+    // const gRoute = await API.graphql(graphqlOperation(listRoutes.items));
+    // setDbRoute(gRoute);
+  const listUserFromQl = async () =>{
+    const listUsers = await API.graphql(graphqlOperation(listUsers));
+    setDbUser(listUsers)
+    
+  }
 
   useEffect(() => {
     if (!sub){return}
-    
-    DataStore.query(User, (user) => user.sub.eq(sub)).then(
-      (users) => {
-        setDbUser(users[0]);
-        setLoading(false);
-      }
-    );
+    listUserFromQl();
+  
+    // DataStore.query(User, (user) => user.sub.eq(sub)).then(
+    //   (users) => {
+    //     setDbUser(users[0]);
+    //     setLoading(false);
+    //   }
+    // );
+    console.log('dbUser',dbUser);
   },[sub]);
 
   useEffect(() => {
+    
     const fetchData = async () => {
       if (userEmail) {
         //console.log(userEmail.toString())

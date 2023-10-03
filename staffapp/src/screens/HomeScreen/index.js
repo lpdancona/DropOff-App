@@ -61,7 +61,7 @@ const sendNotification = async (notificationTitle,notificationBody) => {
       console.error('Error sending notification:', error);
     }
 };
-
+console.log(GOOGLE_MAPS_APIKEY)
 const HomeScreen = () => {
 
   const { dbUser } = useAuthContext();
@@ -130,7 +130,7 @@ const HomeScreen = () => {
   // };
 
   const get = async () => {
-    const gRoute = await API.graphql(graphqlOperation(listRoutes.items));
+    const gRoute = await API.graphql(graphqlOperation(listRoutes));
     setDbRoute(gRoute);
     
   }
@@ -149,8 +149,8 @@ const HomeScreen = () => {
     // //}
     // //console.log('route coords', routeCoords)
     //console.log(dbRoute)
-    console.log('get route ', dbRoute);
-    console.log('get route ', dbRoute);
+    // console.log('get route ', dbRoute);
+    // console.log('get route ', dbRoute);
   },[]); //[dbRoute,vans,driver,helper,routeCoords,kids]);
 
 
