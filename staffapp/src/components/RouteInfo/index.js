@@ -3,11 +3,11 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from "react-nati
 import { Auth } from "aws-amplify";
 
 
-const RouteInfoComponent = ({ van }) => {
-  const waypoints = van.waypoints;
-  const splitIndex = 6; // Split after the 6th item
-  const firstColumn = waypoints.slice(0, splitIndex);
-  const secondColumn = waypoints.slice(splitIndex);
+const RouteInfoComponent = ({ vans, routeCoords, driver, helper }) => {
+  // const waypoints = routeCoords.waypoints;
+  // const splitIndex = 6; // Split after the 6th item
+  // const firstColumn = routeCoords.slice(0, splitIndex);
+  // const secondColumn = routeCoords.slice(splitIndex);
 
   const handleLogout = async () => {
     try {
@@ -25,18 +25,18 @@ const RouteInfoComponent = ({ van }) => {
          <View style={styles.row}>
             <View style={styles.driverInfo}>
               <Text style={styles.driverLabel}>Driver:</Text>
-              <Text style={styles.driverName}>{van.driver}</Text>
+              <Text style={styles.driverName}>{driver[0]?.name}</Text>
             </View>
 
             <View style={styles.helperInfo}>
               <Text style={styles.helperLabel}>Helper:</Text>
-              <Text style={styles.helperName}>{van.helper}</Text>
+              <Text style={styles.helperName}>{helper[0]?.name}</Text>
             </View>
         </View>
         <View style={styles.infoColumn}>
           <View style={styles.vehicleInfo}>
             <Text style={styles.vehicleLabel}>Vehicle:</Text>
-            <Text style={styles.vehicleName}>{van.name} - {van.model} </Text>
+            <Text style={styles.vehicleName}>{vans.name} - {vans.model} </Text>
           </View>
         </View>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -56,13 +56,13 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 10,
     padding: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    // shadowColor: "#000",
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2,
+    // },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 3.84,
     elevation: 5,
   },
     logoutButton: {

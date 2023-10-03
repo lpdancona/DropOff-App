@@ -184,6 +184,11 @@ export const getRoute = /* GraphQL */ `
         __typename
       }
       status
+      Kids {
+        nextToken
+        startedAt
+        __typename
+      }
       createdAt
       updatedAt
       _version
@@ -275,6 +280,7 @@ export const getKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
       _version
@@ -302,6 +308,7 @@ export const listKids = /* GraphQL */ `
         birthDate
         photo
         vans
+        routeID
         createdAt
         updatedAt
         _version
@@ -339,6 +346,7 @@ export const syncKids = /* GraphQL */ `
         birthDate
         photo
         vans
+        routeID
         createdAt
         updatedAt
         _version
@@ -378,6 +386,47 @@ export const kidsByVans = /* GraphQL */ `
         birthDate
         photo
         vans
+        routeID
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+        __typename
+      }
+      nextToken
+      startedAt
+      __typename
+    }
+  }
+`;
+export const kidsByRouteID = /* GraphQL */ `
+  query KidsByRouteID(
+    $routeID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelKidFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    kidsByRouteID(
+      routeID: $routeID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        vans
+        routeID
         createdAt
         updatedAt
         _version

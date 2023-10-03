@@ -101,6 +101,7 @@ type EagerRoute = {
   readonly route?: string | null;
   readonly Van?: Van | null;
   readonly status?: RouteStatus | keyof typeof RouteStatus | null;
+  readonly Kids?: (Kid | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly routeVanId?: string | null;
@@ -121,6 +122,7 @@ type LazyRoute = {
   readonly route?: string | null;
   readonly Van: AsyncItem<Van | undefined>;
   readonly status?: RouteStatus | keyof typeof RouteStatus | null;
+  readonly Kids: AsyncCollection<Kid>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly routeVanId?: string | null;
@@ -147,6 +149,7 @@ type EagerKid = {
   readonly birthDate?: string | null;
   readonly photo?: string | null;
   readonly vans?: string | null;
+  readonly routeID?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -166,6 +169,7 @@ type LazyKid = {
   readonly birthDate?: string | null;
   readonly photo?: string | null;
   readonly vans?: string | null;
+  readonly routeID?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -184,12 +188,13 @@ type EagerUser = {
   readonly id: string;
   readonly sub: string;
   readonly name: string;
-  readonly userType?: UserTypes | keyof typeof UserTypes | null;
+  readonly email?: string | null;
   readonly unitNumber?: string | null;
   readonly address: string;
   readonly lng: number;
   readonly lat: number;
   readonly phoneNumber?: string | null;
+  readonly userType?: UserTypes | keyof typeof UserTypes | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -202,12 +207,13 @@ type LazyUser = {
   readonly id: string;
   readonly sub: string;
   readonly name: string;
-  readonly userType?: UserTypes | keyof typeof UserTypes | null;
+  readonly email?: string | null;
   readonly unitNumber?: string | null;
   readonly address: string;
   readonly lng: number;
   readonly lat: number;
   readonly phoneNumber?: string | null;
+  readonly userType?: UserTypes | keyof typeof UserTypes | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

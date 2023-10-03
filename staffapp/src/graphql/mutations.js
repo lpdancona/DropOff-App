@@ -167,6 +167,11 @@ export const createRoute = /* GraphQL */ `
         __typename
       }
       status
+      Kids {
+        nextToken
+        startedAt
+        __typename
+      }
       createdAt
       updatedAt
       _version
@@ -208,6 +213,11 @@ export const updateRoute = /* GraphQL */ `
         __typename
       }
       status
+      Kids {
+        nextToken
+        startedAt
+        __typename
+      }
       createdAt
       updatedAt
       _version
@@ -249,6 +259,11 @@ export const deleteRoute = /* GraphQL */ `
         __typename
       }
       status
+      Kids {
+        nextToken
+        startedAt
+        __typename
+      }
       createdAt
       updatedAt
       _version
@@ -275,6 +290,7 @@ export const createKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
       _version
@@ -300,6 +316,7 @@ export const updateKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
       _version
@@ -325,6 +342,7 @@ export const deleteKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
       _version

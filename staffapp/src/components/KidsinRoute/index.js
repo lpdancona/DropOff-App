@@ -1,8 +1,8 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 
-const KidsinRoute = ({ van }) => {
-  const waypoints = van.waypoints;
+const KidsinRoute = ({ kids }) => {
+  //const waypoints = van.waypoints;
   const splitIndex = 6; // Split after the 6th item
   const firstColumn = waypoints.slice(0, splitIndex);
   const secondColumn = waypoints.slice(splitIndex);
