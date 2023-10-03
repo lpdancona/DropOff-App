@@ -21,11 +21,12 @@ import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import RouteInfoComponent from "../../components/RouteInfo";
-import { DataStore } from "aws-amplify";
+//import { DataStore } from "aws-amplify";
 import { Route, Van, Kid, User } from '../../models';
 import { useAuthContext } from "../../contexts/AuthContext";
 import { API, graphqlOperation } from 'aws-amplify';
 import { updateRoute } from "../../graphql/mutations";
+import { listRoutes } from "../../graphql/queries";
 
 // import * as Notifications from 'expo-notifications'
 // import * as Permissions from 'expo-permissions'
@@ -61,7 +62,6 @@ const sendNotification = async (notificationTitle,notificationBody) => {
     }
 };
 
-
 const HomeScreen = () => {
 
   const { dbUser } = useAuthContext();
@@ -92,56 +92,66 @@ const HomeScreen = () => {
   const [helper, setHelper] = useState([]);
   const [driver, setDriver] = useState([]);
   const [routeCoords, setRouteCoords] = useState([]);
-  const [updatePerformed, setUpdatePerformed] = useState(false);
 
-  const fetchRoute = async () => {
-    try {
-      // Fetch Route data
-      const routeDetails = await DataStore.query(Route, (r) => r.status.eq("WAITING_TO_START"));
-      setDbRoute(routeDetails[0]);
-      // Fetch associated Van data using the route's van ID
-      const vanData = await DataStore.query(Van, routeDetails[0].routeVanId);
-      setVans(vanData);
-      // Fetch associated Kid data using the route's ID
-      const kidData = await DataStore.query(Kid, (k) => k.routeID.eq(routeDetails[0].id));
-      setKids(kidData);
-      // fetch information of helper and driver user on the route
-      const helperData = await DataStore.query(
-        User, (h) => h.and(h => 
-        [
-          h.userType.eq('STAFF'),
-          h.id.eq(routeDetails[0].helper)
-        ]
-      ));
-      setHelper(helperData);
-      //
-      const driverData = await DataStore.query(
-        User, (d) => d.and(d => 
-        [
-          d.userType.eq('DRIVER'),
-          d.id.eq(routeDetails[0].driver)
-        ]
-      ));
-      setDriver(driverData);
+  // const fetchRoute = async () => {
+  //   try {
+      
+  //     // Fetch Route data
+  //     const routeDetails = await DataStore.query(Route, (r) => r.status.eq("WAITING_TO_START"));
+  //     setDbRoute(routeDetails[0]);
+  //     // Fetch associated Van data using the route's van ID
+  //     const vanData = await DataStore.query(Van, routeDetails[0].routeVanId);
+  //     setVans(vanData);
+  //     // Fetch associated Kid data using the route's ID
+  //     const kidData = await DataStore.query(Kid, (k) => k.routeID.eq(routeDetails[0].id));
+  //     setKids(kidData);
+  //     // fetch information of helper and driver user on the route
+  //     const helperData = await DataStore.query(
+  //       User, (h) => h.and(h => 
+  //       [
+  //         h.userType.eq('STAFF'),
+  //         h.id.eq(routeDetails[0].helper)
+  //       ]
+  //     ));
+  //     setHelper(helperData);
+  //     //
+  //     const driverData = await DataStore.query(
+  //       User, (d) => d.and(d => 
+  //       [
+  //         d.userType.eq('DRIVER'),
+  //         d.id.eq(routeDetails[0].driver)
+  //       ]
+  //     ));
+  //     setDriver(driverData);
 
-    } catch (error) {
-      console.error('Error fetching route data:', error);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('Error fetching route data:', error);
+  //   }
+  // };
+
+  const get = async () => {
+    const gRoute = await API.graphql(graphqlOperation(listRoutes.items));
+    setDbRoute(gRoute);
+    
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
-       if (!dbRoute || dbRoute.length === 0) {
-        await fetchRoute();
-      }
-    }
+    get();
+    // const fetchData = async () => {
+    //    if (!dbRoute || dbRoute.length === 0) {
+    //     await fetchRoute();
+    //   }
+    // }
+    // //console.log(dbRoute)
+    // fetchData();
+    // //if (dbRoute && dbRoute.length >= 0) {
+    //   setRouteCoords(dbRoute?.route.routeData);
+    // //}
+    // //console.log('route coords', routeCoords)
     //console.log(dbRoute)
-    fetchData();
-    //if (dbRoute && dbRoute.length >= 0) {
-      setRouteCoords(dbRoute?.route.routeData);
-    //}
-    //console.log('route coords', routeCoords)
-  },[dbRoute,vans,driver,helper,routeCoords,kids]);
+    console.log('get route ', dbRoute);
+    console.log('get route ', dbRoute);
+  },[]); //[dbRoute,vans,driver,helper,routeCoords,kids]);
 
 
   const renderItem = ({ item, index }) => {
@@ -166,20 +176,31 @@ const HomeScreen = () => {
     );
   };
 
-  
+ const updatedLocation = async () => {
+  console.log('driver location', driverLocation)
+  try {
+    const response = await API.graphql(
+      graphqlOperation(updateRoute, {
+        input: {
+          id: dbRoute.id,
+          lat: driverLocation.latitude,
+          lng: driverLocation.longitude,
+          departTime: 10
+        },
+      })
+    );
+
+    console.log('Route updated successfully', response);
+  } catch (error) {
+    console.error('Error updating route', error);
+  }
+};
+
   useEffect(() => { // user effect to update the location 
-    if (!driverLocation){
-       return;
-    }
-    API.updateRoute({
-      input: {
-        id: dbRoute.id,
-        lat: driverLocation.latitude,
-        lng: driverLocation.longitude
-      }
-     }).then(response => {
-      console.log('Route updated successfully', response);
-     })
+    if (!driverLocation || !dbRoute){
+        return;
+     }
+    //updatedLocation();
     // console.log('drive location lat', driverLocation);
     // //console.log('dbRoute',dbRoute);
     // DataStore.save(Route.copyOf(dbRoute, (updated) => {

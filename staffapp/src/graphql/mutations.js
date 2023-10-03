@@ -11,9 +11,6 @@ export const createWeekday = /* GraphQL */ `
       name
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -28,9 +25,6 @@ export const updateWeekday = /* GraphQL */ `
       name
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -45,9 +39,6 @@ export const deleteWeekday = /* GraphQL */ `
       name
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -68,14 +59,10 @@ export const createVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -96,14 +83,10 @@ export const updateVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -124,14 +107,10 @@ export const deleteVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -161,22 +140,15 @@ export const createRoute = /* GraphQL */ `
         bosterSeats
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
       status
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       routeVanId
       __typename
     }
@@ -207,22 +179,15 @@ export const updateRoute = /* GraphQL */ `
         bosterSeats
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
       status
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       routeVanId
       __typename
     }
@@ -253,22 +218,15 @@ export const deleteRoute = /* GraphQL */ `
         bosterSeats
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
       status
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       routeVanId
       __typename
     }
@@ -293,9 +251,6 @@ export const createKid = /* GraphQL */ `
       routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -319,9 +274,6 @@ export const updateKid = /* GraphQL */ `
       routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -345,9 +297,6 @@ export const deleteKid = /* GraphQL */ `
       routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -361,17 +310,15 @@ export const createUser = /* GraphQL */ `
       id
       sub
       name
-      userType
+      email
       unitNumber
       address
       lng
       lat
       phoneNumber
+      userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -385,17 +332,15 @@ export const updateUser = /* GraphQL */ `
       id
       sub
       name
-      userType
+      email
       unitNumber
       address
       lng
       lat
       phoneNumber
+      userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -409,17 +354,15 @@ export const deleteUser = /* GraphQL */ `
       id
       sub
       name
-      userType
+      email
       unitNumber
       address
       lng
       lat
       phoneNumber
+      userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }

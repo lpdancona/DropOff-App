@@ -16,34 +16,6 @@ export enum UserTypes {
 
 
 
-type EagerWeekday = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Weekday, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly name?: string | null;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-type LazyWeekday = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Weekday, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly name?: string | null;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-export declare type Weekday = LazyLoading extends LazyLoadingDisabled ? EagerWeekday : LazyWeekday
-
-export declare const Weekday: (new (init: ModelInit<Weekday>) => Weekday) & {
-  copyOf(source: Weekday, mutator: (draft: MutableModel<Weekday>) => MutableModel<Weekday> | void): Weekday;
-}
-
 type EagerVan = {
   readonly [__modelMeta__]: {
     identifier: ManagedIdentifier<Van, 'id'>;
