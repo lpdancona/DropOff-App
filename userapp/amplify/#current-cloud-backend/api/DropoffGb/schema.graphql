@@ -1,0 +1,70 @@
+enum RouteStatus {
+  IN_PROGRESS
+  FINISHED
+  WAITING_TO_START
+}
+
+type Weekday @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+}
+
+type Van @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  image: String
+  plate: String
+  model: String
+  year: String
+  seats: String
+  bosterSeats: String
+  Kids: [Kid] @hasMany(indexName: "byVan", fields: ["id"])
+}
+
+type Route @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  date: String
+  departTime: String
+  lat: Float
+  lng: Float
+  driver: String
+  helper: String
+  route: AWSJSON
+  Van: Van @hasOne
+  status: RouteStatus
+  Kids: [Kid] @hasMany(indexName: "byRoute", fields: ["id"])
+}
+
+type Kid @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  parent1Email: String
+  parent2Email: String
+  dropOffAddress: String
+  lat: Float
+  lng: Float
+  birthDate: AWSDate
+  photo: String
+  vans: ID @index(name: "byVan")
+  routeID: ID @index(name: "byRoute")
+}
+
+enum UserTypes {
+  PARENT
+  STAFF
+  DRIVER
+}
+
+type User @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  sub: String!
+  name: String!
+  email: String
+  unitNumber: String
+  address: String!
+  lng: Float!
+  lat: Float!
+  phoneNumber: String
+  userType: UserTypes
+}
+ 
