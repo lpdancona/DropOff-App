@@ -21,7 +21,7 @@ const AuthContextProvider = ({children}) => {
         setIsEmailVerified(user.attributes.email_verified);
         setUserEmail(user.attributes.email);
         // Assuming that user.attributes.sub is the unique identifier for the user
-        setUserPassword(user.attributes.sub);
+        //setUserPassword(user.attributes.sub);
       })
       .catch((error) => {
         console.error('Error fetching authenticated user:', error);

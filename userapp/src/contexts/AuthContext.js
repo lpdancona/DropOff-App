@@ -1,9 +1,9 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { DataStore } from 'aws-amplify';
+//import { DataStore } from 'aws-amplify';
+//import { User, Kid } from '../models';
 import { Auth } from 'aws-amplify'; 
-import { User, Kid } from '../models';
 import { API, graphqlOperation } from 'aws-amplify';
-import { listUsers } from '../../queries'
+import { listUsers, listKids} from '../graphql/queries'
 
 const AuthContext = createContext({});
 
@@ -13,9 +13,7 @@ const AuthContextProvider = ({children}) => {
   const sub = authUser?.attributes?.sub;
   const [userEmail, setUserEmail] = useState(null); //authUser?.attributes?.email
   const [isEmailVerified, setIsEmailVerified] = useState(false); //authUser?.attributes?.email_verified
-  const [isParent,setIsParent] = useState(false)
   const [kids, setKids] = useState([]);
-  const [userPassword,setUserPassword ] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,73 +23,71 @@ const AuthContextProvider = ({children}) => {
         setIsEmailVerified(user.attributes.email_verified);
         setUserEmail(user.attributes.email);
         // Assuming that user.attributes.sub is the unique identifier for the user
-        setUserPassword(user.attributes.sub);
+        //setUserPassword(user.attributes.sub);
       })
       .catch((error) => {
         console.error('Error fetching authenticated user:', error);
-      });
+    });
   }, [authUser]);
 
 
-  // useEffect(() => {
-  //   Auth.currentAuthenticatedUser({ bypassCache: true }).then(setAuthUser);
-  // },[]);
-
-  // useEffect(() => {
-  //   if (isEmailVerified) {
-  //     setUserEmail(authUser?.attributes?.email)
-  //     setUserPassword()
-  //   }
-  // },[authUser]);
-    // const gRoute = await API.graphql(graphqlOperation(listRoutes.items));
-    // setDbRoute(gRoute);
-  const listUserFromQl = async () =>{
-    const listUsers = await API.graphql(graphqlOperation(listUsers));
-    setDbUser(listUsers)
-    
+  const listUserFromQl = async () => {
+    //console.log('sub', sub)
+    const getUserBySub = await API.graphql({query: listUsers, variables: { filter: {  sub: {eq: sub} } } })
+    //graphqlOperation(listUsers))
+    const response = getUserBySub.data.listUsers.items[0]
+    //console.log('getUserBysub', response[0])
+    //console.log(response)
+    setDbUser(response)
+    setLoading(false);
   }
 
   useEffect(() => {
-    if (!sub){return}
+    if (!sub) {return}
     listUserFromQl();
-  
-    // DataStore.query(User, (user) => user.sub.eq(sub)).then(
-    //   (users) => {
-    //     setDbUser(users[0]);
-    //     setLoading(false);
-    //   }
-    // );
-    console.log('dbUser',dbUser);
   },[sub]);
 
-  useEffect(() => {
-    
-    const fetchData = async () => {
-      if (userEmail) {
-        //console.log(userEmail.toString())
-        const queryResult = await DataStore.query(Kid, (s) =>
-          s.or(s => [
-            s.parent1Email.eq(userEmail),
-            s.parent2Email.eq(userEmail)
-          ])
-        );
-        
-        // Assuming queryResult is an array, you can check if it contains any items
-        if (queryResult.length > 0) {
-          setIsParent(true);
-          setKids(queryResult)
-        }
-        
-        // You can also log the queryResult if needed
-        //console.log(queryResult);
-      }
-    };
 
-    fetchData();
+  useEffect(() => {
+    const fetchData = async () => {
+      if (userEmail){
+        //console.log(userEmail);
+        try {
+          const variables = {
+            filter: {
+              or: [
+                { parent1Email: { eq: userEmail } },
+                { parent2Email: { eq: userEmail } }
+              ]
+            },
+          }
+          const response = await API.graphql({query: listKids, variables: variables})
+          //console.log(response)
+          const fetchedKids = response.data.listKids.items;
+          
+          //console.log(fetchedKids);
+    
+          if (fetchedKids.length === 0) {
+            // If the response is empty, sign out
+            await Auth.signOut();
+          } else {
+            // Set the kids state if there is data
+            setKids(fetchedKids);
+          }
+          // setKids(response.data.listKids.items);
+
+        } catch (error) {
+          console.error('Error fetching kids:', error);
+        } finally {
+          //setLoading(false);
+        }
+      }
+  };
+  fetchData();
   }, [isEmailVerified, userEmail]);
 
   return (
-    <AuthContext.Provider value={{ authUser, dbUser, sub, setDbUser, userEmail, isParent, kids, userPassword, loading }}>
+    <AuthContext.Provider value={{ authUser, dbUser, sub, userEmail, kids, loading }}>
       {children}
     </AuthContext.Provider>
   );

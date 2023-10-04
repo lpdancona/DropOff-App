@@ -19,34 +19,31 @@ import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import { FlatList } from "react-native-gesture-handler";
-import { DataStore } from 'aws-amplify';
+//import { DataStore } from 'aws-amplify';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { Auth } from "aws-amplify";
-import { Route } from "../../models";
+//import { Route } from "../../models";
+import { API, graphqlOperation } from 'aws-amplify';
+import { listRoutes, kidsByRouteID, getVan } from '../../graphql/queries'
 
-
-const van = vans[0];
+//const van = vans[0];
 
 
 const gbLocation = {latitude: 49.263527201707745, longitude: -123.10070015042552}; // gb location (we can import from the database in future)
 
 
-const HomeScreen = ({route}) => {
+const HomeScreen = () => {
   
-  const {kids} = useAuthContext();
+  const { kids, dbUser } = useAuthContext();
   const [dropOffAddress, setDropOffAddress] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
-  //console.log(kids);
-
-  
-
-  //{address: 1} // van.waypoint[0] // '' //route.params;
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
-
   const {width, height} = useWindowDimensions();
   const [driverLocation, setDriverLocation] = useState(null);
-  const [vanLocation, setVanLocation] = useState(null)
+  //const [vanLocation, setVanLocation] = useState(null)
+  const vanLocation = null;
+  const [currentRouteData, setCurrentRouteData] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
   //const [deliveryStatus, setDeliveryStatus] = useState(ORDER_STATUSES.READY_FOR_PICKUP)
@@ -56,30 +53,66 @@ const HomeScreen = ({route}) => {
   const snapPoints = useMemo(() => ["12%", "95%"],[])
   const navigation = useNavigation();
   //const routeWaypoints = van.waypoints.slice(1);
-  const getVanLocation = async () =>  {
-    const vanLocationData = await DataStore.query(Route);
-    //console.log(vanLocationData);
-    setVanLocation(vanLocationData);
+  
+  // const getUserBySub = await API.graphql({query: listUsers, variables: { filter: {  sub: {eq: sub} } } })
+  // //graphqlOperation(listUsers))
+  // const response = getUserBySub.data.listUsers.items[0]
+
+ const getCurrentRouteData = async () =>  {
+  try {
+    const variables = {
+      filter: {
+        status: { eq: 'IN_PROGRESS' } 
+      }
+    }
+
+    // Fetch route data
+    const responseListRoutes = await API.graphql({ query: listRoutes, variables: variables });
+    const routeData = responseListRoutes.data.listRoutes.items;
+    
+
+    // Fetch kids data for each route
+    const mergedData = await Promise.all(routeData.map(async route => {
+      const responseKidsByRouteID = await API.graphql({ query: kidsByRouteID, variables: { routeID: route.id } });
+      const kidsData = responseKidsByRouteID.data.kidsByRouteID.items;
+      //
+      const responseGetVan = await API.graphql({ query: getVan, variables: { id: route.routeVanId } });
+      //console.log(responseGetVan);
+      const vansData = responseGetVan.data.getVan;
+      
+      return { ...route, Kid: kidsData, Van: vansData  };
+    }));
+
+    console.log('mergedData', mergedData);
+    setCurrentRouteData(mergedData);
+  } catch (error) {
+    console.error('Error fetching data:', error);
   }
-  useEffect(() => {
-    getVanLocation();
-    //console.log(vanLocation.lat);    
-  },[vanLocation]);
+}
+
+useEffect(() => {
+  getCurrentRouteData();
+  
+  return () => {
+
+  };
+}, []);
 
 
-  useEffect(() => {
-    //console.log(vanLocation)
-    //console.log(vanLocation)
-    if (!vanLocation) {
-      return;
-    }
-    const subscription = DataStore.observe(Route).subscribe(msg => {
-    if (msg.opType ==='UPDATE') {r
-      setDriver(msg.element);
-    }
-    });
-    return () => subscription.unsubscribe();
-  },[vanLocation]);
+
+  // useEffect(() => {
+  //   //console.log(vanLocation)
+  //   //console.log(vanLocation)
+  //   if (!vanLocation) {
+  //     return;
+  //   }
+  //   const subscription = DataStore.observe(Route).subscribe(msg => {
+  //   if (msg.opType ==='UPDATE') {r
+  //     setDriver(msg.element);
+  //   }
+  //   });
+  //   return () => subscription.unsubscribe();
+  // },[vanLocation]);
 
 
   useEffect (() => {
@@ -114,27 +147,27 @@ const HomeScreen = ({route}) => {
   //console.warn(driverLocation);
   //console.log(dropOffAddress);
 
-  useEffect(() => {
-    //console.log(kids)
-    if (kids) {
-      setDropOffAddress({latitude : kids[0]?.lat, longitude: kids[0]?.lng})
-    }
-  },[kids]);
-  //console.log(vanLocation);
-  if (!driverLocation || !dropOffAddress || !vanLocation) {
-    return <ActivityIndicator style={{padding: 50}} size={'large'}/>
-  }
-  //console.log('driver location ',driverLocation);
-  //console.log('dropOffAddress ',dropOffAddress);
-  
-  const handleLogout = async () => {
-    try {
-      // Sign out the user using Amplify Auth
-      await Auth.signOut();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
+  // useEffect(() => {
+  //   //console.log(kids)
+  //   if (kids) {
+  //     setDropOffAddress({latitude : kids[0]?.lat, longitude: kids[0]?.lng})
+  //     }
+  //   },[kids]);
+  //   //console.log(vanLocation);
+  //   if (!driverLocation || !dropOffAddress || !vanLocation) {
+  //     return <ActivityIndicator style={{padding: 50}} size={'large'}/>
+  //   }
+  //   //console.log('driver location ',driverLocation);
+  //   //console.log('dropOffAddress ',dropOffAddress);
+    
+  //   const handleLogout = async () => {
+  //     try {
+  //       // Sign out the user using Amplify Auth
+  //       await Auth.signOut();
+  //     } catch (error) {
+  //       console.error('Logout error:', error);
+  //     }
+  //   };
 
   const handleGoBack = () => {
     // Navigate back to the login screen
@@ -158,7 +191,7 @@ const HomeScreen = ({route}) => {
         onDismiss={closeMenu}
         anchor={<Appbar.Action icon="menu" onPress={openMenu} />}
       >
-        <Menu.Item onPress={handleLogout} title="Logout" />
+        {/* <Menu.Item onPress={handleLogout} title="Logout" /> */}
         {/* <Menu.Item onPress={handleGoBack} title="Go Back to Login" /> */}
       </Menu>
 

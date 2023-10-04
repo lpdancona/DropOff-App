@@ -14,6 +14,7 @@ const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
   const { dbUser, loading } = useAuthContext();
+  //console.log(dbUser);
   
   if (loading) {
     return <ActivityIndicator size='large' color='gray' />;

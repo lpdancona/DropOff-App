@@ -4,11 +4,6 @@ enum RouteStatus {
   WAITING_TO_START
 }
 
-type Weekday @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  name: String
-}
-
 type Van @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String
@@ -22,7 +17,7 @@ type Van @model @auth(rules: [{allow: public}]) {
 }
 
 type Route @model @auth(rules: [{allow: public}]) {
-  id: ID!
+  id: ID
   date: String
   departTime: String
   lat: Float

@@ -1,4 +1,4 @@
-import 'core-js/full/symbol/async-iterator';
+//import 'core-js/full/symbol/async-iterator';
 import { StatusBar } from 'expo-status-bar';
 import RootNavigator from './src/navigation';
 import { NavigationContainer } from '@react-navigation/native'
@@ -21,41 +21,41 @@ Amplify.configure(awsExports);
 
 
 function App() {
-  const [hasSignedOut, setHasSignedOut] = useState(false);
-  useEffect(() => {
-    const signOutOnStart = async () => {
-      try {
-        // Check if the user has already been signed out
-        const hasSignedOutFlag = await SecureStore.getItemAsync('hasSignedOut');
-        if (!hasSignedOutFlag) {
-          await Auth.signOut();
-          // Set the flag to indicate that the user has been signed out
-          await SecureStore.setItemAsync('hasSignedOut', 'true');
-          setHasSignedOut(true);
-        }
-      } catch (error) {
-        console.error('Sign out error:', error);
-      }
-    };
+  // const [hasSignedOut, setHasSignedOut] = useState(false);
+  // useEffect(() => {
+  //   const signOutOnStart = async () => {
+  //     try {
+  //       // Check if the user has already been signed out
+  //       const hasSignedOutFlag = await SecureStore.getItemAsync('hasSignedOut');
+  //       if (!hasSignedOutFlag) {
+  //         await Auth.signOut();
+  //         // Set the flag to indicate that the user has been signed out
+  //         await SecureStore.setItemAsync('hasSignedOut', 'true');
+  //         setHasSignedOut(true);
+  //       }
+  //     } catch (error) {
+  //       console.error('Sign out error:', error);
+  //     }
+  //   };
 
-    signOutOnStart();
-  }, []);
+  //   signOutOnStart();
+  // }, []);
 
-  useEffect(() => {
-    const checkCurrentUser = async () => {
-      try {
-        const user = await Auth.currentAuthenticatedUser();
-        // User is authenticated, navigate to the main app screen
-        // You can use navigation to the appropriate screen here
-        console.log('User is already authenticated:', user);
-      } catch (error) {
-        // No user is authenticated, show authentication screens
-        console.log('No user is authenticated:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const checkCurrentUser = async () => {
+  //     try {
+  //       const user = await Auth.currentAuthenticatedUser();
+  //       // User is authenticated, navigate to the main app screen
+  //       // You can use navigation to the appropriate screen here
+  //       console.log('User is already authenticated:', user);
+  //     } catch (error) {
+  //       // No user is authenticated, show authentication screens
+  //       console.log('No user is authenticated:', error);
+  //     }
+  //   };
 
-    checkCurrentUser();
-  }, []);
+  //   checkCurrentUser();
+  // }, []);
 
   registerNNPushToken(12497, 'wDb6oKTWDGkDZd1Rv468rP');
   return (

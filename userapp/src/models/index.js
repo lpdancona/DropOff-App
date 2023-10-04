@@ -14,10 +14,9 @@ const UserTypes = {
   "DRIVER": "DRIVER"
 };
 
-const { Weekday, Van, Route, Kid, User } = initSchema(schema);
+const { Van, Route, Kid, User } = initSchema(schema);
 
 export {
-  Weekday,
   Van,
   Route,
   Kid,
