@@ -26,7 +26,7 @@ import { Auth } from "aws-amplify";
 import { API, graphqlOperation } from 'aws-amplify';
 import { listRoutes, kidsByRouteID, getVan } from '../../graphql/queries'
 
-//const van = vans[0];
+const van = vans[0];
 
 
 const gbLocation = {latitude: 49.263527201707745, longitude: -123.10070015042552}; // gb location (we can import from the database in future)
@@ -40,9 +40,10 @@ const HomeScreen = () => {
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
   const {width, height} = useWindowDimensions();
-  const [driverLocation, setDriverLocation] = useState(null);
-  //const [vanLocation, setVanLocation] = useState(null)
-  const vanLocation = null;
+  //const [driverLocation, setDriverLocation] = useState(null);
+  const [busLocation, setBusLocation] = useState(null)
+  //const busLocation = null;
+  const [routesData, setRoutesData] = useState(null);
   const [currentRouteData, setCurrentRouteData] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
@@ -58,7 +59,7 @@ const HomeScreen = () => {
   // //graphqlOperation(listUsers))
   // const response = getUserBySub.data.listUsers.items[0]
 
- const getCurrentRouteData = async () =>  {
+ const getRoutesData = async () =>  {
   try {
     const variables = {
       filter: {
@@ -75,7 +76,7 @@ const HomeScreen = () => {
     const mergedData = await Promise.all(routeData.map(async route => {
       const responseKidsByRouteID = await API.graphql({ query: kidsByRouteID, variables: { routeID: route.id } });
       const kidsData = responseKidsByRouteID.data.kidsByRouteID.items;
-      //
+      // fetch the van
       const responseGetVan = await API.graphql({ query: getVan, variables: { id: route.routeVanId } });
       //console.log(responseGetVan);
       const vansData = responseGetVan.data.getVan;
@@ -83,36 +84,82 @@ const HomeScreen = () => {
       return { ...route, Kid: kidsData, Van: vansData  };
     }));
 
-    console.log('mergedData', mergedData);
-    setCurrentRouteData(mergedData);
+    //console.log('mergedData', mergedData);
+    
+    setRoutesData(mergedData);
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 }
 
 useEffect(() => {
-  getCurrentRouteData();
+  // if (kids){
+    getRoutesData();
+    // if (currentRouteData.map( m => {    
+      
+    // }))
+    return () => {};
+  // }
   
-  return () => {
+}, [kids]);
 
+useEffect(() => {
+  const checkKidsInRoutes = () => {
+    if (kids && routesData) {
+      // Find the first route that has at least one kid from the context
+      const routeWithMatchingKids = routesData.find(item => {
+        if (item.Kid && Array.isArray(item.Kid)) {
+          return item.Kid.some(routeKid => kids.some(contextKid => routeKid.id === contextKid.id));
+        }
+        return false;
+      });
+
+      if (routeWithMatchingKids) {
+        // Update the state variable with the route that has matching kids
+        setCurrentRouteData([routeWithMatchingKids]);
+      } else {
+        // Set an empty array if no matching route is found
+        //setCurrentRouteData([]);
+      }
+    }
   };
+
+  checkKidsInRoutes();
+  // console.log('currentRoute ',currentRouteData);
+  // console.log('all routes', routesData);
+
+  return () => {
+    // Cleanup code if needed
+  };
+}, [kids, routesData]);
+
+useEffect(() => {
+  if (!currentRouteData) {
+    return;
+  }
+  //console.log(currentRouteData);
+  setBusLocation({
+    latitude: currentRouteData.lat, 
+    longitude: currentRouteData.lng,
+  });
+  //console.log(busLocation);
+  
+  return () => {};
 }, []);
 
 
-
-  // useEffect(() => {
-  //   //console.log(vanLocation)
-  //   //console.log(vanLocation)
-  //   if (!vanLocation) {
-  //     return;
-  //   }
-  //   const subscription = DataStore.observe(Route).subscribe(msg => {
-  //   if (msg.opType ==='UPDATE') {r
-  //     setDriver(msg.element);
-  //   }
-  //   });
-  //   return () => subscription.unsubscribe();
-  // },[vanLocation]);
+useEffect(() => {
+  //console.log(busLocation)
+  // if (!busLocation) {
+  //   return;
+  // }
+  // const subscription = DataStore.observe(Route).subscribe(msg => {
+  // if (msg.opType ==='UPDATE') {r
+  //   setDriver(msg.element);
+  // }
+  // });
+  // return () => subscription.unsubscribe();
+},[busLocation]);
 
 
   useEffect (() => {
@@ -124,7 +171,7 @@ useEffect(() => {
       }
       
       let location = await Location.getCurrentPositionAsync({accuracy: 3 });
-      setDriverLocation({
+      setBusLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude
       });
@@ -135,7 +182,7 @@ useEffect(() => {
         accuracy: Location.Accuracy.High,
         distanceInterval: 5
       }, (updatedLocation) => {
-        setDriverLocation({
+        setBusLocation({
           latitude: updatedLocation.coords.latitude,
           longitude: updatedLocation.coords.longitude
         })
@@ -147,27 +194,27 @@ useEffect(() => {
   //console.warn(driverLocation);
   //console.log(dropOffAddress);
 
-  // useEffect(() => {
-  //   //console.log(kids)
-  //   if (kids) {
-  //     setDropOffAddress({latitude : kids[0]?.lat, longitude: kids[0]?.lng})
-  //     }
-  //   },[kids]);
-  //   //console.log(vanLocation);
-  //   if (!driverLocation || !dropOffAddress || !vanLocation) {
-  //     return <ActivityIndicator style={{padding: 50}} size={'large'}/>
-  //   }
+  useEffect(() => {
+    //console.log(kids)
+    if (kids) {
+      setDropOffAddress({latitude : kids[0]?.lat, longitude: kids[0]?.lng})
+    }
+    return () => {};
+  },[]);
+  //   //console.log(busLocation);
+  
+
   //   //console.log('driver location ',driverLocation);
   //   //console.log('dropOffAddress ',dropOffAddress);
     
-  //   const handleLogout = async () => {
-  //     try {
-  //       // Sign out the user using Amplify Auth
-  //       await Auth.signOut();
-  //     } catch (error) {
-  //       console.error('Logout error:', error);
-  //     }
-  //   };
+  const handleLogout = async () => {
+    try {
+      // Sign out the user using Amplify Auth
+      await Auth.signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const handleGoBack = () => {
     // Navigate back to the login screen
@@ -176,7 +223,10 @@ useEffect(() => {
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
-
+  
+  if (!busLocation || !dropOffAddress) {
+    return <ActivityIndicator style={{padding: 50}} size={'large'}/>
+  }
 
   return (
 
@@ -191,7 +241,7 @@ useEffect(() => {
         onDismiss={closeMenu}
         anchor={<Appbar.Action icon="menu" onPress={openMenu} />}
       >
-        {/* <Menu.Item onPress={handleLogout} title="Logout" /> */}
+        <Menu.Item onPress={handleLogout} title="Logout" />
         {/* <Menu.Item onPress={handleGoBack} title="Go Back to Login" /> */}
       </Menu>
 
@@ -213,8 +263,8 @@ useEffect(() => {
         showsUserLocation={true} 
         //followsUserLocation={true}
         initialRegion={{
-          latitude: vanLocation[0].lat,
-          longitude: vanLocation[0].lng,
+          latitude: busLocation.latitude,
+          longitude: busLocation.longitude,
           latitudeDelta: 0.007,
           longitudeDelta: 0.007
         }}
@@ -237,11 +287,11 @@ useEffect(() => {
           }}
         /> */}
         <MapViewDirections
-          origin={[vanLocation[0].lat,vanLocation[0].lng]} // Start from the first waypoint
+          origin={busLocation} // Start from the first waypoint
           destination={dropOffAddress} //{van.waypoints[van.waypoints.length - 1]} // End at the last waypoint
           //waypoints={van.waypoints} // Exclude the start and end waypoints
           strokeWidth={7}
-          strokeColor='black'
+          strokeColor='#3fc060'
           apikey={GOOGLE_MAPS_APIKEY}
           onReady={(result) => {
             // Handle the route information here
@@ -268,11 +318,11 @@ useEffect(() => {
         ))} */}
         <Marker
           coordinate={{
-            latitude: vanLocation[0].lat, 
-            longitude: vanLocation[0].lng
+            latitude: busLocation.latitude, 
+            longitude: busLocation.longitude
           }}
           title={"Gracie Barra Van"}
-          description={van.name}
+          description={currentRouteData?.Van?.name}
         >
           <View style={{padding: 5}}>
             <FontAwesome5 name='map-marker-alt' size={30} color='red' />
