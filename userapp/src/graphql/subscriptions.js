@@ -14,14 +14,10 @@ export const onCreateVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -39,14 +35,10 @@ export const onUpdateVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -64,14 +56,10 @@ export const onDeleteVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -98,22 +86,15 @@ export const onCreateRoute = /* GraphQL */ `
         bosterSeats
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
       status
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       routeVanId
       __typename
     }
@@ -141,22 +122,15 @@ export const onUpdateRoute = /* GraphQL */ `
         bosterSeats
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
       status
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       routeVanId
       __typename
     }
@@ -184,22 +158,15 @@ export const onDeleteRoute = /* GraphQL */ `
         bosterSeats
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
       status
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       routeVanId
       __typename
     }
@@ -221,9 +188,6 @@ export const onCreateKid = /* GraphQL */ `
       routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -244,9 +208,6 @@ export const onUpdateKid = /* GraphQL */ `
       routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -267,9 +228,6 @@ export const onDeleteKid = /* GraphQL */ `
       routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -289,9 +247,6 @@ export const onCreateUser = /* GraphQL */ `
       userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -311,9 +266,6 @@ export const onUpdateUser = /* GraphQL */ `
       userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -333,9 +285,6 @@ export const onDeleteUser = /* GraphQL */ `
       userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
