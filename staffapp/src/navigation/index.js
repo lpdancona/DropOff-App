@@ -7,27 +7,21 @@ import ProfileScreen from "../screens/ProfileScreen";
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
-  const { dbUser, loading } = useAuthContext();
-  
+  const { dbUser, loading, isDriver } = useAuthContext();
+
+  //console.log(isDriver);
   if (loading) {
-    return <ActivityIndicator size='large' color='gray' />;
+    return <ActivityIndicator size="large" color="gray" />;
   }
 
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {dbUser ? (
-        <Stack.Screen
-          name='Home'
-          component={HomeScreen}
-        />
-        ):(
-        <Stack.Screen 
-          name="StaffLogin" 
-          component={ProfileScreen} 
-        />
-        )
-      }
-   
+        <Stack.Screen name="Home" component={HomeScreen} />
+      ) : (
+        <Stack.Screen name="StaffLogin" component={ProfileScreen} />
+      )}
+
       {/* <Stack.Screen 
         name='Login' 
         component={LoginScreen}
@@ -35,8 +29,5 @@ const RootNavigator = () => {
     </Stack.Navigator>
   );
 };
-
-
-
 
 export default RootNavigator;

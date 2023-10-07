@@ -1,39 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onCreateWeekday = /* GraphQL */ `
-  subscription OnCreateWeekday($filter: ModelSubscriptionWeekdayFilterInput) {
-    onCreateWeekday(filter: $filter) {
-      id
-      name
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateWeekday = /* GraphQL */ `
-  subscription OnUpdateWeekday($filter: ModelSubscriptionWeekdayFilterInput) {
-    onUpdateWeekday(filter: $filter) {
-      id
-      name
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteWeekday = /* GraphQL */ `
-  subscription OnDeleteWeekday($filter: ModelSubscriptionWeekdayFilterInput) {
-    onDeleteWeekday(filter: $filter) {
-      id
-      name
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
 export const onCreateVan = /* GraphQL */ `
   subscription OnCreateVan($filter: ModelSubscriptionVanFilterInput) {
     onCreateVan(filter: $filter) {

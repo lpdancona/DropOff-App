@@ -1,48 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createWeekday = /* GraphQL */ `
-  mutation CreateWeekday(
-    $input: CreateWeekdayInput!
-    $condition: ModelWeekdayConditionInput
-  ) {
-    createWeekday(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const updateWeekday = /* GraphQL */ `
-  mutation UpdateWeekday(
-    $input: UpdateWeekdayInput!
-    $condition: ModelWeekdayConditionInput
-  ) {
-    updateWeekday(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const deleteWeekday = /* GraphQL */ `
-  mutation DeleteWeekday(
-    $input: DeleteWeekdayInput!
-    $condition: ModelWeekdayConditionInput
-  ) {
-    deleteWeekday(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
 export const createVan = /* GraphQL */ `
   mutation CreateVan(
     $input: CreateVanInput!

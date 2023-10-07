@@ -179,44 +179,6 @@ const HomeScreen = () => {
     };
   }, [busLocation]);
 
-  // useEffect(() => {
-  //   // Fetch initial location
-  //   const fetchInitialLocation = async () => {
-  //     let { status } = await Location.requestForegroundPermissionsAsync();
-  //     if (!status === "granted") {
-  //       setErrorMsg("Permission to access location was denied");
-  //       return;
-  //     }
-
-  //     let location = await Location.getCurrentPositionAsync({ accuracy: 5 });
-  //     setBusLocation({
-  //       latitude: location.coords.latitude,
-  //       longitude: location.coords.longitude,
-  //     });
-  //   };
-
-  //   fetchInitialLocation();
-
-  //   // Watch for location changes
-  //   const foregroundSubscription = Location.watchPositionAsync(
-  //     {
-  //       accuracy: Location.Accuracy.High,
-  //       distanceInterval: 5,
-  //     },
-  //     (updatedLocation) => {
-  //       setBusLocation({
-  //         latitude: updatedLocation.coords.latitude,
-  //         longitude: updatedLocation.coords.longitude,
-  //       });
-  //     }
-  //   );
-
-  //   return () => {
-  //     // Cleanup location subscription on component unmount
-  //     foregroundSubscription.remove();
-  //   };
-  // }, []);
-
   const handleLogout = async () => {
     try {
       // Sign out the user using Amplify Auth

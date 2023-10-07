@@ -22,11 +22,11 @@ import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import RouteInfoComponent from "../../components/RouteInfo";
 //import { DataStore } from "aws-amplify";
-import { Route, Van, Kid, User } from "../../models";
+//import { Route, Van, Kid, User } from "../../models";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { API, graphqlOperation } from "aws-amplify";
-import { updateRoute } from "../../graphql/mutations";
-import { listRoutes } from "../../graphql/queries";
+import { listRoutes, kidsByRouteID, getVan } from "../../graphql/queries";
+import vans from "../../../assets/data/vans.json";
 
 // import * as Notifications from 'expo-notifications'
 // import * as Permissions from 'expo-permissions'
@@ -63,10 +63,10 @@ const sendNotification = async (notificationTitle, notificationBody) => {
     console.error("Error sending notification:", error);
   }
 };
-console.log(GOOGLE_MAPS_APIKEY);
+
 const HomeScreen = () => {
-  const { dbUser } = useAuthContext();
-  //const van = vans[0];
+  const { dbUser, isDriver, currentUserData } = useAuthContext();
+  const van = vans[0];
   const gbLocation = {
     latitude: 49.263527201707745,
     longitude: -123.10070015042552,
@@ -77,7 +77,7 @@ const HomeScreen = () => {
   const mapRef = useRef(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const { width, height } = useWindowDimensions();
-  const [driverLocation, setDriverLocation] = useState(null);
+  //const [driverLocation, setDriverLocation] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
 
@@ -90,71 +90,16 @@ const HomeScreen = () => {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-  const [dbRoute, setDbRoute] = useState(null);
-  const [vans, setVans] = useState([]);
-  const [kids, setKids] = useState([]);
-  const [helper, setHelper] = useState([]);
-  const [driver, setDriver] = useState([]);
-  const [routeCoords, setRouteCoords] = useState([]);
-
-  // const fetchRoute = async () => {
-  //   try {
-
-  //     // Fetch Route data
-  //     const routeDetails = await DataStore.query(Route, (r) => r.status.eq("WAITING_TO_START"));
-  //     setDbRoute(routeDetails[0]);
-  //     // Fetch associated Van data using the route's van ID
-  //     const vanData = await DataStore.query(Van, routeDetails[0].routeVanId);
-  //     setVans(vanData);
-  //     // Fetch associated Kid data using the route's ID
-  //     const kidData = await DataStore.query(Kid, (k) => k.routeID.eq(routeDetails[0].id));
-  //     setKids(kidData);
-  //     // fetch information of helper and driver user on the route
-  //     const helperData = await DataStore.query(
-  //       User, (h) => h.and(h =>
-  //       [
-  //         h.userType.eq('STAFF'),
-  //         h.id.eq(routeDetails[0].helper)
-  //       ]
-  //     ));
-  //     setHelper(helperData);
-  //     //
-  //     const driverData = await DataStore.query(
-  //       User, (d) => d.and(d =>
-  //       [
-  //         d.userType.eq('DRIVER'),
-  //         d.id.eq(routeDetails[0].driver)
-  //       ]
-  //     ));
-  //     setDriver(driverData);
-
-  //   } catch (error) {
-  //     console.error('Error fetching route data:', error);
-  //   }
-  // };
-
-  const get = async () => {
-    const gRoute = await API.graphql(graphqlOperation(listRoutes));
-    setDbRoute(gRoute);
-  };
-
-  useEffect(() => {
-    get();
-    // const fetchData = async () => {
-    //    if (!dbRoute || dbRoute.length === 0) {
-    //     await fetchRoute();
-    //   }
-    // }
-    // //console.log(dbRoute)
-    // fetchData();
-    // //if (dbRoute && dbRoute.length >= 0) {
-    //   setRouteCoords(dbRoute?.route.routeData);
-    // //}
-    // //console.log('route coords', routeCoords)
-    //console.log(dbRoute)
-    // console.log('get route ', dbRoute);
-    // console.log('get route ', dbRoute);
-  }, []); //[dbRoute,vans,driver,helper,routeCoords,kids]);
+  //const [dbRoute, setDbRoute] = useState(null);
+  //const [vans, setVans] = useState([]);
+  //const [kids, setKids] = useState([]);
+  //const [helper, setHelper] = useState([]);
+  //const [driver, setDriver] = useState([]);
+  //const [routeCoords, setRouteCoords] = useState([]);
+  const [busLocation, setBusLocation] = useState(null);
+  const [routesData, setRoutesData] = useState(null);
+  const [currentRouteData, setCurrentRouteData] = useState(null);
+  const [addressList, setAddressList] = useState(null);
 
   const renderItem = ({ item, index }) => {
     if (!dbRoute) {
@@ -178,40 +123,114 @@ const HomeScreen = () => {
     );
   };
 
-  const updatedLocation = async () => {
-    console.log("driver location", driverLocation);
+  const getRoutesData = async () => {
     try {
-      const response = await API.graphql(
-        graphqlOperation(updateRoute, {
-          input: {
-            id: dbRoute.id,
-            lat: driverLocation.latitude,
-            lng: driverLocation.longitude,
-            departTime: 10,
-          },
+      //console.log("isDriver? ", isDriver);
+      const variables = {
+        filter: {
+          status: { eq: "WAITING_TO_START" },
+        },
+      };
+
+      // Fetch route data
+      const responseListRoutes = await API.graphql({
+        query: listRoutes,
+        variables: variables,
+      });
+      const routeData = responseListRoutes.data.listRoutes.items;
+
+      // Fetch kids data for each route
+      const mergedData = await Promise.all(
+        routeData.map(async (route) => {
+          const responseKidsByRouteID = await API.graphql({
+            query: kidsByRouteID,
+            variables: { routeID: route.id },
+          });
+          const kidsData = responseKidsByRouteID.data.kidsByRouteID.items;
+          // fetch the van
+          const responseGetVan = await API.graphql({
+            query: getVan,
+            variables: { id: route.routeVanId },
+          });
+          const vansData = responseGetVan.data.getVan;
+
+          return { ...route, Kid: kidsData, Van: vansData };
         })
       );
 
-      console.log("Route updated successfully", response);
+      setRoutesData(mergedData);
     } catch (error) {
-      console.error("Error updating route", error);
+      console.error("Error fetching data getROutesData: ", error);
+    }
+  };
+
+  const checkStaffInRoutes = () => {
+    //console.log("current user ", currentUserData);
+
+    if (routesData && (isDriver || isHelper)) {
+      const roleToCheck = isDriver ? "driver" : "helper";
+
+      const routeWithMatchingRole = routesData.find((item) => {
+        if (item[roleToCheck] && item[roleToCheck] === dbUser.id) {
+          return true;
+        }
+        return false;
+      });
+
+      if (routeWithMatchingRole) {
+        // Update the state variable with the route that has matching role
+        setCurrentRouteData(routeWithMatchingRole);
+      } else {
+        // Handle case when no matching route is found
+        console.log(
+          `No route found for ${roleToCheck} with user ID ${dbUser.id}`
+        );
+      }
     }
   };
 
   useEffect(() => {
-    // user effect to update the location
-    if (!driverLocation || !dbRoute) {
-      return;
+    // Fetch initial data when the component mounts
+    const fetchInitialData = async () => {
+      await getRoutesData();
+    };
+    fetchInitialData();
+  }, [dbUser]);
+
+  useEffect(() => {
+    if (routesData) {
+      checkStaffInRoutes();
+      //console.log("current route ", currentRouteData);
     }
-    //updatedLocation();
-    // console.log('drive location lat', driverLocation);
-    // //console.log('dbRoute',dbRoute);
-    // DataStore.save(Route.copyOf(dbRoute, (updated) => {
-    //   updated.lat = driverLocation.latitude
-    //   updated.lng = driverLocation.longitude
-    // }));
-    // //console.log('Location saved successfully!');
-  }, [driverLocation]);
+  }, [routesData]);
+
+  useEffect(() => {
+    if (currentRouteData) {
+      const waypoints = JSON.parse(currentRouteData.route);
+      setAddressList(waypoints.routeData);
+      //console.log(addressList);
+    }
+  }, [currentRouteData]);
+
+  // const updatedLocation = async () => {
+  //   console.log("driver location", driverLocation);
+  //   try {
+  //     const response = await API.graphql(
+  //       graphqlOperation(updateRoute, {
+  //         input: {
+  //           id: dbRoute.id,
+  //           lat: driverLocation.latitude,
+  //           lng: driverLocation.longitude,
+  //           departTime: 10,
+  //         },
+  //       })
+  //     );
+
+  //     console.log("Route updated successfully", response);
+  //   } catch (error) {
+  //     console.error("Error updating route", error);
+  //   }
+  // };
 
   useEffect(() => {
     (async () => {
@@ -222,7 +241,7 @@ const HomeScreen = () => {
       }
 
       let location = await Location.getCurrentPositionAsync({ accuracy: 5 });
-      setDriverLocation({
+      setBusLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
@@ -238,7 +257,7 @@ const HomeScreen = () => {
         distanceInterval: 10,
       },
       (updatedLocation) => {
-        setDriverLocation({
+        setBusLocation({
           latitude: updatedLocation.coords.latitude,
           longitude: updatedLocation.coords.longitude,
         });
@@ -249,15 +268,20 @@ const HomeScreen = () => {
 
   const zoomInOnDriver = () => {
     mapRef.current.animateToRegion({
-      latitude: driverLocation.latitude,
-      longitude: driverLocation.longitude,
+      latitude: busLocation.latitude,
+      longitude: busLocation.longitude,
       latitudeDelta: 0.001,
       longitudeDelta: 0.001,
     });
   };
 
-  //console.warn(driverLocation);
-  if (!driverLocation) {
+  //console.log(JSON.parse(currentRouteData.route));
+  //console.log(addressList);
+  if (!busLocation || !currentRouteData) {
+    return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
+  }
+
+  if (addressList === null) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
 
@@ -270,16 +294,16 @@ const HomeScreen = () => {
         showsUserLocation={true}
         followsUserLocation={true}
         initialRegion={{
-          latitude: driverLocation.latitude,
-          longitude: driverLocation.longitude,
+          latitude: busLocation.latitude,
+          longitude: busLocation.longitude,
           latitudeDelta: 0.007,
           longitudeDelta: 0.007,
         }}
       >
         <MapViewDirections
-          origin={driverLocation} // Start from the first waypoint
-          destination={routeCoords[routeCoords.length - 1]} // End at the last waypoint
-          waypoints={routeCoords} // Exclude the start and end waypoints
+          origin={busLocation} // Start from the first waypoint
+          destination={addressList[addressList?.length - 1]} // End at the last waypoint
+          waypoints={addressList} // Exclude the start and end waypoints
           strokeWidth={7}
           strokeColor="#3fc060"
           apikey={GOOGLE_MAPS_APIKEY}
@@ -292,8 +316,8 @@ const HomeScreen = () => {
         />
         <Marker
           coordinate={{
-            latitude: driverLocation.latitude,
-            longitude: driverLocation.longitude,
+            latitude: busLocation.latitude,
+            longitude: busLocation.longitude,
           }}
           title={"Gracie Barra Van"}
           description={vans?.name}
@@ -314,7 +338,7 @@ const HomeScreen = () => {
             <FontAwesome5 name='home' size={30} color='green' />
           </View>
         </Marker> */}
-        {routeCoords.map((waypoint, index) => (
+        {addressList.map((waypoint, index) => (
           <Marker
             key={index}
             coordinate={{
@@ -339,12 +363,12 @@ const HomeScreen = () => {
           </View>
         ))}
       </View> */}
-      <RouteInfoComponent
+      {/* <RouteInfoComponent
         vans={vans}
         routeCoords={routeCoords}
         driver={driver}
         helper={helper}
-      />
+      /> */}
       <BottomSheet
         ref={bottomSheetRef}
         snapPoints={snapPoints}
@@ -368,7 +392,7 @@ const HomeScreen = () => {
         </Text>
 
         <View style={{ flex: 1, paddingBottom: 10, marginBottom: 65 }}>
-          <BottomSheetFlatList
+          {/* <BottomSheetFlatList
             data={kids} //data={van.kidsInRoute}
             renderItem={renderItem}
             keyExtractor={(item) => item.name.toString()}
@@ -379,7 +403,7 @@ const HomeScreen = () => {
 
             //   </View>
             // )}
-          />
+          /> */}
 
           <Modal
             visible={selectedItem !== null}

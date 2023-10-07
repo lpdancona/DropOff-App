@@ -1,36 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const getWeekday = /* GraphQL */ `
-  query GetWeekday($id: ID!) {
-    getWeekday(id: $id) {
-      id
-      name
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listWeekdays = /* GraphQL */ `
-  query ListWeekdays(
-    $filter: ModelWeekdayFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listWeekdays(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        name
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
 export const getVan = /* GraphQL */ `
   query GetVan($id: ID!) {
     getVan(id: $id) {
