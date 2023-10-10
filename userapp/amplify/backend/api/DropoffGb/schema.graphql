@@ -1,3 +1,12 @@
+type AddressList @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  order: Int
+  latitude: Float
+  longitude: Float
+  routeID: ID! @index(name: "byRoute")
+  Kid: Kid @hasOne
+}
+
 enum RouteStatus {
   IN_PROGRESS
   FINISHED
@@ -28,6 +37,7 @@ type Route @model @auth(rules: [{allow: public}]) {
   Van: Van @hasOne
   status: RouteStatus
   Kids: [Kid] @hasMany(indexName: "byRoute", fields: ["id"])
+  AddressLists: [AddressList] @hasMany(indexName: "byRoute", fields: ["id"])
 }
 
 type Kid @model @auth(rules: [{allow: public}]) {
@@ -61,5 +71,6 @@ type User @model @auth(rules: [{allow: public}]) {
   lat: Float!
   phoneNumber: String
   userType: UserTypes
+  photo: String
 }
  

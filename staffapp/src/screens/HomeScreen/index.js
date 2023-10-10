@@ -9,10 +9,11 @@ import {
   Pressable,
   Modal,
   SafeAreaView,
+  FlatList,
 } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 //import vans from '../../../assets/data/vans.json';
 import styles from "./styles";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
@@ -25,81 +26,81 @@ import RouteInfoComponent from "../../components/RouteInfo";
 //import { Route, Van, Kid, User } from "../../models";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { API, graphqlOperation } from "aws-amplify";
-import { listRoutes, kidsByRouteID, getVan } from "../../graphql/queries";
-import vans from "../../../assets/data/vans.json";
+import {
+  listRoutes,
+  kidsByRouteID,
+  getVan,
+  getUser,
+  listAddressLists,
+  getKid,
+} from "../../graphql/queries";
+import { updateRoute } from "../../graphql/mutations";
+import axios from "axios";
+import ExpoPushNotifications from "../../components/ExpoPushNotifications";
+
+// import vans from "../../../assets/data/vans.json";
 
 // import * as Notifications from 'expo-notifications'
 // import * as Permissions from 'expo-permissions'
 // import * as Device from 'expo-device';
-import axios from "axios";
 
-const sendNotification = async (notificationTitle, notificationBody) => {
-  const apiUrl = "https://app.nativenotify.com/api/notification";
-  const currentDate = new Date();
-  const notificationDate = `${
-    currentDate.getMonth() + 1
-  }-${currentDate.getDate()}-${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}${
-    currentDate.getHours() >= 12 ? "PM" : "AM"
-  }`;
-  //console.log(notificationDate);
-  try {
-    const response = await axios.post(apiUrl, {
-      appId: 12497,
-      appToken: "wDb6oKTWDGkDZd1Rv468rP",
-      title: notificationTitle,
-      body: notificationBody,
-      dateSent: notificationDate,
-      //pushData: { yourProperty: 'yourPropertyValue' },
-      //bigPictureURL: 'Big picture URL as a string',
-    });
+// const sendNotification = async (notificationTitle, notificationBody) => {
+//   const apiUrl = "https://app.nativenotify.com/api/notification";
+//   const currentDate = new Date();
+//   const notificationDate = `${
+//     currentDate.getMonth() + 1
+//   }-${currentDate.getDate()}-${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}${
+//     currentDate.getHours() >= 12 ? "PM" : "AM"
+//   }`;
+//   //console.log(notificationDate);
+//   try {
+//     const response = await axios.post(apiUrl, {
+//       appId: 12497,
+//       appToken: "wDb6oKTWDGkDZd1Rv468rP",
+//       title: notificationTitle,
+//       body: notificationBody,
+//       dateSent: notificationDate,
+//       //pushData: { yourProperty: 'yourPropertyValue' },
+//       //bigPictureURL: 'Big picture URL as a string',
+//     });
 
-    if (response.status === 200) {
-      console.log("Notification sent successfully");
-    } else {
-      console.error("Failed to send notification");
-      console.error(response.data);
-    }
-  } catch (error) {
-    console.error("Error sending notification:", error);
-  }
-};
+//     if (response.status === 200) {
+//       console.log("Notification sent successfully");
+//     } else {
+//       console.error("Failed to send notification");
+//       console.error(response.data);
+//     }
+//   } catch (error) {
+//     console.error("Error sending notification:", error);
+//   }
+// };
 
 const HomeScreen = () => {
   const { dbUser, isDriver, currentUserData } = useAuthContext();
-  const van = vans[0];
-  const gbLocation = {
-    latitude: 49.263527201707745,
-    longitude: -123.10070015042552,
-  }; // gb location (we can import from the database in future)
-
-  //const { address } = van.waypoints;
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const { width, height } = useWindowDimensions();
-  //const [driverLocation, setDriverLocation] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
-
   const [isDriverClose, setIsDriverClose] = useState(false);
-
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
-
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-  //const [dbRoute, setDbRoute] = useState(null);
-  //const [vans, setVans] = useState([]);
-  //const [kids, setKids] = useState([]);
-  //const [helper, setHelper] = useState([]);
-  //const [driver, setDriver] = useState([]);
-  //const [routeCoords, setRouteCoords] = useState([]);
+  const [helper, setHelper] = useState([]);
+  const [driver, setDriver] = useState([]);
   const [busLocation, setBusLocation] = useState(null);
   const [routesData, setRoutesData] = useState(null);
   const [currentRouteData, setCurrentRouteData] = useState(null);
   const [addressList, setAddressList] = useState(null);
+  const [currentWaypointIndex, setCurrentWaypointIndex] = useState(0);
+  const [origin, setOrigin] = useState(null);
+  const [destination, setDestination] = useState(null);
+  const [nextWaypoints, setNextWaypoints] = useState(null);
+  const [notificationSent, setNotificationSent] = useState(false);
 
   const renderItem = ({ item, index }) => {
     if (!dbRoute) {
@@ -123,12 +124,61 @@ const HomeScreen = () => {
     );
   };
 
+  const getOrderAddress = async () => {
+    try {
+      const variables = {
+        filter: {
+          routeID: { eq: currentRouteData.routeID },
+        },
+      };
+      const responseListAddress = await API.graphql({
+        query: listAddressLists,
+        variables: variables,
+      });
+      const AddressListsData = responseListAddress.data.listAddressLists.items;
+      const sortedAddressList = AddressListsData.sort(
+        (a, b) => a.order - b.order
+      );
+
+      const addressListWithKids = await Promise.all(
+        sortedAddressList.map(async (addressListItem) => {
+          try {
+            const responseGetKid = await API.graphql({
+              query: getKid,
+              variables: { id: addressListItem.addressListKidId },
+            });
+            const kidData = responseGetKid.data.getKid;
+            //console.log("kid Data", kidData);
+            return {
+              ...addressListItem,
+              Kid: kidData,
+            };
+          } catch (kidError) {
+            console.error("Error fetching Kid data", kidError);
+            return addressListItem;
+          }
+        })
+      );
+      // Filter out addresses with the same latitude and longitude
+      const uniqueAddressList = addressListWithKids.filter(
+        (address, index, self) =>
+          index ===
+          self.findIndex(
+            (a) => a.Kid.dropOffAddress === address.Kid.dropOffAddress
+          )
+      );
+      setAddressList(uniqueAddressList);
+    } catch (error) {
+      console.error("Error fetching getOrderAddress: ", error);
+    }
+  };
+
   const getRoutesData = async () => {
     try {
       //console.log("isDriver? ", isDriver);
       const variables = {
         filter: {
-          status: { eq: "WAITING_TO_START" },
+          status: { eq: "WAITING_TO_START" }, //status: { eq: "IN_PROGRESS" }, //
         },
       };
 
@@ -167,7 +217,7 @@ const HomeScreen = () => {
   const checkStaffInRoutes = () => {
     //console.log("current user ", currentUserData);
 
-    if (routesData && (isDriver || isHelper)) {
+    if (routesData && isDriver) {
       const roleToCheck = isDriver ? "driver" : "helper";
 
       const routeWithMatchingRole = routesData.find((item) => {
@@ -189,6 +239,19 @@ const HomeScreen = () => {
     }
   };
 
+  const getStaffInfo = async () => {
+    const driverData = await API.graphql({
+      query: getUser,
+      variables: { id: currentRouteData.driver },
+    });
+    setDriver(driverData.data.getUser);
+    const helperData = await API.graphql({
+      query: getUser,
+      variables: { id: currentRouteData.helper },
+    });
+    setHelper(helperData.data.getUser);
+  };
+
   useEffect(() => {
     // Fetch initial data when the component mounts
     const fetchInitialData = async () => {
@@ -206,31 +269,74 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (currentRouteData) {
-      const waypoints = JSON.parse(currentRouteData.route);
-      setAddressList(waypoints.routeData);
+      getOrderAddress();
+      // const waypoints = currentRouteData.Kid.map((kid, index) => ({
+      //   latitude: kid.lat,
+      //   longitude: kid.lng,
+      //   kidName: kid.name,
+      //   description: `${kid.dropOffAddress}`,
+      // })); //JSON.parse(currentRouteData.route);
+      // console.log(waypoints);
+      // setAddressList(waypoints);
       //console.log(addressList);
     }
   }, [currentRouteData]);
 
-  // const updatedLocation = async () => {
-  //   console.log("driver location", driverLocation);
-  //   try {
-  //     const response = await API.graphql(
-  //       graphqlOperation(updateRoute, {
-  //         input: {
-  //           id: dbRoute.id,
-  //           lat: driverLocation.latitude,
-  //           lng: driverLocation.longitude,
-  //           departTime: 10,
-  //         },
-  //       })
-  //     );
+  const handleNextWaypoint = () => {
+    setCurrentWaypointIndex((prevIndex) => prevIndex + 1);
+  };
 
-  //     console.log("Route updated successfully", response);
-  //   } catch (error) {
-  //     console.error("Error updating route", error);
-  //   }
-  // };
+  useEffect(() => {
+    if (currentRouteData) {
+      getStaffInfo();
+    }
+  }, [currentRouteData]);
+
+  const updateRouteStatus = async (status) => {
+    //console.log(status);
+    try {
+      const response = await API.graphql(
+        graphqlOperation(updateRoute, {
+          input: {
+            id: currentRouteData.id,
+            status: status,
+            //departTime: 10,
+          },
+        })
+      );
+
+      //console.log("Route updated successfully", response);
+    } catch (error) {
+      console.error("Error updating route", error);
+    }
+  };
+
+  const updateLocation = async () => {
+    //console.log("driver location", busLocation);
+    try {
+      const response = await API.graphql(
+        graphqlOperation(updateRoute, {
+          input: {
+            id: currentRouteData.id,
+            lat: busLocation.latitude,
+            lng: busLocation.longitude,
+            //departTime: 10,
+          },
+        })
+      );
+
+      //console.log("Route updated successfully", response);
+    } catch (error) {
+      console.error("Error updating route", error);
+    }
+  };
+
+  useEffect(() => {
+    if (currentRouteData) {
+      //console.log(addressList);
+      updateLocation();
+    }
+  }, [busLocation]);
 
   useEffect(() => {
     (async () => {
@@ -240,7 +346,7 @@ const HomeScreen = () => {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({ accuracy: 5 });
+      let location = await Location.getCurrentPositionAsync({ accuracy: 6 });
       setBusLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -254,7 +360,7 @@ const HomeScreen = () => {
     const foregroundSubscription = Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.BestForNavigation,
-        distanceInterval: 10,
+        distanceInterval: 5,
       },
       (updatedLocation) => {
         setBusLocation({
@@ -275,69 +381,121 @@ const HomeScreen = () => {
     });
   };
 
-  //console.log(JSON.parse(currentRouteData.route));
-  //console.log(addressList);
+  useEffect(() => {
+    if (
+      !busLocation ||
+      !addressList ||
+      currentWaypointIndex >= addressList.length
+    ) {
+      return;
+    }
+
+    const origin =
+      currentWaypointIndex === 0
+        ? busLocation
+        : {
+            latitude: addressList[currentWaypointIndex - 1].latitude,
+            longitude: addressList[currentWaypointIndex - 1].longitude,
+          };
+    setOrigin(origin);
+
+    const destination = {
+      latitude: addressList[currentWaypointIndex].latitude,
+      longitude: addressList[currentWaypointIndex].longitude,
+    };
+
+    setDestination(destination);
+
+    if (!origin || !destination) {
+      console.error("Origin or destination is undefined.");
+      return;
+    }
+
+    const nextWaypoints =
+      currentWaypointIndex < addressList.length - 1
+        ? [
+            {
+              latitude: addressList[currentWaypointIndex + 1].latitude,
+              longitude: addressList[currentWaypointIndex + 1].longitude,
+            },
+          ]
+        : [];
+
+    setNextWaypoints(nextWaypoints);
+  }, [addressList, currentWaypointIndex, busLocation]);
+
   if (!busLocation || !currentRouteData) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
 
-  if (addressList === null) {
+  if (addressList === null || origin === null || destination === null) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
 
+  // console.log("origin", origin);
+  // console.log("destination", destination);
+  // console.log("next waypoint", nextWaypoints);
   return (
     <SafeAreaView style={styles.mapContainer}>
       <MapView
         ref={mapRef}
         provider={MapView.PROVIDER_GOOGLE}
         style={{ width, height }}
-        showsUserLocation={true}
-        followsUserLocation={true}
+        // showsUserLocation={true}
+        //followsUserLocation={true}
         initialRegion={{
           latitude: busLocation.latitude,
           longitude: busLocation.longitude,
-          latitudeDelta: 0.007,
-          longitudeDelta: 0.007,
+          latitudeDelta: 0.07,
+          longitudeDelta: 0.07,
         }}
       >
-        <MapViewDirections
-          origin={busLocation} // Start from the first waypoint
-          destination={addressList[addressList?.length - 1]} // End at the last waypoint
-          waypoints={addressList} // Exclude the start and end waypoints
-          strokeWidth={7}
-          strokeColor="#3fc060"
-          apikey={GOOGLE_MAPS_APIKEY}
-          onReady={(result) => {
-            // Handle the route information here
-            setIsDriverClose(result.getMinutes <= 5);
-            setTotalMinutes(result.duration);
-            setTotalKm(result.distance);
-          }}
-        />
+        {origin && destination && (
+          <MapViewDirections
+            //key={index}
+            origin={{ latitude: origin.latitude, longitude: origin.longitude }}
+            destination={{
+              latitude: destination.latitude,
+              longitude: destination.longitude,
+            }}
+            mode={"DRIVING"}
+            //waypoints={nextWaypoints}
+            // waypoints={
+            //   index < addressList.length - 1 ? [addressList[index + 1]] : []
+            // }
+            precision="high"
+            strokeWidth={5}
+            strokeColor="blue"
+            apikey={GOOGLE_MAPS_APIKEY}
+            onReady={(result) => {
+              //console.log(result);
+              const isClose = result.duration <= 5;
+              if (isClose && !notificationSent) {
+                sendNotification("driver is close 5 minutes away");
+                setIsDriverClose(true);
+                setNotificationSent(true);
+              }
+              setTotalMinutes(result.duration);
+              setTotalKm(result.distance);
+
+              if (result.distance <= 1) {
+                handleNextWaypoint();
+              }
+            }}
+          />
+        )}
         <Marker
           coordinate={{
             latitude: busLocation.latitude,
             longitude: busLocation.longitude,
           }}
-          title={"Gracie Barra Van"}
-          description={vans?.name}
+          title={"Gracie Barra Bus"}
+          description={`${currentRouteData.Van.name} - ${currentRouteData.Van.model}`}
         >
           <View style={{ padding: 5 }}>
-            <FontAwesome5 name="map-marker-alt" size={30} color="red" />
+            <FontAwesome name="bus" size={30} color="green" />
           </View>
         </Marker>
-        {/* <Marker
-          coordinate={{
-            latitude: van.waypoints.latitude, 
-            longitude: van.waypoints.longitude
-          }}
-          title={van.kidsInRoute[address].first_name + " " +van.kidsInRoute[address].last_name + "  House's"} 
-          //description={}
-        >
-           <View style={{padding: 5}}>
-            <FontAwesome5 name='home' size={30} color='green' />
-          </View>
-        </Marker> */}
         {addressList.map((waypoint, index) => (
           <Marker
             key={index}
@@ -345,30 +503,31 @@ const HomeScreen = () => {
               latitude: waypoint.latitude,
               longitude: waypoint.longitude,
             }}
-            //title={`${waypoint.kidName} House's`}
-            //description={`${waypoint.latitude}, ${waypoint.longitude}`}
+            title={`${waypoint.Kid.name} House's`}
+            description={`${waypoint.Kid.dropOffAddress}`}
           >
-            <View style={{ padding: 5 }}>
-              <FontAwesome5 name="map-marker-alt" size={25} color="red" />
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 3,
+                borderRadius: 10,
+                borderColor: "black",
+                borderWidth: 1, // Add border width
+              }}
+            >
+              <Text style={{ color: "black" }}>{index + 1}</Text>
             </View>
           </Marker>
         ))}
       </MapView>
-      {/* <View style={styles.addressList}>
-        {routeCoords.map((waypoint, index) => (
-          <View key={index} style={styles.addressItem}>
-            <Text style={styles.addressItemText}>
-              Waypoint {index + 1}: {waypoint.latitude}, {waypoint.longitude}
-            </Text>
-          </View>
-        ))}
-      </View> */}
-      {/* <RouteInfoComponent
-        vans={vans}
-        routeCoords={routeCoords}
+
+      <RouteInfoComponent
+        vans={currentRouteData.Van}
+        addressList={addressList}
         driver={driver}
         helper={helper}
-      /> */}
+      />
+
       <BottomSheet
         ref={bottomSheetRef}
         snapPoints={snapPoints}
@@ -388,22 +547,24 @@ const HomeScreen = () => {
           <Text style={styles.routeDetailsText}>{totalKm.toFixed(2)} Km</Text>
         </View>
         <Text style={{ textAlign: "center", padding: 5 }}>
-          Kids on the Route ({vans?.name} - {vans?.model})
+          Kids on the Route ({addressList.kidName})
         </Text>
 
-        <View style={{ flex: 1, paddingBottom: 10, marginBottom: 65 }}>
-          {/* <BottomSheetFlatList
-            data={kids} //data={van.kidsInRoute}
+        <View
+          style={{
+            flex: 1,
+            paddingBottom: 10,
+            marginBottom: 65,
+            //backgroundColor: "red",
+          }}
+        >
+          <BottomSheetFlatList
+            data={addressList.kidName} //data={van.kidsInRoute}
             renderItem={renderItem}
             keyExtractor={(item) => item.name.toString()}
             contentContainerStyle={{ backgroundColor: "white" }}
-
-            // ListFooterComponent={() => (
-            //   <View>
-
-            //   </View>
-            // )}
-          /> */}
+            //ListFooterComponent={() => <View></View>}
+          />
 
           <Modal
             visible={selectedItem !== null}
@@ -484,7 +645,9 @@ const HomeScreen = () => {
         <View style={styles.buttonDriveContainer}>
           <TouchableOpacity
             onPress={() => {
+              updateRouteStatus("IN_PROGRESS");
               zoomInOnDriver();
+              //console.warn("Initialing the Route");
               // send push notification to user app
               sendNotification(
                 "Drop-off starting",

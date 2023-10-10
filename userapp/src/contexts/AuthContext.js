@@ -3,7 +3,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 //import { User, Kid } from '../models';
 import { Auth } from "aws-amplify";
 import { API, graphqlOperation } from "aws-amplify";
-import { listUsers, listKids } from "../graphql/queries";
+import { listUsers, listKids, getUser } from "../graphql/queries";
 
 const AuthContext = createContext({});
 
@@ -12,15 +12,16 @@ const AuthContextProvider = ({ children }) => {
   const [dbUser, setDbUser] = useState(null);
   const sub = authUser?.attributes?.sub;
   const [userEmail, setUserEmail] = useState(null); //authUser?.attributes?.email
-  const [isEmailVerified, setIsEmailVerified] = useState(false); //authUser?.attributes?.email_verified
+  //const [isEmailVerified, setIsEmailVerified] = useState(false); //authUser?.attributes?.email_verified
   const [kids, setKids] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserData, setCurrentUserData] = useState(null);
 
   useEffect(() => {
     Auth.currentAuthenticatedUser({ bypassCache: true })
       .then((user) => {
         setAuthUser(user);
-        setIsEmailVerified(user.attributes.email_verified);
+        //setIsEmailVerified(user.attributes.email_verified);
         setUserEmail(user.attributes.email);
         // Assuming that user.attributes.sub is the unique identifier for the user
         //setUserPassword(user.attributes.sub);
@@ -43,6 +44,14 @@ const AuthContextProvider = ({ children }) => {
     setDbUser(response);
     setLoading(false);
   };
+  const getCurrentUserData = async () => {
+    const responseGetUser = await API.graphql({
+      query: getUser,
+      variables: { id: dbUser.id },
+    });
+    //const userData =
+    setCurrentUserData(responseGetUser.data.getUser);
+  };
 
   useEffect(() => {
     if (!sub) {
@@ -50,6 +59,13 @@ const AuthContextProvider = ({ children }) => {
     }
     listUserFromQl();
   }, [sub]);
+
+  useEffect(() => {
+    if (!sub) {
+      return;
+    }
+    getCurrentUserData();
+  }, [dbUser]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,11 +106,19 @@ const AuthContextProvider = ({ children }) => {
     };
     fetchData();
     //console.log(isEmailVerified);
-  }, [isEmailVerified, userEmail]);
+  }, [userEmail]);
 
   return (
     <AuthContext.Provider
-      value={{ authUser, dbUser, sub, userEmail, kids, loading }}
+      value={{
+        authUser,
+        dbUser,
+        sub,
+        userEmail,
+        kids,
+        loading,
+        currentUserData,
+      }}
     >
       {children}
     </AuthContext.Provider>

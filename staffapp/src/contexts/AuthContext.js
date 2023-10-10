@@ -12,7 +12,7 @@ const AuthContextProvider = ({ children }) => {
   const [dbUser, setDbUser] = useState(null);
   const sub = authUser?.attributes?.sub;
   const [userEmail, setUserEmail] = useState(null); //authUser?.attributes?.email
-  const [isEmailVerified, setIsEmailVerified] = useState(false); //authUser?.attributes?.email_verified
+  //const [isEmailVerified, setIsEmailVerified] = useState(false); //authUser?.attributes?.email_verified
   const [userPassword, setUserPassword] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isDriver, setIsDriver] = useState(null);
@@ -22,7 +22,7 @@ const AuthContextProvider = ({ children }) => {
     Auth.currentAuthenticatedUser({ bypassCache: true })
       .then((user) => {
         setAuthUser(user);
-        setIsEmailVerified(user.attributes.email_verified);
+        //setIsEmailVerified(user.attributes.email_verified);
         setUserEmail(user.attributes.email);
         // Assuming that user.attributes.sub is the unique identifier for the user
         //setUserPassword(user.attributes.sub);

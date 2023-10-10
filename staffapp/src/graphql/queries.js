@@ -1,6 +1,91 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getAddressList = /* GraphQL */ `
+  query GetAddressList($id: ID!) {
+    getAddressList(id: $id) {
+      id
+      order
+      latitude
+      longitude
+      routeID
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        vans
+        routeID
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      addressListKidId
+      __typename
+    }
+  }
+`;
+export const listAddressLists = /* GraphQL */ `
+  query ListAddressLists(
+    $filter: ModelAddressListFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listAddressLists(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        order
+        latitude
+        longitude
+        routeID
+        createdAt
+        updatedAt
+        addressListKidId
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const addressListsByRouteID = /* GraphQL */ `
+  query AddressListsByRouteID(
+    $routeID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelAddressListFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    addressListsByRouteID(
+      routeID: $routeID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        order
+        latitude
+        longitude
+        routeID
+        createdAt
+        updatedAt
+        addressListKidId
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getVan = /* GraphQL */ `
   query GetVan($id: ID!) {
     getVan(id: $id) {
@@ -73,6 +158,10 @@ export const getRoute = /* GraphQL */ `
       }
       status
       Kids {
+        nextToken
+        __typename
+      }
+      AddressLists {
         nextToken
         __typename
       }
@@ -243,6 +332,7 @@ export const getUser = /* GraphQL */ `
       lat
       phoneNumber
       userType
+      photo
       createdAt
       updatedAt
       __typename
@@ -267,6 +357,7 @@ export const listUsers = /* GraphQL */ `
         lat
         phoneNumber
         userType
+        photo
         createdAt
         updatedAt
         __typename

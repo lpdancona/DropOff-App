@@ -7,34 +7,40 @@ import {
   Image,
   TouchableOpacity,
   Linking,
+  Pressable,
+  Modal,
 } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Appbar, Menu } from "react-native-paper";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import vans from "../../../assets/data/vans.json";
+import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
+//import vans from "../../../assets/data/vans.json";
 import styles from "./styles";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import * as Location from "expo-location";
+//import * as Location from "expo-location";
 import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import { FlatList } from "react-native-gesture-handler";
-//import { DataStore } from 'aws-amplify';
 import { useAuthContext } from "../../contexts/AuthContext";
-import { Auth } from "aws-amplify";
-//import { Route } from "../../models";
+import { Auth, Predicates } from "aws-amplify";
 import { API, graphqlOperation } from "aws-amplify";
-import { listRoutes, kidsByRouteID, getVan } from "../../graphql/queries";
+import {
+  listRoutes,
+  kidsByRouteID,
+  getVan,
+  getUser,
+} from "../../graphql/queries";
 import { onUpdateRoute } from "../../graphql/subscriptions";
 
-const van = vans[0];
-const gbLocation = {
-  latitude: 49.263527201707745,
-  longitude: -123.10070015042552,
-}; // gb location (we can import from the database in future)
+// const van = vans[0];
+// const gbLocation = {
+//   latitude: 49.263527201707745,
+//   longitude: -123.10070015042552,
+// }; // gb location (we can import from the database in future)
 
 const HomeScreen = () => {
-  const { kids, dbUser } = useAuthContext();
+  const { kids, dbUser, currentUserData } = useAuthContext();
+  const [selectedItem, setSelectedItem] = useState(null);
   const [dropOffLatLng, setDropLatLng] = useState(null);
   const [dropOffAddress, setDropOffAddress] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -46,16 +52,14 @@ const HomeScreen = () => {
   const [currentRouteData, setCurrentRouteData] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
-
-  const [isDriverClose, setIsDriverClose] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
+  const [matchingKids, setMatchingKids] = useState(null);
+  const [driver, setDriver] = useState(null);
+  const [helper, setHelper] = useState(null);
 
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
-  //const routeWaypoints = van.waypoints.slice(1);
 
-  // const getUserBySub = await API.graphql({query: listUsers, variables: { filter: {  sub: {eq: sub} } } })
-  // //graphqlOperation(listUsers))
-  // const response = getUserBySub.data.listUsers.items[0]
   const getRoutesData = async () => {
     try {
       const variables = {
@@ -109,15 +113,37 @@ const HomeScreen = () => {
       });
 
       if (routeWithMatchingKids) {
+        //console.log("RoutewihmatchinKids", routeWithMatchingKids);
         // Update the state variable with the route that has matching kids
         setCurrentRouteData(routeWithMatchingKids);
-      } else {
+        //
+        const matchingKidsArray = kids.filter((contextKid) =>
+          routeWithMatchingKids.Kid.some(
+            (routeKid) => routeKid.id === contextKid.id
+          )
+        );
+        if (matchingKidsArray.length > 0) {
+          // Update the state variable with matching kids
+          setMatchingKids(matchingKidsArray);
+
+          // Loop through matching kids and extract dropOffAddress and dropOffLatLng
+          matchingKidsArray.forEach((matchingKid) => {
+            const { dropOffAddress, lat, lng } = matchingKid;
+            // Do something with dropOffAddress and dropOffLatLng
+            setDropLatLng({ latitude: lat, longitude: lng });
+            setDropOffAddress(dropOffAddress);
+          });
+        }
+        return true;
       }
+      return false;
     }
+    return false;
   };
 
   useEffect(() => {
     // Fetch initial data when the component mounts
+
     const fetchInitialData = async () => {
       await getRoutesData();
     };
@@ -127,20 +153,42 @@ const HomeScreen = () => {
   useEffect(() => {
     if (routesData) {
       // Check kids in routes after fetching initial data
-      checkKidsInRoutes();
+      if (!checkKidsInRoutes()) {
+        setShowMessage(true);
+        handleLogout();
+      }
     }
-  }, [routesData]);
+  }, [routesData, kids]);
+
+  const getStaffData = async () => {
+    const responseGetDriver = await API.graphql({
+      query: getUser,
+      variables: { id: currentRouteData.driver },
+    });
+    const driverData = responseGetDriver.data.getUser;
+    //
+    const responseGetHelper = await API.graphql({
+      query: getUser,
+      variables: { id: currentRouteData.helper },
+    });
+    const helperData = responseGetHelper.data.getUser;
+    // console.log("driver Data", driverData);
+    // console.log("helper Data", helperData);
+    setDriver(driverData);
+    setHelper(helperData);
+  };
 
   useEffect(() => {
-    if (!kids[0]) {
+    if (!currentRouteData) {
       return;
     }
-    setDropLatLng({ latitude: kids[0].lat, longitude: kids[0].lng });
-    setDropOffAddress(kids[0].dropOffAddress);
-  }, [kids]);
+    getStaffData();
+  }, [currentRouteData]);
 
   useEffect(() => {
     // Update the bus location state when currentRouteData changes
+    //console.log("current Route data", currentRouteData);
+    //console.log(driver);
     if (currentRouteData) {
       const initialBusLocation = {
         latitude: currentRouteData.lat,
@@ -156,6 +204,7 @@ const HomeScreen = () => {
     }
     const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
       next: ({ value }) => {
+        //console.log(value);
         const newBusLocation = {
           latitude: value.data.onUpdateRoute.lat,
           longitude: value.data.onUpdateRoute.lng,
@@ -195,13 +244,19 @@ const HomeScreen = () => {
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
-
+  //console.log(driver);
   if (!busLocation || !dropOffLatLng) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
 
   return (
     <View style={styles.mapContainer}>
+      {showMessage && (
+        <View>
+          <Text>Your kids are not on any of your routes for the day!</Text>
+        </View>
+      )}
+
       <Appbar.Header>
         <Appbar.Action icon="menu" onPress={openMenu} />
         {/* <Appbar.Content title="Parent Home Screen" /> */}
@@ -231,12 +286,12 @@ const HomeScreen = () => {
         <MapViewDirections
           origin={busLocation} // Start from the first waypoint
           destination={dropOffLatLng} //{van.waypoints[van.waypoints.length - 1]} // End at the last waypoint
-          strokeWidth={7}
-          strokeColor="#3fc060"
+          strokeWidth={1}
+          strokeColor="rgba(0, 0, 0, 0)"
           apikey={GOOGLE_MAPS_APIKEY}
           onReady={(result) => {
             // Handle the route information here
-            setIsDriverClose(result.distance <= 0.1);
+            //setIsDriverClose(result.distance <= 0.1);
             setTotalMinutes(result.duration);
             setTotalKm(result.distance);
           }}
@@ -250,7 +305,7 @@ const HomeScreen = () => {
           description={currentRouteData?.Van?.name}
         >
           <View style={{ padding: 5 }}>
-            <FontAwesome5 name="map-marker-alt" size={30} color="red" />
+            <FontAwesome name="bus" size={30} color="green" />
           </View>
         </Marker>
         <Marker
@@ -258,25 +313,15 @@ const HomeScreen = () => {
             latitude: dropOffLatLng?.latitude,
             longitude: dropOffLatLng?.longitude, //van.waypoints[address].longitude
           }}
-          title={`${kids
-            .map((kid, index) => `${kid.name}`)
-            .join(" - ")} House's`} //{kids[0].name} //van.kidsInRoute[address].first_name + " " +van.kidsInRoute[address].last_name + "  House's"}
+          title={matchingKids.map((kid) => `${kid.name} House's`).join(" - ")}
+          // title={`${kids.map((kid) => `${kid.name}`).join(" - ")} House's`} //{kids[0].name} //van.kidsInRoute[address].first_name + " " +van.kidsInRoute[address].last_name + "  House's"}
           description={dropOffAddress}
         >
           <View style={{ padding: 5 }}>
-            <FontAwesome5 name="home" size={30} color="green" />
+            <FontAwesome5 name="home" size={30} color="red" />
           </View>
         </Marker>
       </MapView>
-      {/* {deliveryStatus === ORDER_STATUSES.READY_FOR_PICKUP && (
-        <Ionicons 
-          onPress={() => navigation.goBack()}
-          name='arrow-back-circle'
-          size={45}
-          color='black'
-          style={{top: 40, left: 15, position: 'absolute'}}
-        />
-      )} */}
       <BottomSheet
         ref={bottomSheetRef}
         snapPoints={snapPoints}
@@ -296,12 +341,12 @@ const HomeScreen = () => {
           />
           <Text style={styles.routeDetailsText}>{totalKm.toFixed(2)} Km</Text>
         </View>
-        <View style={{ padding: 5, marginBottom: 1 }}>
-          <Text>
+        <View style={{ padding: 5, marginBottom: 1, flex: 1 }}>
+          <Text style={{ textAlign: "center" }}>
             Kids on the Route ({currentRouteData?.Van?.name} -{" "}
             {currentRouteData?.Van?.model})
           </Text>
-          <View style={{ flex: 0, color: "red" }}>
+          <View style={{ flex: 1, color: "red" }}>
             <BottomSheetFlatList
               data={currentRouteData.Kid}
               renderItem={({ item }) => (
@@ -312,10 +357,7 @@ const HomeScreen = () => {
                       padding: 10,
                     }}
                   >
-                    <Text style={{ fontSize: 20 }}>
-                      {" "}
-                      {item.first_name} {item.last_name}
-                    </Text>
+                    <Text style={{ fontSize: 20 }}> {item.name}</Text>
                   </View>
                 </View>
               )}
@@ -326,21 +368,44 @@ const HomeScreen = () => {
               }}
               ListFooterComponent={() => (
                 <View>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={{ paddingRight: 130, paddingLeft: 30 }}>
-                      Driver: Tais
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      //alignItems: "center",
+                      //textAlign: "center",
+                      //justifyContent: "space-between",
+                      marginLeft: 20,
+                      position: "absolute",
+                    }}
+                  >
+                    <Text style={{ marginRight: 20 }}>
+                      Driver: {driver?.name}
                     </Text>
-                    <Text>Helper: Elaine</Text>
+                    <Text>Helper: {helper?.name} </Text>
                   </View>
                   <View style={styles.container}>
-                    <Image
-                      source={require("../../../assets/img/Tais.jpeg")}
-                      style={styles.image}
-                    />
-                    <Image
-                      source={require("../../../assets/img/Elaine.jpeg")}
-                      style={styles.image}
-                    />
+                    <Pressable
+                      onPress={(e) => {
+                        setSelectedItem(driver);
+                        //setClickPositionY(e.nativeEvent.pageY);
+                      }}
+                    >
+                      <Image
+                        source={{ uri: driver?.photo }}
+                        style={styles.image}
+                      />
+                    </Pressable>
+                    <Pressable
+                      onPress={(e) => {
+                        setSelectedItem(helper);
+                        //setClickPositionY(e.nativeEvent.pageY);
+                      }}
+                    >
+                      <Image
+                        source={{ uri: helper?.photo }}
+                        style={styles.image}
+                      />
+                    </Pressable>
                   </View>
                   <View style={{ alignItems: "center", marginTop: 1 }}>
                     <TouchableOpacity
@@ -372,6 +437,35 @@ const HomeScreen = () => {
                 </View>
               )}
             />
+            <Modal
+              visible={selectedItem !== null}
+              animationType="slide"
+              transparent={true}
+              onRequestClose={() => {
+                setSelectedItem(null);
+              }}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  {selectedItem && (
+                    <View>
+                      <Text>{selectedItem.name}</Text>
+                      <Text>{selectedItem.phoneNumber}</Text>
+                      <Text>{selectedItem.email}</Text>
+                      <Text>{selectedItem.userType}</Text>
+                      <Pressable
+                        onPress={() => {
+                          setSelectedItem(null); // Close the popup when pressed
+                        }}
+                        style={styles.closeButton}
+                      >
+                        <Text style={styles.closeButtonText}>Close</Text>
+                      </Pressable>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </Modal>
           </View>
         </View>
       </BottomSheet>
