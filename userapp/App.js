@@ -6,8 +6,9 @@ import { Auth } from "aws-amplify";
 import { withAuthenticator } from "@aws-amplify/ui-react-native";
 import AuthContextProvider from "./src/contexts/AuthContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-//import registerNNPushToken from "native-notify";
+import PushNotificationsContextProvider from "./src/contexts/PushNotificationsContext";
 import { PaperProvider } from "react-native-paper";
+//import registerNNPushToken from "native-notify";
 
 // Aws Amplify config
 import { Amplify } from "aws-amplify";
@@ -19,14 +20,16 @@ function App() {
 
   return (
     <NavigationContainer>
-      <AuthContextProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <PaperProvider>
-            <RootNavigator />
-          </PaperProvider>
-        </GestureHandlerRootView>
-        <StatusBar style="light" />
-      </AuthContextProvider>
+      <PushNotificationsContextProvider>
+        <AuthContextProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <PaperProvider>
+              <RootNavigator />
+            </PaperProvider>
+          </GestureHandlerRootView>
+          <StatusBar style="light" />
+        </AuthContextProvider>
+      </PushNotificationsContextProvider>
     </NavigationContainer>
   );
 }

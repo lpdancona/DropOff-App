@@ -3,6 +3,7 @@ import {
   View,
   Text,
   ScrollView,
+  SafeAreaView,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
@@ -24,7 +25,7 @@ const RouteInfoComponent = ({ vans, addressList, driver, helper }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View>
         <Text style={styles.heading}>Route Information</Text>
         <View style={styles.row}>
@@ -60,7 +61,7 @@ const RouteInfoComponent = ({ vans, addressList, driver, helper }) => {
           <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

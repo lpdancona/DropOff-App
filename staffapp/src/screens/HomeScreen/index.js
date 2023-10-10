@@ -76,7 +76,8 @@ import { usePushNotificationsContext } from "../../contexts/PushNotificationsCon
 // };
 
 const HomeScreen = () => {
-  const { schedulePushNotification } = usePushNotificationsContext();
+  const { schedulePushNotification, sendPushNotification } =
+    usePushNotificationsContext();
   const { dbUser, isDriver, currentUserData } = useAuthContext();
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
@@ -179,7 +180,10 @@ const HomeScreen = () => {
       //console.log("isDriver? ", isDriver);
       const variables = {
         filter: {
-          status: { eq: "WAITING_TO_START" }, //status: { eq: "IN_PROGRESS" }, //
+          or: [
+            { status: { eq: "WAITING_TO_START" } },
+            { status: { eq: "IN_PROGRESS" } }, //status: { eq: "IN_PROGRESS" }, //
+          ],
         },
       };
 
@@ -642,10 +646,15 @@ const HomeScreen = () => {
         </View>
         <View style={styles.buttonDriveContainer}>
           <TouchableOpacity
-            onPress={() => {
-              schedulePushNotification(
-                "Drop-off starting",
-                "Dear parents, The children are leaving for drop off. Remember that we care about the maximum safety of the children, so there may be delays in the estimated time depending on traffic. Thank you"
+            onPress={async () => {
+              // schedulePushNotification(
+              //   "Drop-off starting",
+              //   "Dear parents, The children are leaving for drop off. Remember that we care about the maximum safety of the children, so there may be delays in the estimated time depending on traffic. Thank you"
+              // );
+              await sendPushNotification(
+                "ExponentPushToken[sj2WvlIU0ORVR6B5lDvKXD]",
+                "drop off start",
+                "dear parents"
               );
               //updateRouteStatus("IN_PROGRESS");
               zoomInOnDriver();
