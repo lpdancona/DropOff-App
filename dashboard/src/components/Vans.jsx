@@ -44,6 +44,36 @@ function Vans() {
     };
     fetchVans();
   }, []);
+  async function getVanById(vanId) {
+    try {
+      const response = await API.graphql(
+        graphqlOperation(getVan, { id: vanId })
+      );
+
+      const vanData = response.data.getVan;
+      console.log("van data", vanData);
+      console.log("Fetched van data:", vanData);
+
+      return vanData;
+    } catch (error) {
+      console.error("Error fetching van:", error);
+      throw error;
+    }
+  }
+  const handleVanModelSelect = async (e) => {
+    const model = e.target.value;
+    setSelectedVanModel(model);
+
+    // Find the first van with the selected model
+    const selectedVanData = vans.find((van) => van && van.model === model);
+
+    if (selectedVanData) {
+      const vanDetails = await getVanById(selectedVanData.id);
+      setSelectedVan(vanDetails);
+    } else {
+      setSelectedVan(null);
+    }
+  };
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -72,16 +102,6 @@ function Vans() {
     };
     fetchEmployees();
   }, []);
-
-  // Function to handle van model selection
-  const handleVanModelSelect = (e) => {
-    const model = e.target.value;
-    setSelectedVanModel(model);
-
-    // Find the first van with the selected model
-    const selectedVanData = vans.find((van) => van && van.model === model);
-    setSelectedVan(selectedVanData);
-  };
 
   // Function to handle input changes for new van data
   const handleNewVanChange = (e) => {
@@ -214,7 +234,7 @@ function Vans() {
             ))}
           </select>
 
-          {selectedVan && selectedVan.model && (
+          {selectedVan && (
             <div className="selected-van-info">
               <div className="share-van">
                 <h3>Selected Van: {selectedVan.model}</h3>{" "}
@@ -225,7 +245,7 @@ function Vans() {
                   <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
                 </Link>
               </div>
-              <h4>Employees:</h4>
+              {/* <h4>Employees:</h4> */}
               {/* <ul className="van-employees">
                 {selectedVan.employes.map((employeeId) => {
                   const employee = employees.find((e) => e._id === employeeId);
@@ -240,28 +260,41 @@ function Vans() {
                     </li>
                   );
                 })}
-              </ul>
+              </ul> */}
               <h4>Students:</h4>
               <ul className="van-students">
-                {selectedVan.students.map((studentId) => {
-                  const student = students.find((s) => s._id === studentId);
-                  return (
-                    <li key={student._id} className="van-student">
-                      <img src={student.photo} alt="" />
-
-                      <div className="van-student-info">
-                        <div className="van-student-name">{student.name}</div>
-                        <div className="van-student-address">
-                          {student.address}
-                        </div>
-                      </div>
-                      <button onClick={() => handleUnaddStudent(student._id)}>
-                        <FontAwesomeIcon icon={faUserXmark} />
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul> */}
+                {selectedVan &&
+                selectedVan.Kids &&
+                selectedVan.Kids.length > 0 ? (
+                  selectedVan.Kids.map((studentId) => {
+                    const student = students.find((s) => s._id === studentId);
+                    if (student) {
+                      return (
+                        <li key={student._id} className="van-student">
+                          <img src={student.photo} alt="" />
+                          <div className="van-student-info">
+                            <div className="van-student-name">
+                              {student.name}
+                            </div>
+                            <div className="van-student-address">
+                              {student.address}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleUnaddStudent(student._id)}
+                          >
+                            <FontAwesomeIcon icon={faUserXmark} />
+                          </button>
+                        </li>
+                      );
+                    } else {
+                      return null; // Handle the case where the student is not found
+                    }
+                  })
+                ) : (
+                  <p>No students in this van.</p>
+                )}
+              </ul>
             </div>
           )}
         </div>
