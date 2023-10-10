@@ -46,10 +46,11 @@ function Vans() {
   }, []);
   async function getVanById(vanId) {
     try {
-      const response = await API.graphql(
-        graphqlOperation(getVan, { id: vanId })
-      );
-
+      const response = await API.graphql({
+        query: getVan,
+        variables: { id: vanId },
+      });
+      console.log(vanId);
       const vanData = response.data.getVan;
       console.log("van data", vanData);
       console.log("Fetched van data:", vanData);
