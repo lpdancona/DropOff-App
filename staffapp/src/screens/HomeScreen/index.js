@@ -36,7 +36,7 @@ import {
 } from "../../graphql/queries";
 import { updateRoute } from "../../graphql/mutations";
 import axios from "axios";
-import ExpoPushNotifications from "../../components/ExpoPushNotifications";
+import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
 
 // import vans from "../../../assets/data/vans.json";
 
@@ -76,6 +76,7 @@ import ExpoPushNotifications from "../../components/ExpoPushNotifications";
 // };
 
 const HomeScreen = () => {
+  const { schedulePushNotification } = usePushNotificationsContext();
   const { dbUser, isDriver, currentUserData } = useAuthContext();
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
@@ -103,7 +104,7 @@ const HomeScreen = () => {
   const [notificationSent, setNotificationSent] = useState(false);
 
   const renderItem = ({ item, index }) => {
-    if (!dbRoute) {
+    if (!currentRouteData) {
       return <ActivityIndicator size="large" color="gray" />;
     }
     //console.log(routeCoords)
@@ -333,7 +334,6 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (currentRouteData) {
-      //console.log(addressList);
       updateLocation();
     }
   }, [busLocation]);
@@ -546,20 +546,18 @@ const HomeScreen = () => {
           />
           <Text style={styles.routeDetailsText}>{totalKm.toFixed(2)} Km</Text>
         </View>
-        <Text style={{ textAlign: "center", padding: 5 }}>
-          Kids on the Route ({addressList.kidName})
+        <Text style={{ textAlign: "center", padding: 5, marginBottom: 5 }}>
+          Kids on the Route
         </Text>
 
         <View
           style={{
             flex: 1,
-            paddingBottom: 10,
-            marginBottom: 65,
-            //backgroundColor: "red",
+            color: "red",
           }}
         >
           <BottomSheetFlatList
-            data={addressList.kidName} //data={van.kidsInRoute}
+            data={currentRouteData.Kid} //data={van.kidsInRoute}
             renderItem={renderItem}
             keyExtractor={(item) => item.name.toString()}
             contentContainerStyle={{ backgroundColor: "white" }}
@@ -645,14 +643,19 @@ const HomeScreen = () => {
         <View style={styles.buttonDriveContainer}>
           <TouchableOpacity
             onPress={() => {
-              updateRouteStatus("IN_PROGRESS");
-              zoomInOnDriver();
-              //console.warn("Initialing the Route");
-              // send push notification to user app
-              sendNotification(
+              schedulePushNotification(
                 "Drop-off starting",
                 "Dear parents, The children are leaving for drop off. Remember that we care about the maximum safety of the children, so there may be delays in the estimated time depending on traffic. Thank you"
               );
+              //updateRouteStatus("IN_PROGRESS");
+              zoomInOnDriver();
+              //console.warn("Initialing the Route");
+              // send push notification to user app
+
+              // sendNotification(
+              //   "Drop-off starting",
+              //   "Dear parents, The children are leaving for drop off. Remember that we care about the maximum safety of the children, so there may be delays in the estimated time depending on traffic. Thank you"
+              // );
               // Create an array of waypoint coordinates
               // const waypointsWithoutLast = dbRoute?.route.slice(0, -1);
               // const waypoints = waypointsWithoutLast.map((waypoint) => {

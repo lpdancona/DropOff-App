@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#0a43fc"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.geodarth.dropoffgb"
@@ -23,7 +21,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.geodarth.dropoffgb"
+      "package": "com.geodarth.dropoffgb",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
