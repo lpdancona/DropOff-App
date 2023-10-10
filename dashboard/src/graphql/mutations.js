@@ -1,57 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createWeekday = /* GraphQL */ `
-  mutation CreateWeekday(
-    $input: CreateWeekdayInput!
-    $condition: ModelWeekdayConditionInput
-  ) {
-    createWeekday(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-  }
-`;
-export const updateWeekday = /* GraphQL */ `
-  mutation UpdateWeekday(
-    $input: UpdateWeekdayInput!
-    $condition: ModelWeekdayConditionInput
-  ) {
-    updateWeekday(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-  }
-`;
-export const deleteWeekday = /* GraphQL */ `
-  mutation DeleteWeekday(
-    $input: DeleteWeekdayInput!
-    $condition: ModelWeekdayConditionInput
-  ) {
-    deleteWeekday(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-  }
-`;
 export const createVan = /* GraphQL */ `
   mutation CreateVan(
     $input: CreateVanInput!
@@ -68,14 +17,10 @@ export const createVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -96,14 +41,10 @@ export const updateVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -124,14 +65,10 @@ export const deleteVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -143,7 +80,6 @@ export const createRoute = /* GraphQL */ `
   ) {
     createRoute(input: $input, condition: $condition) {
       id
-      van
       date
       departTime
       lat
@@ -151,11 +87,27 @@ export const createRoute = /* GraphQL */ `
       driver
       helper
       route
+      Van {
+        id
+        name
+        image
+        plate
+        model
+        year
+        seats
+        bosterSeats
+        createdAt
+        updatedAt
+        __typename
+      }
+      status
+      Kids {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
+      routeVanId
       __typename
     }
   }
@@ -167,7 +119,6 @@ export const updateRoute = /* GraphQL */ `
   ) {
     updateRoute(input: $input, condition: $condition) {
       id
-      van
       date
       departTime
       lat
@@ -175,11 +126,27 @@ export const updateRoute = /* GraphQL */ `
       driver
       helper
       route
+      Van {
+        id
+        name
+        image
+        plate
+        model
+        year
+        seats
+        bosterSeats
+        createdAt
+        updatedAt
+        __typename
+      }
+      status
+      Kids {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
+      routeVanId
       __typename
     }
   }
@@ -191,7 +158,6 @@ export const deleteRoute = /* GraphQL */ `
   ) {
     deleteRoute(input: $input, condition: $condition) {
       id
-      van
       date
       departTime
       lat
@@ -199,11 +165,27 @@ export const deleteRoute = /* GraphQL */ `
       driver
       helper
       route
+      Van {
+        id
+        name
+        image
+        plate
+        model
+        year
+        seats
+        bosterSeats
+        createdAt
+        updatedAt
+        __typename
+      }
+      status
+      Kids {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
+      routeVanId
       __typename
     }
   }
@@ -224,11 +206,9 @@ export const createKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -249,11 +229,9 @@ export const updateKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -274,11 +252,9 @@ export const deleteKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -292,17 +268,15 @@ export const createUser = /* GraphQL */ `
       id
       sub
       name
-      userType
+      email
       unitNumber
       address
       lng
       lat
       phoneNumber
+      userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -316,17 +290,15 @@ export const updateUser = /* GraphQL */ `
       id
       sub
       name
-      userType
+      email
       unitNumber
       address
       lng
       lat
       phoneNumber
+      userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -340,17 +312,15 @@ export const deleteUser = /* GraphQL */ `
       id
       sub
       name
-      userType
+      email
       unitNumber
       address
       lng
       lat
       phoneNumber
+      userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }

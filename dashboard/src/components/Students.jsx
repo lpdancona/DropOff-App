@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { API, graphqlOperation } from "aws-amplify";
+import { createKid, updateKid, deleteKid } from "../graphql/mutations";
+import { listKids } from "../graphql/queries";
 import { DataStore } from "@aws-amplify/datastore";
 import { Kid } from "../models";
 import "./Students.css";
@@ -28,7 +31,9 @@ function Students() {
   useEffect(() => {
     const fetchKids = async () => {
       try {
-        const kidsData = await DataStore.query(Kid);
+        const response = await API.graphql({ query: listKids });
+        console.log(response);
+        const kidsData = response.data.listKids.items;
         setStudents(kidsData);
       } catch (error) {
         console.error("Error fetching kids", error);
@@ -81,14 +86,12 @@ function Students() {
     }
 
     try {
-      // Use DataStore.delete to delete the Kid
-      await DataStore.delete(Kid, selectedStudent.id);
-
-      // Filter out the deleted Kid from the students state
+      await API.graphql(
+        graphqlOperation(deleteKid, { input: { id: selectedStudent.id } })
+      );
       const updatedStudents = students.filter(
         (student) => student.id !== selectedStudent.id
       );
-
       setStudents(updatedStudents);
       setSelectedStudent(null);
       setMode("list");
@@ -103,20 +106,26 @@ function Students() {
     }
     try {
       console.log("Updating student...");
-      // Use DataStore.save to update the Kid
-      const updatedKid = await DataStore.save(
-        Kid.copyOf(selectedStudent, (updated) => {
-          updated.name = updatedName;
-          updated.address = updatedAddress;
-          updated.age = updatedAge;
-          updated.parent1Email = updatedParent1Email;
-          updated.parent2Email = updatedParent2Email;
-          updated.photo = updatedPhoto;
+      await API.graphql(
+        graphqlOperation(updateKid, {
+          input: {
+            id: selectedStudent.id,
+            name: updatedName,
+            parent1Email: updatedParent1Email,
+            parent2Email: updatedParent2Email,
+            dropOffAddress: updatedAddress,
+            lat: selectedStudent.lat,
+            lng: selectedStudent.lng,
+            birthDate: updatedAge,
+            photo: updatedPhoto,
+            vans: selectedStudent.vans,
+          },
         })
       );
-      // Update the students state with the updatedKid
       const updatedStudents = students.map((student) =>
-        student.id === updatedKid.id ? updatedKid : student
+        student.id === selectedStudent.id
+          ? { ...student, name: updatedName, dropOffAddress: updatedAddress }
+          : student
       );
       setStudents(updatedStudents);
       setSelectedStudent(null);

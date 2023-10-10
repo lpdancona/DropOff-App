@@ -7,7 +7,6 @@
 import * as React from "react";
 import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
-import { Van } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -46,7 +45,7 @@ export declare type AddKidVanProps = React.PropsWithChildren<{
     overrides?: AddKidVanOverridesProps | undefined | null;
 } & {
     id?: string;
-    van?: Van;
+    van?: any;
     onSubmit?: (fields: AddKidVanInputValues) => AddKidVanInputValues;
     onSuccess?: (fields: AddKidVanInputValues) => void;
     onError?: (fields: AddKidVanInputValues, errorMessage: string) => void;

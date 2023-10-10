@@ -1,72 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const getWeekday = /* GraphQL */ `
-  query GetWeekday($id: ID!) {
-    getWeekday(id: $id) {
-      id
-      name
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-  }
-`;
-export const listWeekdays = /* GraphQL */ `
-  query ListWeekdays(
-    $filter: ModelWeekdayFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listWeekdays(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        name
-        createdAt
-        updatedAt
-        _version
-        _deleted
-        _lastChangedAt
-        __typename
-      }
-      nextToken
-      startedAt
-      __typename
-    }
-  }
-`;
-export const syncWeekdays = /* GraphQL */ `
-  query SyncWeekdays(
-    $filter: ModelWeekdayFilterInput
-    $limit: Int
-    $nextToken: String
-    $lastSync: AWSTimestamp
-  ) {
-    syncWeekdays(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      lastSync: $lastSync
-    ) {
-      items {
-        id
-        name
-        createdAt
-        updatedAt
-        _version
-        _deleted
-        _lastChangedAt
-        __typename
-      }
-      nextToken
-      startedAt
-      __typename
-    }
-  }
-`;
 export const getVan = /* GraphQL */ `
   query GetVan($id: ID!) {
     getVan(id: $id) {
@@ -80,14 +14,10 @@ export const getVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -110,31 +40,25 @@ export const listVans = /* GraphQL */ `
         bosterSeats
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
       nextToken
-      startedAt
       __typename
     }
   }
 `;
-export const syncVans = /* GraphQL */ `
-  query SyncVans(
-    $filter: ModelVanFilterInput
-    $limit: Int
-    $nextToken: String
-    $lastSync: AWSTimestamp
-  ) {
-    syncVans(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      lastSync: $lastSync
-    ) {
-      items {
+export const getRoute = /* GraphQL */ `
+  query GetRoute($id: ID!) {
+    getRoute(id: $id) {
+      id
+      date
+      departTime
+      lat
+      lng
+      driver
+      helper
+      route
+      Van {
         id
         name
         image
@@ -145,34 +69,16 @@ export const syncVans = /* GraphQL */ `
         bosterSeats
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
-      nextToken
-      startedAt
-      __typename
-    }
-  }
-`;
-export const getRoute = /* GraphQL */ `
-  query GetRoute($id: ID!) {
-    getRoute(id: $id) {
-      id
-      van
-      date
-      departTime
-      lat
-      lng
-      driver
-      helper
-      route
+      status
+      Kids {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
+      routeVanId
       __typename
     }
   }
@@ -186,7 +92,6 @@ export const listRoutes = /* GraphQL */ `
     listRoutes(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        van
         date
         departTime
         lat
@@ -194,51 +99,13 @@ export const listRoutes = /* GraphQL */ `
         driver
         helper
         route
+        status
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
+        routeVanId
         __typename
       }
       nextToken
-      startedAt
-      __typename
-    }
-  }
-`;
-export const syncRoutes = /* GraphQL */ `
-  query SyncRoutes(
-    $filter: ModelRouteFilterInput
-    $limit: Int
-    $nextToken: String
-    $lastSync: AWSTimestamp
-  ) {
-    syncRoutes(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      lastSync: $lastSync
-    ) {
-      items {
-        id
-        van
-        date
-        departTime
-        lat
-        lng
-        driver
-        helper
-        route
-        createdAt
-        updatedAt
-        _version
-        _deleted
-        _lastChangedAt
-        __typename
-      }
-      nextToken
-      startedAt
       __typename
     }
   }
@@ -256,11 +123,9 @@ export const getKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -283,52 +148,12 @@ export const listKids = /* GraphQL */ `
         birthDate
         photo
         vans
+        routeID
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
       nextToken
-      startedAt
-      __typename
-    }
-  }
-`;
-export const syncKids = /* GraphQL */ `
-  query SyncKids(
-    $filter: ModelKidFilterInput
-    $limit: Int
-    $nextToken: String
-    $lastSync: AWSTimestamp
-  ) {
-    syncKids(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      lastSync: $lastSync
-    ) {
-      items {
-        id
-        name
-        parent1Email
-        parent2Email
-        dropOffAddress
-        lat
-        lng
-        birthDate
-        photo
-        vans
-        createdAt
-        updatedAt
-        _version
-        _deleted
-        _lastChangedAt
-        __typename
-      }
-      nextToken
-      startedAt
       __typename
     }
   }
@@ -359,15 +184,48 @@ export const kidsByVans = /* GraphQL */ `
         birthDate
         photo
         vans
+        routeID
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
       nextToken
-      startedAt
+      __typename
+    }
+  }
+`;
+export const kidsByRouteID = /* GraphQL */ `
+  query KidsByRouteID(
+    $routeID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelKidFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    kidsByRouteID(
+      routeID: $routeID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        vans
+        routeID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
       __typename
     }
   }
@@ -378,17 +236,15 @@ export const getUser = /* GraphQL */ `
       id
       sub
       name
-      userType
+      email
       unitNumber
       address
       lng
       lat
       phoneNumber
+      userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -404,57 +260,18 @@ export const listUsers = /* GraphQL */ `
         id
         sub
         name
-        userType
+        email
         unitNumber
         address
         lng
         lat
         phoneNumber
-        createdAt
-        updatedAt
-        _version
-        _deleted
-        _lastChangedAt
-        __typename
-      }
-      nextToken
-      startedAt
-      __typename
-    }
-  }
-`;
-export const syncUsers = /* GraphQL */ `
-  query SyncUsers(
-    $filter: ModelUserFilterInput
-    $limit: Int
-    $nextToken: String
-    $lastSync: AWSTimestamp
-  ) {
-    syncUsers(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      lastSync: $lastSync
-    ) {
-      items {
-        id
-        sub
-        name
         userType
-        unitNumber
-        address
-        lng
-        lat
-        phoneNumber
         createdAt
         updatedAt
-        _version
-        _deleted
-        _lastChangedAt
         __typename
       }
       nextToken
-      startedAt
       __typename
     }
   }

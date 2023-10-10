@@ -7,7 +7,6 @@
 import * as React from "react";
 import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
-import { Kid } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -49,7 +48,7 @@ export declare type KidUpdateFormProps = React.PropsWithChildren<{
     overrides?: KidUpdateFormOverridesProps | undefined | null;
 } & {
     id?: string;
-    kid?: Kid;
+    kid?: any;
     onSubmit?: (fields: KidUpdateFormInputValues) => KidUpdateFormInputValues;
     onSuccess?: (fields: KidUpdateFormInputValues) => void;
     onError?: (fields: KidUpdateFormInputValues, errorMessage: string) => void;

@@ -15,34 +15,40 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type UserCreateFormInputValues = {
     sub?: string;
     name?: string;
-    userType?: string;
+    email?: string;
     unitNumber?: string;
     address?: string;
     lng?: number;
     lat?: number;
     phoneNumber?: string;
+    userType?: string;
+    photo?: string;
 };
 export declare type UserCreateFormValidationValues = {
     sub?: ValidationFunction<string>;
     name?: ValidationFunction<string>;
-    userType?: ValidationFunction<string>;
+    email?: ValidationFunction<string>;
     unitNumber?: ValidationFunction<string>;
     address?: ValidationFunction<string>;
     lng?: ValidationFunction<number>;
     lat?: ValidationFunction<number>;
     phoneNumber?: ValidationFunction<string>;
+    userType?: ValidationFunction<string>;
+    photo?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type UserCreateFormOverridesProps = {
     UserCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     sub?: PrimitiveOverrideProps<TextFieldProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
-    userType?: PrimitiveOverrideProps<SelectFieldProps>;
+    email?: PrimitiveOverrideProps<TextFieldProps>;
     unitNumber?: PrimitiveOverrideProps<TextFieldProps>;
     address?: PrimitiveOverrideProps<TextFieldProps>;
     lng?: PrimitiveOverrideProps<TextFieldProps>;
     lat?: PrimitiveOverrideProps<TextFieldProps>;
     phoneNumber?: PrimitiveOverrideProps<TextFieldProps>;
+    userType?: PrimitiveOverrideProps<SelectFieldProps>;
+    photo?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type UserCreateFormProps = React.PropsWithChildren<{
     overrides?: UserCreateFormOverridesProps | undefined | null;

@@ -7,7 +7,6 @@
 import * as React from "react";
 import { GridProps, SelectFieldProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
-import { Route } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -49,7 +48,7 @@ export declare type RouteUpdateFormProps = React.PropsWithChildren<{
     overrides?: RouteUpdateFormOverridesProps | undefined | null;
 } & {
     id?: string;
-    route?: Route;
+    route?: any;
     onSubmit?: (fields: RouteUpdateFormInputValues) => RouteUpdateFormInputValues;
     onSuccess?: (fields: RouteUpdateFormInputValues) => void;
     onError?: (fields: RouteUpdateFormInputValues, errorMessage: string) => void;

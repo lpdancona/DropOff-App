@@ -1,48 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onCreateWeekday = /* GraphQL */ `
-  subscription OnCreateWeekday($filter: ModelSubscriptionWeekdayFilterInput) {
-    onCreateWeekday(filter: $filter) {
-      id
-      name
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateWeekday = /* GraphQL */ `
-  subscription OnUpdateWeekday($filter: ModelSubscriptionWeekdayFilterInput) {
-    onUpdateWeekday(filter: $filter) {
-      id
-      name
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteWeekday = /* GraphQL */ `
-  subscription OnDeleteWeekday($filter: ModelSubscriptionWeekdayFilterInput) {
-    onDeleteWeekday(filter: $filter) {
-      id
-      name
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-  }
-`;
 export const onCreateVan = /* GraphQL */ `
   subscription OnCreateVan($filter: ModelSubscriptionVanFilterInput) {
     onCreateVan(filter: $filter) {
@@ -56,14 +14,10 @@ export const onCreateVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -81,14 +35,10 @@ export const onUpdateVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -106,14 +56,10 @@ export const onDeleteVan = /* GraphQL */ `
       bosterSeats
       Kids {
         nextToken
-        startedAt
         __typename
       }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -122,7 +68,6 @@ export const onCreateRoute = /* GraphQL */ `
   subscription OnCreateRoute($filter: ModelSubscriptionRouteFilterInput) {
     onCreateRoute(filter: $filter) {
       id
-      van
       date
       departTime
       lat
@@ -130,11 +75,27 @@ export const onCreateRoute = /* GraphQL */ `
       driver
       helper
       route
+      Van {
+        id
+        name
+        image
+        plate
+        model
+        year
+        seats
+        bosterSeats
+        createdAt
+        updatedAt
+        __typename
+      }
+      status
+      Kids {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
+      routeVanId
       __typename
     }
   }
@@ -143,7 +104,6 @@ export const onUpdateRoute = /* GraphQL */ `
   subscription OnUpdateRoute($filter: ModelSubscriptionRouteFilterInput) {
     onUpdateRoute(filter: $filter) {
       id
-      van
       date
       departTime
       lat
@@ -151,11 +111,27 @@ export const onUpdateRoute = /* GraphQL */ `
       driver
       helper
       route
+      Van {
+        id
+        name
+        image
+        plate
+        model
+        year
+        seats
+        bosterSeats
+        createdAt
+        updatedAt
+        __typename
+      }
+      status
+      Kids {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
+      routeVanId
       __typename
     }
   }
@@ -164,7 +140,6 @@ export const onDeleteRoute = /* GraphQL */ `
   subscription OnDeleteRoute($filter: ModelSubscriptionRouteFilterInput) {
     onDeleteRoute(filter: $filter) {
       id
-      van
       date
       departTime
       lat
@@ -172,11 +147,27 @@ export const onDeleteRoute = /* GraphQL */ `
       driver
       helper
       route
+      Van {
+        id
+        name
+        image
+        plate
+        model
+        year
+        seats
+        bosterSeats
+        createdAt
+        updatedAt
+        __typename
+      }
+      status
+      Kids {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
+      routeVanId
       __typename
     }
   }
@@ -194,11 +185,9 @@ export const onCreateKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -216,11 +205,9 @@ export const onUpdateKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -238,11 +225,9 @@ export const onDeleteKid = /* GraphQL */ `
       birthDate
       photo
       vans
+      routeID
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -253,17 +238,15 @@ export const onCreateUser = /* GraphQL */ `
       id
       sub
       name
-      userType
+      email
       unitNumber
       address
       lng
       lat
       phoneNumber
+      userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -274,17 +257,15 @@ export const onUpdateUser = /* GraphQL */ `
       id
       sub
       name
-      userType
+      email
       unitNumber
       address
       lng
       lat
       phoneNumber
+      userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }
@@ -295,17 +276,15 @@ export const onDeleteUser = /* GraphQL */ `
       id
       sub
       name
-      userType
+      email
       unitNumber
       address
       lng
       lat
       phoneNumber
+      userType
       createdAt
       updatedAt
-      _version
-      _deleted
-      _lastChangedAt
       __typename
     }
   }

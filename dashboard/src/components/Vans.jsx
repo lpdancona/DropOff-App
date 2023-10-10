@@ -3,6 +3,7 @@ import "./Vans.css";
 import AddStudent from "../components/AddStudent";
 import AddEmployee from "../components/AddEmployee";
 import { DataStore } from "@aws-amplify/datastore";
+import { API, graphqlOperation } from "aws-amplify";
 import { Van } from "../models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,6 +12,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import AddVan from "./AddVan";
 import { Link } from "react-router-dom";
+import { createVan, updateVan, deleteVan } from "../graphql/mutations";
+import { listVans, getVan } from "../graphql/queries";
 
 function Vans() {
   const [students, setStudents] = useState([]);
@@ -26,17 +29,15 @@ function Vans() {
   });
 
   useEffect(() => {
+    // Fetch the list of vans using the GraphQL query
     const fetchVans = async () => {
       try {
-        const response = await fetch(
-          "https://drop-off-app-dere.onrender.com/api/vans"
+        const response = await API.graphql(
+          graphqlOperation(listVans, { limit: 100 })
         );
-        if (response.ok) {
-          const json = await response.json();
-          setVans(json.vans);
-        } else {
-          console.error("Failed to fetch vans data");
-        }
+        const vansData = response.data.listVans.items;
+        console.log("fetched data", vansData);
+        setVans(vansData);
       } catch (error) {
         console.error("Error fetching vans:", error);
       }
@@ -213,7 +214,7 @@ function Vans() {
             ))}
           </select>
 
-          {selectedVan && (
+          {selectedVan && selectedVan.model && (
             <div className="selected-van-info">
               <div className="share-van">
                 <h3>Selected Van: {selectedVan.model}</h3>{" "}
@@ -225,7 +226,7 @@ function Vans() {
                 </Link>
               </div>
               <h4>Employees:</h4>
-              <ul className="van-employees">
+              {/* <ul className="van-employees">
                 {selectedVan.employes.map((employeeId) => {
                   const employee = employees.find((e) => e._id === employeeId);
                   return (
@@ -260,7 +261,7 @@ function Vans() {
                     </li>
                   );
                 })}
-              </ul>
+              </ul> */}
             </div>
           )}
         </div>

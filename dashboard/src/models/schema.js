@@ -1,64 +1,5 @@
 export const schema = {
     "models": {
-        "Weekday": {
-            "name": "Weekday",
-            "fields": {
-                "id": {
-                    "name": "id",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": true,
-                    "attributes": []
-                },
-                "name": {
-                    "name": "name",
-                    "isArray": false,
-                    "type": "String",
-                    "isRequired": false,
-                    "attributes": []
-                },
-                "createdAt": {
-                    "name": "createdAt",
-                    "isArray": false,
-                    "type": "AWSDateTime",
-                    "isRequired": false,
-                    "attributes": [],
-                    "isReadOnly": true
-                },
-                "updatedAt": {
-                    "name": "updatedAt",
-                    "isArray": false,
-                    "type": "AWSDateTime",
-                    "isRequired": false,
-                    "attributes": [],
-                    "isReadOnly": true
-                }
-            },
-            "syncable": true,
-            "pluralName": "Weekdays",
-            "attributes": [
-                {
-                    "type": "model",
-                    "properties": {}
-                },
-                {
-                    "type": "auth",
-                    "properties": {
-                        "rules": [
-                            {
-                                "allow": "public",
-                                "operations": [
-                                    "create",
-                                    "update",
-                                    "delete",
-                                    "read"
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
         "Van": {
             "name": "Van",
             "fields": {
@@ -262,6 +203,22 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "Kids": {
+                    "name": "Kids",
+                    "isArray": true,
+                    "type": {
+                        "model": "Kid"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "routeID"
+                        ]
+                    }
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -384,6 +341,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "routeID": {
+                    "name": "routeID",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -414,6 +378,15 @@ export const schema = {
                         "name": "byVan",
                         "fields": [
                             "vans"
+                        ]
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "byRoute",
+                        "fields": [
+                            "routeID"
                         ]
                     }
                 },
@@ -459,12 +432,10 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "userType": {
-                    "name": "userType",
+                "email": {
+                    "name": "email",
                     "isArray": false,
-                    "type": {
-                        "enum": "UserTypes"
-                    },
+                    "type": "String",
                     "isRequired": false,
                     "attributes": []
                 },
@@ -500,6 +471,15 @@ export const schema = {
                     "name": "phoneNumber",
                     "isArray": false,
                     "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "userType": {
+                    "name": "userType",
+                    "isArray": false,
+                    "type": {
+                        "enum": "UserTypes"
+                    },
                     "isRequired": false,
                     "attributes": []
                 },
@@ -566,5 +546,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "bc95661781552135d5adc19a918fe037"
+    "version": "ca43a94ba17b07574092c833e659597e"
 };

@@ -8,9 +8,10 @@
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { Van } from "../models";
 import { fetchByPath, validateField } from "./utils";
-import { DataStore } from "aws-amplify";
+import { API } from "aws-amplify";
+import { getVan } from "../graphql/queries";
+import { updateVan } from "../graphql/mutations";
 export default function VanUpdateForm(props) {
   const {
     id: idProp,
@@ -58,7 +59,14 @@ export default function VanUpdateForm(props) {
   const [vanRecord, setVanRecord] = React.useState(vanModelProp);
   React.useEffect(() => {
     const queryData = async () => {
-      const record = idProp ? await DataStore.query(Van, idProp) : vanModelProp;
+      const record = idProp
+        ? (
+            await API.graphql({
+              query: getVan,
+              variables: { id: idProp },
+            })
+          )?.data?.getVan
+        : vanModelProp;
       setVanRecord(record);
     };
     queryData();
@@ -99,13 +107,13 @@ export default function VanUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          name,
-          image,
-          plate,
-          model,
-          year,
-          seats,
-          bosterSeats,
+          name: name ?? null,
+          image: image ?? null,
+          plate: plate ?? null,
+          model: model ?? null,
+          year: year ?? null,
+          seats: seats ?? null,
+          bosterSeats: bosterSeats ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -135,17 +143,22 @@ export default function VanUpdateForm(props) {
               modelFields[key] = null;
             }
           });
-          await DataStore.save(
-            Van.copyOf(vanRecord, (updated) => {
-              Object.assign(updated, modelFields);
-            })
-          );
+          await API.graphql({
+            query: updateVan,
+            variables: {
+              input: {
+                id: vanRecord.id,
+                ...modelFields,
+              },
+            },
+          });
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
-            onError(modelFields, err.message);
+            const messages = err.errors.map((e) => e.message).join("\n");
+            onError(modelFields, messages);
           }
         }
       }}

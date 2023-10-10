@@ -15,9 +15,9 @@ import {
   TextField,
 } from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { Route } from "../models";
 import { fetchByPath, validateField } from "./utils";
-import { DataStore } from "aws-amplify";
+import { API } from "aws-amplify";
+import { createRoute } from "../graphql/mutations";
 export default function RouteCreateForm(props) {
   const {
     clearOnSuccess = true,
@@ -132,7 +132,14 @@ export default function RouteCreateForm(props) {
               modelFields[key] = null;
             }
           });
-          await DataStore.save(new Route(modelFields));
+          await API.graphql({
+            query: createRoute,
+            variables: {
+              input: {
+                ...modelFields,
+              },
+            },
+          });
           if (onSuccess) {
             onSuccess(modelFields);
           }
@@ -141,7 +148,8 @@ export default function RouteCreateForm(props) {
           }
         } catch (err) {
           if (onError) {
-            onError(modelFields, err.message);
+            const messages = err.errors.map((e) => e.message).join("\n");
+            onError(modelFields, messages);
           }
         }
       }}

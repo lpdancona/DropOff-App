@@ -1,12 +1,16 @@
+type AddressList @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  order: Int
+  latitude: Float
+  longitude: Float
+  routeID: ID! @index(name: "byRoute")
+  Kid: Kid @hasOne
+}
+
 enum RouteStatus {
   IN_PROGRESS
   FINISHED
   WAITING_TO_START
-}
-
-type Weekday @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  name: String
 }
 
 type Van @model @auth(rules: [{allow: public}]) {
@@ -22,7 +26,7 @@ type Van @model @auth(rules: [{allow: public}]) {
 }
 
 type Route @model @auth(rules: [{allow: public}]) {
-  id: ID!
+  id: ID
   date: String
   departTime: String
   lat: Float
@@ -32,6 +36,8 @@ type Route @model @auth(rules: [{allow: public}]) {
   route: AWSJSON
   Van: Van @hasOne
   status: RouteStatus
+  Kids: [Kid] @hasMany(indexName: "byRoute", fields: ["id"])
+  AddressLists: [AddressList] @hasMany(indexName: "byRoute", fields: ["id"])
 }
 
 type Kid @model @auth(rules: [{allow: public}]) {
@@ -45,6 +51,7 @@ type Kid @model @auth(rules: [{allow: public}]) {
   birthDate: AWSDate
   photo: String
   vans: ID @index(name: "byVan")
+  routeID: ID @index(name: "byRoute")
 }
 
 enum UserTypes {
@@ -57,11 +64,13 @@ type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   sub: String!
   name: String!
-  userType: UserTypes
+  email: String
   unitNumber: String
   address: String!
   lng: Float!
   lat: Float!
   phoneNumber: String
+  userType: UserTypes
+  photo: String
 }
  

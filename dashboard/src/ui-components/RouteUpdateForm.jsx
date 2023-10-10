@@ -15,9 +15,10 @@ import {
   TextField,
 } from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { Route } from "../models";
 import { fetchByPath, validateField } from "./utils";
-import { DataStore } from "aws-amplify";
+import { API } from "aws-amplify";
+import { getRoute } from "../graphql/queries";
+import { updateRoute } from "../graphql/mutations";
 export default function RouteUpdateForm(props) {
   const {
     id: idProp,
@@ -71,7 +72,12 @@ export default function RouteUpdateForm(props) {
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
-        ? await DataStore.query(Route, idProp)
+        ? (
+            await API.graphql({
+              query: getRoute,
+              variables: { id: idProp },
+            })
+          )?.data?.getRoute
         : routeModelProp;
       setRouteRecord(record);
     };
@@ -114,14 +120,14 @@ export default function RouteUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          date,
-          departTime,
-          lat,
-          lng,
-          driver,
-          helper,
-          route,
-          status,
+          date: date ?? null,
+          departTime: departTime ?? null,
+          lat: lat ?? null,
+          lng: lng ?? null,
+          driver: driver ?? null,
+          helper: helper ?? null,
+          route: route ?? null,
+          status: status ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -151,17 +157,22 @@ export default function RouteUpdateForm(props) {
               modelFields[key] = null;
             }
           });
-          await DataStore.save(
-            Route.copyOf(routeRecord, (updated) => {
-              Object.assign(updated, modelFields);
-            })
-          );
+          await API.graphql({
+            query: updateRoute,
+            variables: {
+              input: {
+                id: routeRecord.id,
+                ...modelFields,
+              },
+            },
+          });
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
-            onError(modelFields, err.message);
+            const messages = err.errors.map((e) => e.message).join("\n");
+            onError(modelFields, messages);
           }
         }
       }}

@@ -14,9 +14,9 @@ import {
   TextField,
 } from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { User } from "../models";
 import { fetchByPath, validateField } from "./utils";
-import { DataStore } from "aws-amplify";
+import { API } from "aws-amplify";
+import { createUser } from "../graphql/mutations";
 export default function UserCreateForm(props) {
   const {
     clearOnSuccess = true,
@@ -31,16 +31,18 @@ export default function UserCreateForm(props) {
   const initialValues = {
     sub: "",
     name: "",
-    userType: "",
+    email: "",
     unitNumber: "",
     address: "",
     lng: "",
     lat: "",
     phoneNumber: "",
+    userType: "",
+    photo: "",
   };
   const [sub, setSub] = React.useState(initialValues.sub);
   const [name, setName] = React.useState(initialValues.name);
-  const [userType, setUserType] = React.useState(initialValues.userType);
+  const [email, setEmail] = React.useState(initialValues.email);
   const [unitNumber, setUnitNumber] = React.useState(initialValues.unitNumber);
   const [address, setAddress] = React.useState(initialValues.address);
   const [lng, setLng] = React.useState(initialValues.lng);
@@ -48,27 +50,33 @@ export default function UserCreateForm(props) {
   const [phoneNumber, setPhoneNumber] = React.useState(
     initialValues.phoneNumber
   );
+  const [userType, setUserType] = React.useState(initialValues.userType);
+  const [photo, setPhoto] = React.useState(initialValues.photo);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setSub(initialValues.sub);
     setName(initialValues.name);
-    setUserType(initialValues.userType);
+    setEmail(initialValues.email);
     setUnitNumber(initialValues.unitNumber);
     setAddress(initialValues.address);
     setLng(initialValues.lng);
     setLat(initialValues.lat);
     setPhoneNumber(initialValues.phoneNumber);
+    setUserType(initialValues.userType);
+    setPhoto(initialValues.photo);
     setErrors({});
   };
   const validations = {
     sub: [{ type: "Required" }],
     name: [{ type: "Required" }],
-    userType: [],
+    email: [],
     unitNumber: [],
     address: [{ type: "Required" }],
     lng: [{ type: "Required" }],
     lat: [{ type: "Required" }],
     phoneNumber: [],
+    userType: [],
+    photo: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -98,12 +106,14 @@ export default function UserCreateForm(props) {
         let modelFields = {
           sub,
           name,
-          userType,
+          email,
           unitNumber,
           address,
           lng,
           lat,
           phoneNumber,
+          userType,
+          photo,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -133,7 +143,14 @@ export default function UserCreateForm(props) {
               modelFields[key] = null;
             }
           });
-          await DataStore.save(new User(modelFields));
+          await API.graphql({
+            query: createUser,
+            variables: {
+              input: {
+                ...modelFields,
+              },
+            },
+          });
           if (onSuccess) {
             onSuccess(modelFields);
           }
@@ -142,7 +159,8 @@ export default function UserCreateForm(props) {
           }
         } catch (err) {
           if (onError) {
-            onError(modelFields, err.message);
+            const messages = err.errors.map((e) => e.message).join("\n");
+            onError(modelFields, messages);
           }
         }
       }}
@@ -160,12 +178,14 @@ export default function UserCreateForm(props) {
             const modelFields = {
               sub: value,
               name,
-              userType,
+              email,
               unitNumber,
               address,
               lng,
               lat,
               phoneNumber,
+              userType,
+              photo,
             };
             const result = onChange(modelFields);
             value = result?.sub ?? value;
@@ -191,12 +211,14 @@ export default function UserCreateForm(props) {
             const modelFields = {
               sub,
               name: value,
-              userType,
+              email,
               unitNumber,
               address,
               lng,
               lat,
               phoneNumber,
+              userType,
+              photo,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -211,6 +233,212 @@ export default function UserCreateForm(props) {
         hasError={errors.name?.hasError}
         {...getOverrideProps(overrides, "name")}
       ></TextField>
+      <TextField
+        label="Email"
+        isRequired={false}
+        isReadOnly={false}
+        value={email}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              sub,
+              name,
+              email: value,
+              unitNumber,
+              address,
+              lng,
+              lat,
+              phoneNumber,
+              userType,
+              photo,
+            };
+            const result = onChange(modelFields);
+            value = result?.email ?? value;
+          }
+          if (errors.email?.hasError) {
+            runValidationTasks("email", value);
+          }
+          setEmail(value);
+        }}
+        onBlur={() => runValidationTasks("email", email)}
+        errorMessage={errors.email?.errorMessage}
+        hasError={errors.email?.hasError}
+        {...getOverrideProps(overrides, "email")}
+      ></TextField>
+      <TextField
+        label="Unit number"
+        isRequired={false}
+        isReadOnly={false}
+        value={unitNumber}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              sub,
+              name,
+              email,
+              unitNumber: value,
+              address,
+              lng,
+              lat,
+              phoneNumber,
+              userType,
+              photo,
+            };
+            const result = onChange(modelFields);
+            value = result?.unitNumber ?? value;
+          }
+          if (errors.unitNumber?.hasError) {
+            runValidationTasks("unitNumber", value);
+          }
+          setUnitNumber(value);
+        }}
+        onBlur={() => runValidationTasks("unitNumber", unitNumber)}
+        errorMessage={errors.unitNumber?.errorMessage}
+        hasError={errors.unitNumber?.hasError}
+        {...getOverrideProps(overrides, "unitNumber")}
+      ></TextField>
+      <TextField
+        label="Address"
+        isRequired={true}
+        isReadOnly={false}
+        value={address}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              sub,
+              name,
+              email,
+              unitNumber,
+              address: value,
+              lng,
+              lat,
+              phoneNumber,
+              userType,
+              photo,
+            };
+            const result = onChange(modelFields);
+            value = result?.address ?? value;
+          }
+          if (errors.address?.hasError) {
+            runValidationTasks("address", value);
+          }
+          setAddress(value);
+        }}
+        onBlur={() => runValidationTasks("address", address)}
+        errorMessage={errors.address?.errorMessage}
+        hasError={errors.address?.hasError}
+        {...getOverrideProps(overrides, "address")}
+      ></TextField>
+      <TextField
+        label="Lng"
+        isRequired={true}
+        isReadOnly={false}
+        type="number"
+        step="any"
+        value={lng}
+        onChange={(e) => {
+          let value = isNaN(parseFloat(e.target.value))
+            ? e.target.value
+            : parseFloat(e.target.value);
+          if (onChange) {
+            const modelFields = {
+              sub,
+              name,
+              email,
+              unitNumber,
+              address,
+              lng: value,
+              lat,
+              phoneNumber,
+              userType,
+              photo,
+            };
+            const result = onChange(modelFields);
+            value = result?.lng ?? value;
+          }
+          if (errors.lng?.hasError) {
+            runValidationTasks("lng", value);
+          }
+          setLng(value);
+        }}
+        onBlur={() => runValidationTasks("lng", lng)}
+        errorMessage={errors.lng?.errorMessage}
+        hasError={errors.lng?.hasError}
+        {...getOverrideProps(overrides, "lng")}
+      ></TextField>
+      <TextField
+        label="Lat"
+        isRequired={true}
+        isReadOnly={false}
+        type="number"
+        step="any"
+        value={lat}
+        onChange={(e) => {
+          let value = isNaN(parseFloat(e.target.value))
+            ? e.target.value
+            : parseFloat(e.target.value);
+          if (onChange) {
+            const modelFields = {
+              sub,
+              name,
+              email,
+              unitNumber,
+              address,
+              lng,
+              lat: value,
+              phoneNumber,
+              userType,
+              photo,
+            };
+            const result = onChange(modelFields);
+            value = result?.lat ?? value;
+          }
+          if (errors.lat?.hasError) {
+            runValidationTasks("lat", value);
+          }
+          setLat(value);
+        }}
+        onBlur={() => runValidationTasks("lat", lat)}
+        errorMessage={errors.lat?.errorMessage}
+        hasError={errors.lat?.hasError}
+        {...getOverrideProps(overrides, "lat")}
+      ></TextField>
+      <TextField
+        label="Phone number"
+        isRequired={false}
+        isReadOnly={false}
+        value={phoneNumber}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              sub,
+              name,
+              email,
+              unitNumber,
+              address,
+              lng,
+              lat,
+              phoneNumber: value,
+              userType,
+              photo,
+            };
+            const result = onChange(modelFields);
+            value = result?.phoneNumber ?? value;
+          }
+          if (errors.phoneNumber?.hasError) {
+            runValidationTasks("phoneNumber", value);
+          }
+          setPhoneNumber(value);
+        }}
+        onBlur={() => runValidationTasks("phoneNumber", phoneNumber)}
+        errorMessage={errors.phoneNumber?.errorMessage}
+        hasError={errors.phoneNumber?.hasError}
+        {...getOverrideProps(overrides, "phoneNumber")}
+      ></TextField>
       <SelectField
         label="User type"
         placeholder="Please select an option"
@@ -222,12 +450,14 @@ export default function UserCreateForm(props) {
             const modelFields = {
               sub,
               name,
-              userType: value,
+              email,
               unitNumber,
               address,
               lng,
               lat,
               phoneNumber,
+              userType: value,
+              photo,
             };
             const result = onChange(modelFields);
             value = result?.userType ?? value;
@@ -259,167 +489,37 @@ export default function UserCreateForm(props) {
         ></option>
       </SelectField>
       <TextField
-        label="Unit number"
+        label="Photo"
         isRequired={false}
         isReadOnly={false}
-        value={unitNumber}
+        value={photo}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
               sub,
               name,
-              userType,
-              unitNumber: value,
-              address,
-              lng,
-              lat,
-              phoneNumber,
-            };
-            const result = onChange(modelFields);
-            value = result?.unitNumber ?? value;
-          }
-          if (errors.unitNumber?.hasError) {
-            runValidationTasks("unitNumber", value);
-          }
-          setUnitNumber(value);
-        }}
-        onBlur={() => runValidationTasks("unitNumber", unitNumber)}
-        errorMessage={errors.unitNumber?.errorMessage}
-        hasError={errors.unitNumber?.hasError}
-        {...getOverrideProps(overrides, "unitNumber")}
-      ></TextField>
-      <TextField
-        label="Address"
-        isRequired={true}
-        isReadOnly={false}
-        value={address}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              sub,
-              name,
-              userType,
-              unitNumber,
-              address: value,
-              lng,
-              lat,
-              phoneNumber,
-            };
-            const result = onChange(modelFields);
-            value = result?.address ?? value;
-          }
-          if (errors.address?.hasError) {
-            runValidationTasks("address", value);
-          }
-          setAddress(value);
-        }}
-        onBlur={() => runValidationTasks("address", address)}
-        errorMessage={errors.address?.errorMessage}
-        hasError={errors.address?.hasError}
-        {...getOverrideProps(overrides, "address")}
-      ></TextField>
-      <TextField
-        label="Lng"
-        isRequired={true}
-        isReadOnly={false}
-        type="number"
-        step="any"
-        value={lng}
-        onChange={(e) => {
-          let value = isNaN(parseFloat(e.target.value))
-            ? e.target.value
-            : parseFloat(e.target.value);
-          if (onChange) {
-            const modelFields = {
-              sub,
-              name,
-              userType,
-              unitNumber,
-              address,
-              lng: value,
-              lat,
-              phoneNumber,
-            };
-            const result = onChange(modelFields);
-            value = result?.lng ?? value;
-          }
-          if (errors.lng?.hasError) {
-            runValidationTasks("lng", value);
-          }
-          setLng(value);
-        }}
-        onBlur={() => runValidationTasks("lng", lng)}
-        errorMessage={errors.lng?.errorMessage}
-        hasError={errors.lng?.hasError}
-        {...getOverrideProps(overrides, "lng")}
-      ></TextField>
-      <TextField
-        label="Lat"
-        isRequired={true}
-        isReadOnly={false}
-        type="number"
-        step="any"
-        value={lat}
-        onChange={(e) => {
-          let value = isNaN(parseFloat(e.target.value))
-            ? e.target.value
-            : parseFloat(e.target.value);
-          if (onChange) {
-            const modelFields = {
-              sub,
-              name,
-              userType,
-              unitNumber,
-              address,
-              lng,
-              lat: value,
-              phoneNumber,
-            };
-            const result = onChange(modelFields);
-            value = result?.lat ?? value;
-          }
-          if (errors.lat?.hasError) {
-            runValidationTasks("lat", value);
-          }
-          setLat(value);
-        }}
-        onBlur={() => runValidationTasks("lat", lat)}
-        errorMessage={errors.lat?.errorMessage}
-        hasError={errors.lat?.hasError}
-        {...getOverrideProps(overrides, "lat")}
-      ></TextField>
-      <TextField
-        label="Phone number"
-        isRequired={false}
-        isReadOnly={false}
-        value={phoneNumber}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              sub,
-              name,
-              userType,
+              email,
               unitNumber,
               address,
               lng,
               lat,
-              phoneNumber: value,
+              phoneNumber,
+              userType,
+              photo: value,
             };
             const result = onChange(modelFields);
-            value = result?.phoneNumber ?? value;
+            value = result?.photo ?? value;
           }
-          if (errors.phoneNumber?.hasError) {
-            runValidationTasks("phoneNumber", value);
+          if (errors.photo?.hasError) {
+            runValidationTasks("photo", value);
           }
-          setPhoneNumber(value);
+          setPhoto(value);
         }}
-        onBlur={() => runValidationTasks("phoneNumber", phoneNumber)}
-        errorMessage={errors.phoneNumber?.errorMessage}
-        hasError={errors.phoneNumber?.hasError}
-        {...getOverrideProps(overrides, "phoneNumber")}
+        onBlur={() => runValidationTasks("photo", photo)}
+        errorMessage={errors.photo?.errorMessage}
+        hasError={errors.photo?.hasError}
+        {...getOverrideProps(overrides, "photo")}
       ></TextField>
       <Flex
         justifyContent="space-between"

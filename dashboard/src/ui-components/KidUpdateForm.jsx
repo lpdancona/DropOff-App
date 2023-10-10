@@ -8,9 +8,10 @@
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { Kid } from "../models";
 import { fetchByPath, validateField } from "./utils";
-import { DataStore } from "aws-amplify";
+import { API } from "aws-amplify";
+import { getKid } from "../graphql/queries";
+import { updateKid } from "../graphql/mutations";
 export default function KidUpdateForm(props) {
   const {
     id: idProp,
@@ -65,7 +66,14 @@ export default function KidUpdateForm(props) {
   const [kidRecord, setKidRecord] = React.useState(kidModelProp);
   React.useEffect(() => {
     const queryData = async () => {
-      const record = idProp ? await DataStore.query(Kid, idProp) : kidModelProp;
+      const record = idProp
+        ? (
+            await API.graphql({
+              query: getKid,
+              variables: { id: idProp },
+            })
+          )?.data?.getKid
+        : kidModelProp;
       setKidRecord(record);
     };
     queryData();
@@ -108,13 +116,13 @@ export default function KidUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           name,
-          parent1Email,
-          parent2Email,
-          dropOffAddress,
-          lat,
-          lng,
-          birthDate,
-          photo,
+          parent1Email: parent1Email ?? null,
+          parent2Email: parent2Email ?? null,
+          dropOffAddress: dropOffAddress ?? null,
+          lat: lat ?? null,
+          lng: lng ?? null,
+          birthDate: birthDate ?? null,
+          photo: photo ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -144,17 +152,22 @@ export default function KidUpdateForm(props) {
               modelFields[key] = null;
             }
           });
-          await DataStore.save(
-            Kid.copyOf(kidRecord, (updated) => {
-              Object.assign(updated, modelFields);
-            })
-          );
+          await API.graphql({
+            query: updateKid,
+            variables: {
+              input: {
+                id: kidRecord.id,
+                ...modelFields,
+              },
+            },
+          });
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
-            onError(modelFields, err.message);
+            const messages = err.errors.map((e) => e.message).join("\n");
+            onError(modelFields, messages);
           }
         }
       }}

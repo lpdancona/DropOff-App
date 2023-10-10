@@ -7,7 +7,6 @@
 import * as React from "react";
 import { GridProps, SelectFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
-import { User } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -16,40 +15,46 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type UserUpdateFormInputValues = {
     sub?: string;
     name?: string;
-    userType?: string;
+    email?: string;
     unitNumber?: string;
     address?: string;
     lng?: number;
     lat?: number;
     phoneNumber?: string;
+    userType?: string;
+    photo?: string;
 };
 export declare type UserUpdateFormValidationValues = {
     sub?: ValidationFunction<string>;
     name?: ValidationFunction<string>;
-    userType?: ValidationFunction<string>;
+    email?: ValidationFunction<string>;
     unitNumber?: ValidationFunction<string>;
     address?: ValidationFunction<string>;
     lng?: ValidationFunction<number>;
     lat?: ValidationFunction<number>;
     phoneNumber?: ValidationFunction<string>;
+    userType?: ValidationFunction<string>;
+    photo?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type UserUpdateFormOverridesProps = {
     UserUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     sub?: PrimitiveOverrideProps<TextFieldProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
-    userType?: PrimitiveOverrideProps<SelectFieldProps>;
+    email?: PrimitiveOverrideProps<TextFieldProps>;
     unitNumber?: PrimitiveOverrideProps<TextFieldProps>;
     address?: PrimitiveOverrideProps<TextFieldProps>;
     lng?: PrimitiveOverrideProps<TextFieldProps>;
     lat?: PrimitiveOverrideProps<TextFieldProps>;
     phoneNumber?: PrimitiveOverrideProps<TextFieldProps>;
+    userType?: PrimitiveOverrideProps<SelectFieldProps>;
+    photo?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type UserUpdateFormProps = React.PropsWithChildren<{
     overrides?: UserUpdateFormOverridesProps | undefined | null;
 } & {
     id?: string;
-    user?: User;
+    user?: any;
     onSubmit?: (fields: UserUpdateFormInputValues) => UserUpdateFormInputValues;
     onSuccess?: (fields: UserUpdateFormInputValues) => void;
     onError?: (fields: UserUpdateFormInputValues, errorMessage: string) => void;
