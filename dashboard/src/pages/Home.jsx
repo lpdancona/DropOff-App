@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Home.css";
-import Navbar from "../components/Navbar";
 
 export default function Home() {
   const [weekdays, setWeekdays] = useState([]);

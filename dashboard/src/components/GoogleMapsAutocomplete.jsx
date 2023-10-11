@@ -5,21 +5,25 @@ function GoogleMapsAutocomplete({ onPlaceSelect }) {
   const libInjectionRequired = useRef(!Boolean(window.google));
   const libLoading = useRef(false);
   const [autocomplete, setAutocomplete] = useState();
+
   const handlePlaceSelect = useCallback(() => {
-    const selectedPlace = autocomplete.getPlace();
-    if (selectedPlace) {
-      onPlaceSelect(selectedPlace);
+    if (autocomplete) {
+      const selectedPlace = autocomplete.getPlace();
+      if (selectedPlace) {
+        onPlaceSelect(selectedPlace);
+      }
     }
   }, [onPlaceSelect, autocomplete]);
 
   useEffect(() => {
     const initAutocomplete = () => {
-      setAutocomplete(
-        new window.google.maps.places.Autocomplete(autocompleteInput.current)
-      );
+      if (window.google && window.google.maps && window.google.maps.places) {
+        setAutocomplete(
+          new window.google.maps.places.Autocomplete(autocompleteInput.current)
+        );
+      }
     };
 
-    // Check if the Google Maps script has already been loaded
     if (libInjectionRequired.current) {
       if (libLoading.current === true) return;
       libLoading.current = true;
@@ -28,7 +32,6 @@ function GoogleMapsAutocomplete({ onPlaceSelect }) {
       script.async = true;
       script.defer = true;
 
-      // Use a callback function to ensure proper initialization
       script.onload = () => {
         initAutocomplete();
       };
@@ -41,13 +44,15 @@ function GoogleMapsAutocomplete({ onPlaceSelect }) {
 
   useEffect(() => {
     let listener;
-    if (!autocomplete) return;
-    listener = autocomplete.addListener("place_changed", handlePlaceSelect);
+    if (autocomplete) {
+      listener = autocomplete.addListener("place_changed", handlePlaceSelect);
 
-    return () => {
-      if (!listener) return;
-      window.google.maps.event.removeListener(listener);
-    };
+      return () => {
+        if (listener) {
+          window.google.maps.event.removeListener(listener);
+        }
+      };
+    }
   }, [autocomplete, handlePlaceSelect]);
 
   return (
@@ -60,4 +65,5 @@ function GoogleMapsAutocomplete({ onPlaceSelect }) {
     </div>
   );
 }
+
 export default GoogleMapsAutocomplete;

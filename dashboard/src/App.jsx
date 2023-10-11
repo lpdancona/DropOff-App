@@ -8,6 +8,7 @@ import Vans from "./components/Vans";
 import Employees from "./components/Employees";
 import VanDetailPage from "./pages/VanDetailPage";
 import awsExports from "./aws-exports";
+import VansMaps from "./components/VansMaps";
 Amplify.configure(awsExports);
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/vans" element={<Vans />} />
             <Route path="/employees" element={<Employees />} />
             <Route path="/vans/:vanId" element={<VanDetailPage />} />
+            <Route path="/maps" element={<VansMaps />} />
           </Routes>
         </div>
       </BrowserRouter>
