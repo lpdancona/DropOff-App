@@ -113,6 +113,7 @@ const PushNotificationsContextProvider = ({ children }) => {
         registerForPushNotificationsAsync,
         schedulePushNotification,
         sendPushNotification,
+        expoPushToken,
       }}
     >
       {children}

@@ -26,7 +26,7 @@ const PushNotificationsContextProvider = ({ children }) => {
       sound: "default",
       title: title,
       body: body,
-      data: { user: "geo" },
+      //data: { user: "geo" },
     };
 
     await fetch("https://exp.host/--/api/v2/push/send", {
@@ -113,6 +113,7 @@ const PushNotificationsContextProvider = ({ children }) => {
         registerForPushNotificationsAsync,
         schedulePushNotification,
         sendPushNotification,
+        expoPushToken,
       }}
     >
       {children}

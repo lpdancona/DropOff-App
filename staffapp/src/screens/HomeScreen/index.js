@@ -35,7 +35,6 @@ import {
   getKid,
 } from "../../graphql/queries";
 import { updateRoute } from "../../graphql/mutations";
-import axios from "axios";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
 
 // import vans from "../../../assets/data/vans.json";
@@ -76,7 +75,7 @@ import { usePushNotificationsContext } from "../../contexts/PushNotificationsCon
 // };
 
 const HomeScreen = () => {
-  const { schedulePushNotification, sendPushNotification } =
+  const { schedulePushNotification, sendPushNotification, expoPushToken } =
     usePushNotificationsContext();
   const { dbUser, isDriver, currentUserData } = useAuthContext();
   const bottomSheetRef = useRef(null);
@@ -88,10 +87,6 @@ const HomeScreen = () => {
   const [isDriverClose, setIsDriverClose] = useState(false);
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
-  const [expoPushToken, setExpoPushToken] = useState("");
-  const [notification, setNotification] = useState(false);
-  const notificationListener = useRef();
-  const responseListener = useRef();
   const [helper, setHelper] = useState([]);
   const [driver, setDriver] = useState([]);
   const [busLocation, setBusLocation] = useState(null);
@@ -651,6 +646,7 @@ const HomeScreen = () => {
               //   "Drop-off starting",
               //   "Dear parents, The children are leaving for drop off. Remember that we care about the maximum safety of the children, so there may be delays in the estimated time depending on traffic. Thank you"
               // );
+              console.log("expo token ", expoPushToken.data);
               await sendPushNotification(
                 "ExponentPushToken[sj2WvlIU0ORVR6B5lDvKXD]",
                 "drop off start",

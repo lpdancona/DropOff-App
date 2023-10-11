@@ -4,6 +4,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 import { Auth } from "aws-amplify";
 import { API, graphqlOperation } from "aws-amplify";
 import { listUsers, listKids, getUser } from "../graphql/queries";
+import { usePushNotificationsContext } from "./PushNotificationsContext";
 
 const AuthContext = createContext({});
 
@@ -16,6 +17,7 @@ const AuthContextProvider = ({ children }) => {
   const [kids, setKids] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUserData, setCurrentUserData] = useState(null);
+  const { expoPushToken } = usePushNotificationsContext();
 
   useEffect(() => {
     Auth.currentAuthenticatedUser({ bypassCache: true })
@@ -44,6 +46,7 @@ const AuthContextProvider = ({ children }) => {
     setDbUser(response);
     setLoading(false);
   };
+
   const getCurrentUserData = async () => {
     const responseGetUser = await API.graphql({
       query: getUser,
@@ -66,6 +69,10 @@ const AuthContextProvider = ({ children }) => {
     }
     getCurrentUserData();
   }, [dbUser]);
+
+  useEffect(() => {
+    console.log(expoPushToken.data);
+  }, [currentUserData]);
 
   useEffect(() => {
     const fetchData = async () => {
