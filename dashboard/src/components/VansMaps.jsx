@@ -37,10 +37,14 @@ function Map() {
     },
   };
   const [infoWindowOpen, setInfoWindowOpen] = useState(false);
+  const [showStudentMarkers, setShowStudentMarkers] = useState(false);
   const [studentAddresses, setStudentAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const toggleInfoWindow = () => {
     setInfoWindowOpen(!infoWindowOpen);
+  };
+  const toggleStudentMarkers = () => {
+    setShowStudentMarkers(!showStudentMarkers);
   };
 
   useEffect(() => {
@@ -59,38 +63,61 @@ function Map() {
     fetchAdresses();
   }, []);
   return (
-    <GoogleMap zoom={12} center={center} mapContainerClassName="map-container">
-      <MarkerF
-        position={center}
-        options={markerOptions}
-        onClick={toggleInfoWindow}
-      />
-      {Array.isArray(studentAddresses) &&
-        studentAddresses.map((address) => (
-          <MarkerF
-            key={address.id}
-            position={{ lat: address.latitude, lng: address.longitude }}
-            options={houseMarker}
-            onClick={() => {
-              setSelectedAddress(address);
-              toggleInfoWindow();
-            }}
-          />
-        ))}
+    <div className="google-map-container">
+      <GoogleMap
+        zoom={12}
+        center={center}
+        mapContainerClassName="map-container"
+      >
+        <MarkerF
+          position={center}
+          options={markerOptions}
+          onClick={toggleInfoWindow}
+        />
+        {showStudentMarkers &&
+          Array.isArray(studentAddresses) &&
+          studentAddresses.map((address) => (
+            <MarkerF
+              key={address.id}
+              position={{ lat: address.latitude, lng: address.longitude }}
+              options={houseMarker}
+              onClick={() => {
+                setSelectedAddress(address);
+                toggleInfoWindow();
+              }}
+            />
+          ))}
 
-      {infoWindowOpen && selectedAddress && (
-        <InfoWindowF
-          position={{
-            lat: selectedAddress.latitude,
-            lng: selectedAddress.longitude,
-          }}
-          onCloseClick={toggleInfoWindow}
-        >
-          <div>
-            <h3>Address Details</h3>
-          </div>
-        </InfoWindowF>
-      )}
-    </GoogleMap>
+        {infoWindowOpen && selectedAddress && (
+          <InfoWindowF
+            position={{
+              lat: selectedAddress.latitude,
+              lng: selectedAddress.longitude,
+            }}
+            onCloseClick={toggleInfoWindow}
+          >
+            <div>
+              <h3>Address Details</h3>
+            </div>
+          </InfoWindowF>
+        )}
+      </GoogleMap>
+      <div className="check-box">
+        <form action="">
+          <label className="form-control">
+            <input
+              type="checkbox"
+              name="checkbox"
+              onClick={toggleStudentMarkers}
+            />
+            <div className="check-name">Address</div>
+          </label>
+          <label className="form-control">
+            <input type="checkbox" name="checkbox" />
+            <div className="check-name">Vans</div>
+          </label>
+        </form>
+      </div>
+    </div>
   );
 }
