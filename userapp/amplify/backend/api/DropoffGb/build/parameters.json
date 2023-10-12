@@ -1,7 +1,0 @@
-{
-    "AppSyncApiName": "DropoffGb",
-    "DynamoDBBillingMode": "PAY_PER_REQUEST",
-    "DynamoDBEnableServerSideEncryption": false,
-    "S3DeploymentBucket": "amplify-dropoffgb-staging-203656-deployment",
-    "S3DeploymentRootKey": "amplify-appsync-files/392c5a72712c75097902fd5d0daf7e1b5f18423b"
-}
