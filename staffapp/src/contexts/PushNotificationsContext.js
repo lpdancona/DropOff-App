@@ -26,7 +26,7 @@ const PushNotificationsContextProvider = ({ children }) => {
       sound: "default",
       title: title,
       body: body,
-      //data: { user: "geo" },
+      data: { userID: "150105" },
     };
 
     await fetch("https://exp.host/--/api/v2/push/send", {

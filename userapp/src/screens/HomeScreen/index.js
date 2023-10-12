@@ -62,6 +62,7 @@ const HomeScreen = () => {
 
   const getRoutesData = async () => {
     try {
+      //console.log(GOOGLE_MAPS_APIKEY);
       const variables = {
         filter: {
           status: { eq: "IN_PROGRESS" },

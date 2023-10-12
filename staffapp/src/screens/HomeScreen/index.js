@@ -123,6 +123,7 @@ const HomeScreen = () => {
 
   const getOrderAddress = async () => {
     try {
+      //console.log(GOOGLE_MAPS_APIKEY);
       const variables = {
         filter: {
           routeID: { eq: currentRouteData.routeID },
@@ -646,9 +647,9 @@ const HomeScreen = () => {
               //   "Drop-off starting",
               //   "Dear parents, The children are leaving for drop off. Remember that we care about the maximum safety of the children, so there may be delays in the estimated time depending on traffic. Thank you"
               // );
-              console.log("expo token ", expoPushToken.data);
+              //console.log("expo token ", expoPushToken.data);
               await sendPushNotification(
-                "ExponentPushToken[sj2WvlIU0ORVR6B5lDvKXD]",
+                "ExponentPushToken[WhEi3_AV1SttGMnLAlIND5]",
                 "drop off start",
                 "dear parents"
               );
