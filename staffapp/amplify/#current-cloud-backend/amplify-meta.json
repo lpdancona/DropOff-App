@@ -1,0 +1,87 @@
+{
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-dropoffgb-staging-203656-authRole",
+      "UnauthRoleArn": "arn:aws:iam::352700625317:role/amplify-dropoffgb-staging-203656-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::352700625317:role/amplify-dropoffgb-staging-203656-authRole",
+      "Region": "ca-central-1",
+      "DeploymentBucketName": "amplify-dropoffgb-staging-203656-deployment",
+      "UnauthRoleName": "amplify-dropoffgb-staging-203656-unauthRole",
+      "StackName": "amplify-dropoffgb-staging-203656",
+      "StackId": "arn:aws:cloudformation:ca-central-1:352700625317:stack/amplify-dropoffgb-staging-203656/1accc9d0-5b1a-11ee-9b83-06fa9eb2f11c",
+      "AmplifyAppId": "d280gfccs8pnfj"
+    }
+  },
+  "api": {
+    "DropoffGb": {
+      "dependsOn": [],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AWS_IAM"
+            }
+          ],
+          "defaultAuthentication": {
+            "authenticationType": "API_KEY",
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 30,
+              "description": "api key description"
+            }
+          }
+        },
+        "GraphQLAPIIdOutput": "7i4zjncfhnfzxaaghvqxgh6sou",
+        "GraphQLAPIEndpointOutput": "https://zok7ijcg6fd3pduduyc6rjt6ei.appsync-api.ca-central-1.amazonaws.com/graphql",
+        "GraphQLAPIKeyOutput": "da2-h4ocnd6mcvapffsulewqkkdery"
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync",
+      "lastPushTimeStamp": "2023-10-10T00:24:46.815Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-dropoffgb-staging-203656-deployment/amplify-cfn-templates/api/cloudformation-template.json",
+        "logicalId": "apiDropoffGb"
+      },
+      "lastPushDirHash": "pNSC/baobeXNxB2enyzG157Ixfc="
+    }
+  },
+  "auth": {
+    "DropoffGb": {
+      "customAuth": false,
+      "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": []
+        },
+        "signupAttributes": [],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "output": {
+        "UserPoolId": "ca-central-1_MzHeTLd3X",
+        "AppClientIDWeb": "48ai7kk9mce7nsrhm95isq3a58",
+        "AppClientID": "52b7e2b6ulnoobqqkkkvlm6koa",
+        "IdentityPoolId": "ca-central-1:a956c954-5e64-4446-ad2b-359257a03c70",
+        "UserPoolArn": "arn:aws:cognito-idp:ca-central-1:352700625317:userpool/ca-central-1_MzHeTLd3X",
+        "IdentityPoolName": "testAuthIdentityPool__staging",
+        "UserPoolName": "DropoffGb"
+      },
+      "lastPushTimeStamp": "2023-10-10T00:24:46.705Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-dropoffgb-staging-203656-deployment/amplify-cfn-templates/auth/DropoffGb-cloudformation-template.json",
+        "logicalId": "authDropoffGb"
+      }
+    }
+  }
+}
