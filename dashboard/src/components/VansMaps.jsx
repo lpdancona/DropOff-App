@@ -9,7 +9,8 @@ import {
 import "./VansMaps.css";
 import gbIcon from "../docs/gb-logo.svg";
 import houseIcon from "../docs/icon-house.png";
-import { listAddressLists } from "../graphql/queries";
+import vanIcon from "../docs/van.png";
+import { listAddressLists, listRoutes } from "../graphql/queries";
 export default function VansMaps() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLEMAPS_APIKEY,
@@ -36,17 +37,29 @@ function Map() {
       anchor: new window.google.maps.Point(20, 40),
     },
   };
+  const vanMarker = {
+    icon: {
+      url: vanIcon,
+      scaledSize: new window.google.maps.Size(40, 40),
+      origin: new window.google.maps.Point(0, 0),
+      anchor: new window.google.maps.Point(20, 40),
+    },
+  };
   const [infoWindowOpen, setInfoWindowOpen] = useState(false);
   const [showStudentMarkers, setShowStudentMarkers] = useState(false);
   const [studentAddresses, setStudentAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [routeMarkers, setRouteMarkers] = useState([]);
+  const [showVansMarkers, setShowVansMarkers] = useState(false);
   const toggleInfoWindow = () => {
     setInfoWindowOpen(!infoWindowOpen);
   };
   const toggleStudentMarkers = () => {
     setShowStudentMarkers(!showStudentMarkers);
   };
-
+  const toggleVansMarkers = () => {
+    setShowVansMarkers(!showVansMarkers);
+  };
   useEffect(() => {
     const fetchAdresses = async () => {
       try {
@@ -54,13 +67,30 @@ function Map() {
           graphqlOperation(listAddressLists, { limit: 100 })
         );
         const adressesData = response.data.listAddressLists.items;
-        console.log("fetched data", adressesData);
         setStudentAddresses(adressesData);
       } catch (error) {
         console.error("Error fetching vans:", error);
       }
     };
     fetchAdresses();
+  }, []);
+
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const response = await API.graphql(
+          graphqlOperation(listRoutes, {
+            filter: { status: { eq: "IN_PROGRESS" } },
+            limit: 100,
+          })
+        );
+        const routesData = response.data.listRoutes.items;
+        setRouteMarkers(routesData);
+      } catch (error) {
+        console.error("Error fetching routes:", error);
+      }
+    };
+    fetchRoutes();
   }, []);
   return (
     <div className="google-map-container">
@@ -87,6 +117,18 @@ function Map() {
               }}
             />
           ))}
+        {showVansMarkers &&
+          routeMarkers.map((route) => (
+            <MarkerF
+              key={route.id}
+              position={{ lat: route.lat, lng: route.lng }}
+              options={vanMarker}
+              onClick={() => {
+                setSelectedAddress(route);
+                toggleInfoWindow();
+              }}
+            />
+          ))}
 
         {infoWindowOpen && selectedAddress && (
           <InfoWindowF
@@ -107,13 +149,17 @@ function Map() {
           <label className="form-control">
             <input
               type="checkbox"
-              name="checkbox"
+              name="address-checkbox"
               onClick={toggleStudentMarkers}
             />
             <div className="check-name">Address</div>
           </label>
           <label className="form-control">
-            <input type="checkbox" name="checkbox" />
+            <input
+              type="checkbox"
+              name="vans-checkbox"
+              onClick={toggleVansMarkers}
+            />
             <div className="check-name">Vans</div>
           </label>
         </form>
