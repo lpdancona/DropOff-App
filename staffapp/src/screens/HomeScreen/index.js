@@ -123,7 +123,7 @@ const HomeScreen = () => {
 
   const getOrderAddress = async () => {
     try {
-      //console.log(GOOGLE_MAPS_APIKEY);
+      console.log(GOOGLE_MAPS_APIKEY);
       const variables = {
         filter: {
           routeID: { eq: currentRouteData.routeID },
