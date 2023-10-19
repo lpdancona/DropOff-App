@@ -33,7 +33,7 @@
     "expo-updates": "~0.18.16",
     "native-notify": "^3.0.9",
     "react": "18.2.0",
-    "react-native": "0.72.5",
+    "react-native": "0.72.6",
     "react-native-dotenv": "^3.4.9",
     "react-native-gesture-handler": "~2.12.0",
     "react-native-get-random-values": "^1.9.0",
@@ -49,7 +49,8 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.0.0",
     "typescript": "^5.1.3",
-    "expo-constants": "~14.4.2"
+    "expo-constants": "~14.4.2",
+    "expo-sms": "~11.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

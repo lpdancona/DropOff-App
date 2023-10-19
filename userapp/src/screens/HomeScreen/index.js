@@ -285,11 +285,11 @@ const HomeScreen = () => {
         }}
       >
         <MapViewDirections
+          apikey={GOOGLE_MAPS_APIKEY}
           origin={busLocation} // Start from the first waypoint
           destination={dropOffLatLng} //{van.waypoints[van.waypoints.length - 1]} // End at the last waypoint
           strokeWidth={1}
           strokeColor="rgba(0, 0, 0, 0)"
-          apikey={GOOGLE_MAPS_APIKEY}
           onReady={(result) => {
             // Handle the route information here
             //setIsDriverClose(result.distance <= 0.1);

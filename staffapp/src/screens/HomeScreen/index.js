@@ -36,6 +36,28 @@ import {
 } from "../../graphql/queries";
 import { updateRoute } from "../../graphql/mutations";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
+import Twilio from "react-native-twilio";
+
+//import * as SMS from "expo-sms";
+//import SendSMS from "react-native-sms";
+
+// const sendSMS = async () => {
+//   const isAvailable = await SMS.isAvailableAsync();
+//   if (isAvailable) {
+//     const { result } = await SMS.sendSMSAsync(
+//       ["7787899440"], // Array of phone numbers
+//       "Hello, this is a test SMS!"
+//     );
+
+//     if (result === SMS.Sent) {
+//       console.log("SMS sent successfully");
+//     } else {
+//       console.error("Failed to send SMS");
+//     }
+//   } else {
+//     console.error("SMS is not available on this device");
+//   }
+// };
 
 // import vans from "../../../assets/data/vans.json";
 
@@ -123,7 +145,7 @@ const HomeScreen = () => {
 
   const getOrderAddress = async () => {
     try {
-      console.log(GOOGLE_MAPS_APIKEY);
+      //console.log(GOOGLE_MAPS_APIKEY);
       const variables = {
         filter: {
           routeID: { eq: currentRouteData.routeID },
@@ -453,6 +475,7 @@ const HomeScreen = () => {
         {origin && destination && (
           <MapViewDirections
             //key={index}
+            apikey={GOOGLE_MAPS_APIKEY}
             origin={{ latitude: origin.latitude, longitude: origin.longitude }}
             destination={{
               latitude: destination.latitude,
@@ -466,7 +489,6 @@ const HomeScreen = () => {
             precision="high"
             strokeWidth={5}
             strokeColor="blue"
-            apikey={GOOGLE_MAPS_APIKEY}
             onReady={(result) => {
               //console.log(result);
               const isClose = result.duration <= 5;
@@ -643,16 +665,17 @@ const HomeScreen = () => {
         <View style={styles.buttonDriveContainer}>
           <TouchableOpacity
             onPress={async () => {
+              console.log("current Route: ", currentRouteData);
               // schedulePushNotification(
               //   "Drop-off starting",
               //   "Dear parents, The children are leaving for drop off. Remember that we care about the maximum safety of the children, so there may be delays in the estimated time depending on traffic. Thank you"
               // );
               //console.log("expo token ", expoPushToken.data);
-              await sendPushNotification(
-                "ExponentPushToken[WhEi3_AV1SttGMnLAlIND5]",
-                "drop off start",
-                "dear parents"
-              );
+              // await sendPushNotification(
+              //   "ExponentPushToken[sj2WvlIU0ORVR6B5lDvKXD]",
+              //   "drop off start",
+              //   "dear parents"
+              // );
               //updateRouteStatus("IN_PROGRESS");
               zoomInOnDriver();
               //console.warn("Initialing the Route");
