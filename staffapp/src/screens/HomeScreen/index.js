@@ -36,7 +36,6 @@ import {
 } from "../../graphql/queries";
 import { updateRoute } from "../../graphql/mutations";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
-import Twilio from "react-native-twilio";
 
 //import * as SMS from "expo-sms";
 //import SendSMS from "react-native-sms";
@@ -665,17 +664,18 @@ const HomeScreen = () => {
         <View style={styles.buttonDriveContainer}>
           <TouchableOpacity
             onPress={async () => {
-              console.log("current Route: ", currentRouteData);
+              //console.log("current Route: ", currentRouteData);
               // schedulePushNotification(
               //   "Drop-off starting",
               //   "Dear parents, The children are leaving for drop off. Remember that we care about the maximum safety of the children, so there may be delays in the estimated time depending on traffic. Thank you"
               // );
               //console.log("expo token ", expoPushToken.data);
-              // await sendPushNotification(
-              //   "ExponentPushToken[sj2WvlIU0ORVR6B5lDvKXD]",
-              //   "drop off start",
-              //   "dear parents"
-              // );
+              await sendPushNotification(
+                "ExponentPushToken[WhEi3_AV1SttGMnLAlIND5]",
+                "drop off start",
+                "dear parents"
+              );
+
               //updateRouteStatus("IN_PROGRESS");
               zoomInOnDriver();
               //console.warn("Initialing the Route");

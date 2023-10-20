@@ -333,6 +333,7 @@ export const getUser = /* GraphQL */ `
       phoneNumber
       userType
       photo
+      pushToken
       createdAt
       updatedAt
       __typename
@@ -358,6 +359,7 @@ export const listUsers = /* GraphQL */ `
         phoneNumber
         userType
         photo
+        pushToken
         createdAt
         updatedAt
         __typename

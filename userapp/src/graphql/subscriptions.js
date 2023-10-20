@@ -357,6 +357,7 @@ export const onCreateUser = /* GraphQL */ `
       phoneNumber
       userType
       photo
+      pushToken
       createdAt
       updatedAt
       __typename
@@ -377,6 +378,7 @@ export const onUpdateUser = /* GraphQL */ `
       phoneNumber
       userType
       photo
+      pushToken
       createdAt
       updatedAt
       __typename
@@ -397,6 +399,7 @@ export const onDeleteUser = /* GraphQL */ `
       phoneNumber
       userType
       photo
+      pushToken
       createdAt
       updatedAt
       __typename

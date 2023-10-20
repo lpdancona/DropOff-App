@@ -72,5 +72,6 @@ type User @model @auth(rules: [{allow: public}]) {
   phoneNumber: String
   userType: UserTypes
   photo: String
+  pushToken: String
 }
  

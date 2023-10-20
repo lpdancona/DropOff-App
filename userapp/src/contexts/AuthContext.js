@@ -56,6 +56,43 @@ const AuthContextProvider = ({ children }) => {
     setCurrentUserData(responseGetUser.data.getUser);
   };
 
+  const fetchKidsData = async (userEmail) => {
+    if (userEmail) {
+      //console.log(userEmail);
+      try {
+        const variables = {
+          filter: {
+            or: [
+              { parent1Email: { eq: userEmail } },
+              { parent2Email: { eq: userEmail } },
+            ],
+          },
+        };
+        const response = await API.graphql({
+          query: listKids,
+          variables: variables,
+        });
+        //console.log(response)
+        const fetchedKids = response.data.listKids.items;
+
+        //console.log(fetchedKids);
+
+        if (fetchedKids.length === 0) {
+          // If the response is empty, sign out
+          await Auth.signOut();
+        } else {
+          // Set the kids state if there is data
+          setKids(fetchedKids);
+        }
+        // setKids(response.data.listKids.items);
+      } catch (error) {
+        console.error("Error fetching kids:", error);
+      } finally {
+        //setLoading(false);
+      }
+    }
+  };
+
   useEffect(() => {
     if (!sub) {
       return;
@@ -64,10 +101,10 @@ const AuthContextProvider = ({ children }) => {
   }, [sub]);
 
   useEffect(() => {
-    if (!sub) {
-      return;
+    //console.log(dbUser);
+    if (dbUser) {
+      getCurrentUserData();
     }
-    getCurrentUserData();
   }, [dbUser]);
 
   useEffect(() => {
@@ -75,43 +112,7 @@ const AuthContextProvider = ({ children }) => {
   }, [currentUserData]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (userEmail) {
-        //console.log(userEmail);
-        try {
-          const variables = {
-            filter: {
-              or: [
-                { parent1Email: { eq: userEmail } },
-                { parent2Email: { eq: userEmail } },
-              ],
-            },
-          };
-          const response = await API.graphql({
-            query: listKids,
-            variables: variables,
-          });
-          //console.log(response)
-          const fetchedKids = response.data.listKids.items;
-
-          //console.log(fetchedKids);
-
-          if (fetchedKids.length === 0) {
-            // If the response is empty, sign out
-            await Auth.signOut();
-          } else {
-            // Set the kids state if there is data
-            setKids(fetchedKids);
-          }
-          // setKids(response.data.listKids.items);
-        } catch (error) {
-          console.error("Error fetching kids:", error);
-        } finally {
-          //setLoading(false);
-        }
-      }
-    };
-    fetchData();
+    fetchKidsData(userEmail);
     //console.log(isEmailVerified);
   }, [userEmail]);
 
@@ -120,6 +121,7 @@ const AuthContextProvider = ({ children }) => {
       value={{
         authUser,
         dbUser,
+        setDbUser,
         sub,
         userEmail,
         kids,

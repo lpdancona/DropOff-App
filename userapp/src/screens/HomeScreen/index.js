@@ -62,7 +62,7 @@ const HomeScreen = () => {
 
   const getRoutesData = async () => {
     try {
-      //console.log(GOOGLE_MAPS_APIKEY);
+      //console.log(dbUser);
       const variables = {
         filter: {
           status: { eq: "IN_PROGRESS" },
@@ -144,7 +144,9 @@ const HomeScreen = () => {
 
   useEffect(() => {
     // Fetch initial data when the component mounts
-
+    if (!dbUser) {
+      return;
+    }
     const fetchInitialData = async () => {
       await getRoutesData();
     };
