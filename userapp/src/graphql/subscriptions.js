@@ -23,6 +23,8 @@ export const onCreateAddressList = /* GraphQL */ `
         photo
         vans
         routeID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -56,6 +58,8 @@ export const onUpdateAddressList = /* GraphQL */ `
         photo
         vans
         routeID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -89,6 +93,8 @@ export const onDeleteAddressList = /* GraphQL */ `
         photo
         vans
         routeID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -297,6 +303,8 @@ export const onCreateKid = /* GraphQL */ `
       photo
       vans
       routeID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -317,6 +325,8 @@ export const onUpdateKid = /* GraphQL */ `
       photo
       vans
       routeID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -337,6 +347,8 @@ export const onDeleteKid = /* GraphQL */ `
       photo
       vans
       routeID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename

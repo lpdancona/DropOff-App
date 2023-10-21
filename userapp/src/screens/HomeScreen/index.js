@@ -20,9 +20,9 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
-import { FlatList } from "react-native-gesture-handler";
+//import { FlatList } from "react-native-gesture-handler";
 import { useAuthContext } from "../../contexts/AuthContext";
-import { Auth, Predicates } from "aws-amplify";
+import { Auth } from "aws-amplify";
 import { API, graphqlOperation } from "aws-amplify";
 import {
   listRoutes,
@@ -163,6 +163,7 @@ const HomeScreen = () => {
     }
   }, [routesData, kids]);
 
+  //const getParents
   const getStaffData = async () => {
     const responseGetDriver = await API.graphql({
       query: getUser,
@@ -182,6 +183,7 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
+    //console.log(kids);
     if (!currentRouteData) {
       return;
     }
@@ -260,10 +262,9 @@ const HomeScreen = () => {
         </View>
       )}
 
-      <Appbar.Header>
+      {/* <Appbar.Header>
         <Appbar.Action icon="menu" onPress={openMenu} />
-        {/* <Appbar.Content title="Parent Home Screen" /> */}
-      </Appbar.Header>
+      </Appbar.Header> */}
 
       <Menu
         visible={menuVisible}

@@ -27,7 +27,7 @@ function App() {
               <RootNavigator />
             </PaperProvider>
           </GestureHandlerRootView>
-          <StatusBar style="light" />
+          {/* <StatusBar style="light" /> */}
         </AuthContextProvider>
       </PushNotificationsContextProvider>
     </NavigationContainer>

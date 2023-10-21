@@ -16,7 +16,9 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import PhoneInput from "react-native-phone-number-input";
 import { API, graphqlOperation } from "aws-amplify";
-import { createUser, updateUser } from "../../graphql/mutations";
+import { createUser, updateUser, updateKid } from "../../graphql/mutations";
+import { getKid } from "../../graphql/queries";
+import { Auth } from "aws-amplify";
 
 const ProfileScreen = () => {
   const { setDbUser, dbUser, userEmail, kids, sub } = useAuthContext();
@@ -24,7 +26,7 @@ const ProfileScreen = () => {
 
   const [name, setName] = useState(dbUser?.name || "");
   //const [setKids] = useState(kids);
-  const [unitNumber, setUnitNumber] = useState(dbUser?.streetAddress || "");
+  const [unitNumber, setUnitNumber] = useState(dbUser?.unitNumber || "");
   const [address, setAddress] = useState(dbUser?.address || "");
   const [phoneNumber, setPhoneNumber] = useState(dbUser?.phoneNumber || "");
   const phoneInputRef = useRef(null);
@@ -62,27 +64,58 @@ const ProfileScreen = () => {
   };
 
   const onSave = async () => {
-    if (dbUser) {
-      await onUpdateUser();
-    } else {
+    try {
+      // if (dbUser) {
+      //   await onUpdateUser();
+      // } else {
       await onCreateUser();
+      //await onUpdateKid();
+      // }
+    } catch (e) {
+      Alert.alert("Error", e.message);
     }
-    navigation.navigate("Home");
   };
+  const updateKidUserID = async () => {
+    try {
+      //console.log(kids);
+      for (const kid of kids) {
+        //console.log("kid id", kid.id);
+        // Query your GraphQL API to find the kid by some unique identifier (e.g., name or ID).
+        const queryResult = await API.graphql({
+          query: getKid,
+          variables: { id: kid.id },
+        });
 
-  // const updateUser = async () => {
-  //   const user = await DataStore.save(
-  //     User.copyOf(dbUser, (updated) => {
-  //       updated.name = name;
-  //       updated.unitNumber = unitNumber;
-  //       updated.address = address;
-  //       updated.phoneNumber = phoneNumber;
-  //       updated.lat = parseFloat(lat);
-  //       updated.lng = parseFloat(lng);
-  //     })
-  //   );
-  //   setDbUser(user);
-  // };
+        // Check if the query found a matching kid.
+        const foundKid = queryResult.data.getKid;
+        //console.log("found??", foundKid);
+        if (foundKid) {
+          // If a matching kid was found, update their userID.
+          // if (kidparent1Email !== null) {
+
+          const parentField =
+            kid.parent1Email !== null ? "Parent1ID" : "Parent2ID";
+
+          console.log("parent 1 Email ", kid.parent1Email);
+          console.log("parent Field ", parentField);
+          const variables = {
+            input: {
+              id: foundKid.id,
+            },
+          };
+
+          variables.input[parentField] = dbUser.id;
+
+          const updateResult = await API.graphql({
+            query: updateKid,
+            variables: variables,
+          });
+        }
+      }
+    } catch (e) {
+      Alert.alert("Error updating kid", e.message);
+    }
+  };
 
   const onCreateUser = async () => {
     try {
@@ -98,16 +131,39 @@ const ProfileScreen = () => {
         phoneNumber,
         pushToken: expoPushToken.data,
       };
-      const User = await API.graphql({
-        query: createUser,
-        variables: { input: userDetails },
-      });
 
-      setDbUser(User);
+      const response = await API.graphql(
+        graphqlOperation(createUser, { input: userDetails })
+      );
+
+      const newUser = response.data.createUser; // Access the user data from the response
+      const userId = newUser.id; // Access the ID of the newly created user
+
+      //console.log(userId); // Log the user ID
+      await updateKidUserID();
+      setDbUser(newUser);
+
+      // const newUser = await API.graphql(
+      //   graphqlOperation(createUser, { input: userDetails })
+      // );
+      // console.log(newUser.id);
+      // //console.log(User);
+      // setDbUser(newUser);
     } catch (e) {
-      Alert.alert("Error", e.message);
+      Alert.alert("Error saving new user", e.message);
     }
   };
+  // useEffect(() => {
+  //   console.log("kids object", kids);
+  // }, [kids]);
+
+  // useEffect(() => {
+  //   if (dbUser) {
+  //     // The dbUser has been set, so you can call onUpdateKid here
+  //     updateKidUserID();
+  //     //navigation.navigate("Home");
+  //   }
+  // }, [dbUser]);
 
   return (
     <SafeAreaView>
@@ -207,12 +263,12 @@ const ProfileScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-        {/* <TouchableOpacity
-            style={styles.signOutButton}
-            onPress={() => Auth.signOut()}
-          >
-            <Text style={styles.signOutButtonText}>Sign out</Text>
-          </TouchableOpacity> */}
+        <TouchableOpacity
+          style={styles.signOutButton}
+          onPress={() => Auth.signOut()}
+        >
+          <Text style={styles.signOutButtonText}>Sign out</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

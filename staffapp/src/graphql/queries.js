@@ -21,6 +21,7 @@ export const getAddressList = /* GraphQL */ `
         photo
         vans
         routeID
+        userID
         createdAt
         updatedAt
         __typename
@@ -213,6 +214,7 @@ export const getKid = /* GraphQL */ `
       photo
       vans
       routeID
+      userID
       createdAt
       updatedAt
       __typename
@@ -238,6 +240,7 @@ export const listKids = /* GraphQL */ `
         photo
         vans
         routeID
+        userID
         createdAt
         updatedAt
         __typename
@@ -274,6 +277,7 @@ export const kidsByVans = /* GraphQL */ `
         photo
         vans
         routeID
+        userID
         createdAt
         updatedAt
         __typename
@@ -310,6 +314,44 @@ export const kidsByRouteID = /* GraphQL */ `
         photo
         vans
         routeID
+        userID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const kidsByUserID = /* GraphQL */ `
+  query KidsByUserID(
+    $userID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelKidFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    kidsByUserID(
+      userID: $userID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        vans
+        routeID
+        userID
         createdAt
         updatedAt
         __typename
@@ -334,6 +376,10 @@ export const getUser = /* GraphQL */ `
       userType
       photo
       pushToken
+      Kids {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename

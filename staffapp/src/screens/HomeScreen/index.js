@@ -354,6 +354,7 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
+    console.log(currentRouteData.Kid);
     if (currentRouteData) {
       updateLocation();
     }
@@ -492,7 +493,7 @@ const HomeScreen = () => {
               //console.log(result);
               const isClose = result.duration <= 5;
               if (isClose && !notificationSent) {
-                sendNotification("driver is close 5 minutes away");
+                //sendNotification("driver is close 5 minutes away");
                 setIsDriverClose(true);
                 setNotificationSent(true);
               }

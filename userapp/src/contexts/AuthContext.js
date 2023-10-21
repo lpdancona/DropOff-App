@@ -20,6 +20,9 @@ const AuthContextProvider = ({ children }) => {
   //const { expoPushToken } = usePushNotificationsContext();
 
   useEffect(() => {
+    // if (!authUser) {
+    //   return;
+    // }
     Auth.currentAuthenticatedUser({ bypassCache: true })
       .then((user) => {
         setAuthUser(user);

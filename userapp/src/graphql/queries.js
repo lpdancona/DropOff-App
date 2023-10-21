@@ -21,6 +21,8 @@ export const getAddressList = /* GraphQL */ `
         photo
         vans
         routeID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -213,6 +215,8 @@ export const getKid = /* GraphQL */ `
       photo
       vans
       routeID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -238,6 +242,8 @@ export const listKids = /* GraphQL */ `
         photo
         vans
         routeID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -274,6 +280,8 @@ export const kidsByVans = /* GraphQL */ `
         photo
         vans
         routeID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -310,6 +318,8 @@ export const kidsByRouteID = /* GraphQL */ `
         photo
         vans
         routeID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
