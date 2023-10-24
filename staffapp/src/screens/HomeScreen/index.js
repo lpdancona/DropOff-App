@@ -39,6 +39,8 @@ import { Auth } from "aws-amplify";
 import * as TaskManager from "expo-task-manager";
 
 const HomeScreen = () => {
+  const LOCATION_TASK_NAME = "background-location-task";
+
   TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
     if (error) {
       // Error occurred - check `error.message` for more details.
@@ -77,8 +79,6 @@ const HomeScreen = () => {
   const [parent1, setParent1] = useState(null);
   const [parent2, setParent2] = useState(null);
 
-  const LOCATION_TASK_NAME = "background-location-task";
-
   useEffect(() => {
     (async () => {
       const { status: foregroundStatus } =
@@ -93,20 +93,11 @@ const HomeScreen = () => {
         }
       }
 
-      // if (!status === "granted") {
-      //   setErrorMsg("Permission to access location was denied");
-      //   return;
-      // }
-
       let location = await Location.getCurrentPositionAsync({ accuracy: 6 });
       setBusLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
-      // setDbRoute({...dbRoute,
-      //   lat : location.coords.latitude,
-      //   lng : location.coords.longitude
-      // })
     })();
 
     const backgroundSubscription = Location.watchPositionAsync(
@@ -518,8 +509,8 @@ const HomeScreen = () => {
         ref={mapRef}
         provider={MapView.PROVIDER_GOOGLE}
         style={{ width, height }}
-        // showsUserLocation={true}
-        //followsUserLocation={true}
+        showsUserLocation={true}
+        followsUserLocation={true}
         initialRegion={{
           latitude: busLocation.latitude,
           longitude: busLocation.longitude,

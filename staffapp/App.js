@@ -12,6 +12,7 @@ import AuthContextProvider from "./src/contexts/AuthContext";
 import RootNavigator from "./src/navigation";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import PushNotificationsContextProvider from "./src/contexts/PushNotificationsContext";
+import * as TaskManager from "expo-task-manager";
 //import registerNNPushToken from "native-notify";
 //import { API, graphqlOperation } from "aws-amplify";
 
@@ -24,6 +25,19 @@ function SignOutButton() {
   const { signOut } = useAuthenticator();
   return <Button title="Sign Out" onPress={signOut} />;
 } //registerNNPushToken(12494, "S8t82EPJldbDxB0gR2fOyd");
+
+const LOCATION_TASK_NAME = "background-location-task";
+
+TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+  if (error) {
+    // Handle errors
+    return;
+  }
+  if (data) {
+    const { locations } = data;
+    // Handle the background location updates
+  }
+});
 
 function App() {
   return (

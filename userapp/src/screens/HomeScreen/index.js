@@ -262,9 +262,9 @@ const HomeScreen = () => {
         </View>
       )}
 
-      {/* <Appbar.Header>
+      <Appbar.Header>
         <Appbar.Action icon="menu" onPress={openMenu} />
-      </Appbar.Header> */}
+      </Appbar.Header>
 
       <Menu
         visible={menuVisible}
