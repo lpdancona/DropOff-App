@@ -23,7 +23,7 @@ import { useNavigation } from "@react-navigation/native";
 import RouteInfoComponent from "../../components/RouteInfo";
 //import { DataStore } from "aws-amplify";
 //import { Route, Van, Kid, User } from "../../models";
-import { useAuthContext } from "../../contexts/AuthContext";
+//import { useAuthContext } from "../../contexts/AuthContext";
 import { API, graphqlOperation } from "aws-amplify";
 import {
   listRoutes,
@@ -37,25 +37,16 @@ import { updateRoute } from "../../graphql/mutations";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
 import { Auth } from "aws-amplify";
 import * as TaskManager from "expo-task-manager";
+import { updateLocation } from "../../components/LocationUtils";
+import { useRouteContext } from "../../contexts/RouteContext";
+
+//const LOCATION_TASK_NAME = "background-location-task";
 
 const HomeScreen = () => {
-  const LOCATION_TASK_NAME = "background-location-task";
-
-  TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-    if (error) {
-      // Error occurred - check `error.message` for more details.
-      return;
-    }
-    if (data) {
-      const { locations } = data;
-
-      // do something with the locations captured in the background
-    }
-  });
-
   const { schedulePushNotification, sendPushNotification, expoPushToken } =
     usePushNotificationsContext();
-  const { dbUser, isDriver, currentUserData } = useAuthContext();
+  //const { dbUser, isDriver, currentUserData } = useAuthContext();
+  const { routesData, currentRouteData } = useRouteContext();
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -68,8 +59,8 @@ const HomeScreen = () => {
   const [helper, setHelper] = useState([]);
   const [driver, setDriver] = useState([]);
   const [busLocation, setBusLocation] = useState(null);
-  const [routesData, setRoutesData] = useState(null);
-  const [currentRouteData, setCurrentRouteData] = useState(null);
+  // const [routesData, setRoutesData] = useState(null);
+  // const [currentRouteData, setCurrentRouteData] = useState(null);
   const [addressList, setAddressList] = useState(null);
   const [currentWaypointIndex, setCurrentWaypointIndex] = useState(0);
   const [origin, setOrigin] = useState(null);
@@ -79,41 +70,27 @@ const HomeScreen = () => {
   const [parent1, setParent1] = useState(null);
   const [parent2, setParent2] = useState(null);
 
-  useEffect(() => {
-    (async () => {
-      const { status: foregroundStatus } =
-        await Location.requestForegroundPermissionsAsync();
-      if (foregroundStatus === "granted") {
-        const { status: backgroundStatus } =
-          await Location.requestBackgroundPermissionsAsync();
-        if (backgroundStatus === "granted") {
-          await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-            accuracy: Location.Accuracy.BestForNavigation,
-          });
-        }
-      }
+  // const updateLocationInComponent = async () => {
+  //   const updatedBusLocation = {
+  //     latitude: busLocation.latitude,
+  //     longitude: busLocation.longitude,
+  //   };
 
-      let location = await Location.getCurrentPositionAsync({ accuracy: 6 });
-      setBusLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-    })();
+  //   try {
+  //     await updateLocation(
+  //       currentRouteData.id,
+  //       updatedBusLocation.latitude,
+  //       updatedBusLocation.longitude
+  //     );
+  //     console.log(busLocation);
+  //     // Update the busLocation state with the new location
+  //     setBusLocation(updatedBusLocation);
 
-    const backgroundSubscription = Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.BestForNavigation,
-        distanceInterval: 5,
-      },
-      (updatedLocation) => {
-        setBusLocation({
-          latitude: updatedLocation.coords.latitude,
-          longitude: updatedLocation.coords.longitude,
-        });
-      }
-    );
-    return () => backgroundSubscription;
-  }, []);
+  //     // ... handle the rest of the code
+  //   } catch (error) {
+  //     console.error("Error updating route", error);
+  //   }
+  // };
 
   const sendNotificationToAllParents = async () => {
     if (currentRouteData?.Kid) {
@@ -219,78 +196,78 @@ const HomeScreen = () => {
     }
   };
 
-  const getRoutesData = async () => {
-    try {
-      //console.log("isDriver? ", isDriver);
-      const variables = {
-        filter: {
-          or: [
-            { status: { eq: "WAITING_TO_START" } },
-            { status: { eq: "IN_PROGRESS" } }, //status: { eq: "IN_PROGRESS" }, //
-          ],
-        },
-      };
+  // const getRoutesData = async () => {
+  //   try {
+  //     //console.log("isDriver? ", isDriver);
+  //     const variables = {
+  //       filter: {
+  //         or: [
+  //           { status: { eq: "WAITING_TO_START" } },
+  //           { status: { eq: "IN_PROGRESS" } }, //status: { eq: "IN_PROGRESS" }, //
+  //         ],
+  //       },
+  //     };
 
-      // Fetch route data
-      const responseListRoutes = await API.graphql({
-        query: listRoutes,
-        variables: variables,
-      });
-      const routeData = responseListRoutes.data.listRoutes.items;
+  //     // Fetch route data
+  //     const responseListRoutes = await API.graphql({
+  //       query: listRoutes,
+  //       variables: variables,
+  //     });
+  //     const routeData = responseListRoutes.data.listRoutes.items;
 
-      // Fetch kids data for each route
-      const mergedData = await Promise.all(
-        routeData.map(async (route) => {
-          const responseKidsByRouteID = await API.graphql({
-            query: kidsByRouteID,
-            variables: { routeID: route.id },
-          });
-          const kidsData = responseKidsByRouteID.data.kidsByRouteID.items;
-          // fetch the van
-          const responseGetVan = await API.graphql({
-            query: getVan,
-            variables: { id: route.routeVanId },
-          });
-          const vansData = responseGetVan.data.getVan;
+  //     // Fetch kids data for each route
+  //     const mergedData = await Promise.all(
+  //       routeData.map(async (route) => {
+  //         const responseKidsByRouteID = await API.graphql({
+  //           query: kidsByRouteID,
+  //           variables: { routeID: route.id },
+  //         });
+  //         const kidsData = responseKidsByRouteID.data.kidsByRouteID.items;
+  //         // fetch the van
+  //         const responseGetVan = await API.graphql({
+  //           query: getVan,
+  //           variables: { id: route.routeVanId },
+  //         });
+  //         const vansData = responseGetVan.data.getVan;
 
-          return { ...route, Kid: kidsData, Van: vansData };
-        })
-      );
+  //         return { ...route, Kid: kidsData, Van: vansData };
+  //       })
+  //     );
 
-      setRoutesData(mergedData);
-      return true;
-    } catch (error) {
-      console.error("Error fetching data getROutesData: ", error);
-    }
-    return false;
-  };
+  //     setRoutesData(mergedData);
+  //     return true;
+  //   } catch (error) {
+  //     console.error("Error fetching data getROutesData: ", error);
+  //   }
+  //   return false;
+  // };
 
-  const checkStaffInRoutes = () => {
-    //console.log("current user ", currentUserData);
+  // const checkStaffInRoutes = () => {
+  //   //console.log("current user ", currentUserData);
 
-    if (routesData && isDriver) {
-      const roleToCheck = isDriver ? "driver" : "helper";
+  //   if (routesData && isDriver) {
+  //     const roleToCheck = isDriver ? "driver" : "helper";
 
-      const routeWithMatchingRole = routesData.find((item) => {
-        if (item[roleToCheck] && item[roleToCheck] === dbUser.id) {
-          return true;
-        }
-        return false;
-      });
+  //     const routeWithMatchingRole = routesData.find((item) => {
+  //       if (item[roleToCheck] && item[roleToCheck] === dbUser.id) {
+  //         return true;
+  //       }
+  //       return false;
+  //     });
 
-      if (routeWithMatchingRole) {
-        // Update the state variable with the route that has matching role
-        setCurrentRouteData(routeWithMatchingRole);
-        return true;
-      } else {
-        // Handle case when no matching route is found
-        console.log(
-          `No route found for ${roleToCheck} with user ID ${dbUser.id}`
-        );
-      }
-    }
-    return false;
-  };
+  //     if (routeWithMatchingRole) {
+  //       // Update the state variable with the route that has matching role
+  //       setCurrentRouteData(routeWithMatchingRole);
+  //       return true;
+  //     } else {
+  //       // Handle case when no matching route is found
+  //       console.log(
+  //         `No route found for ${roleToCheck} with user ID ${dbUser.id}`
+  //       );
+  //     }
+  //   }
+  //   return false;
+  // };
 
   const getParentsInfo = async () => {
     if (currentRouteData?.Kid) {
@@ -334,47 +311,38 @@ const HomeScreen = () => {
       setHelper(helperData.data.getUser);
     }
   };
-  const handleLogout = async () => {
-    try {
-      // Sign out the user using Amplify Auth
-      await Auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     // Sign out the user using Amplify Auth
+  //     await Auth.signOut();
+  //   } catch (error) {
+  //     console.error("Logout error:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    // Fetch initial data when the component mounts
-    const fetchInitialData = async () => {
-      await getRoutesData();
-    };
+  // useEffect(() => {
+  //   // Fetch initial data when the component mounts
+  //   const fetchInitialData = async () => {
+  //     await getRoutesData();
+  //   };
 
-    fetchInitialData();
-  }, [dbUser]);
+  //   fetchInitialData();
+  // }, [dbUser]);
 
-  useEffect(() => {
-    if (routesData) {
-      const isUserOnRoute = checkStaffInRoutes();
-      if (!isUserOnRoute) {
-        handleLogout();
-      }
-      //checkStaffInRoutes();
-      //console.log("current route ", currentRouteData);
-    }
-  }, [routesData]);
+  // useEffect(() => {
+  //   if (routesData) {
+  //     const isUserOnRoute = checkStaffInRoutes();
+  //     if (!isUserOnRoute) {
+  //       handleLogout();
+  //     }
+  //     //checkStaffInRoutes();
+  //     //console.log("current route ", currentRouteData);
+  //   }
+  // }, [routesData]);
 
   useEffect(() => {
     if (currentRouteData) {
       getOrderAddress();
-      // const waypoints = currentRouteData.Kid.map((kid, index) => ({
-      //   latitude: kid.lat,
-      //   longitude: kid.lng,
-      //   kidName: kid.name,
-      //   description: `${kid.dropOffAddress}`,
-      // })); //JSON.parse(currentRouteData.route);
-      // console.log(waypoints);
-      // setAddressList(waypoints);
-      //console.log(addressList);
     }
   }, [currentRouteData]);
 
@@ -414,29 +382,72 @@ const HomeScreen = () => {
     }
   };
 
-  const updateLocation = async () => {
-    //console.log("driver location", busLocation);
-    try {
-      const response = await API.graphql(
-        graphqlOperation(updateRoute, {
-          input: {
-            id: currentRouteData.id,
-            lat: busLocation.latitude,
-            lng: busLocation.longitude,
-            //departTime: 10,
-          },
-        })
-      );
+  // const updateLocation = async () => {
+  //   //console.log("driver location", busLocation);
+  //   try {
+  //     const response = await API.graphql(
+  //       graphqlOperation(updateRoute, {
+  //         input: {
+  //           id: currentRouteData.id,
+  //           lat: busLocation.latitude,
+  //           lng: busLocation.longitude,
+  //           //departTime: 10,
+  //         },
+  //       })
+  //     );
 
-      //console.log("Route updated successfully", response);
-    } catch (error) {
-      console.error("Error updating route", error);
-    }
-  };
+  //     //console.log("Route updated successfully", response);
+  //   } catch (error) {
+  //     console.error("Error updating route", error);
+  //   }
+  // };
+  useEffect(() => {
+    (async () => {
+      //console.log("current Route ID", currentRouteData.id);
+      const { status: foregroundStatus } =
+        await Location.requestForegroundPermissionsAsync();
+      if (foregroundStatus === "granted") {
+        const { status: backgroundStatus } =
+          await Location.requestBackgroundPermissionsAsync();
+        if (backgroundStatus === "granted") {
+          await Location.startLocationUpdatesAsync("background-location-task", {
+            accuracy: Location.Accuracy.Balanced,
+          });
+        }
+      }
+
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      }); //accuracy: 6
+      setBusLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+
+    const backgroundSubscription = Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.Balanced, //6, //Location.Accuracy.BestForNavigation,
+        distanceInterval: 5,
+      },
+      (updatedLocation) => {
+        setBusLocation({
+          latitude: updatedLocation.coords.latitude,
+          longitude: updatedLocation.coords.longitude,
+        });
+      }
+    );
+    return () => backgroundSubscription;
+  }, []);
 
   useEffect(() => {
     if (currentRouteData) {
-      updateLocation();
+      //console.log("bus Location", busLocation);
+      updateLocation(
+        currentRouteData.id,
+        busLocation.latitude,
+        busLocation.longitude
+      );
     }
   }, [busLocation]);
 
@@ -507,7 +518,7 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.mapContainer}>
       <MapView
         ref={mapRef}
-        provider={MapView.PROVIDER_GOOGLE}
+        provider={PROVIDER_GOOGLE}
         style={{ width, height }}
         showsUserLocation={true}
         followsUserLocation={true}
@@ -753,3 +764,20 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
+
+TaskManager.defineTask("background-location-task", async ({ data, error }) => {
+  if (error) {
+    const { routesData, currentRouteData } = useRouteContext();
+    // Error occurred - check `error.message` for more details.
+    return;
+  }
+  if (data) {
+    const { locations } = data;
+    console.log(currentRouteData);
+    // Update the bus location using the imported function
+    //console.log("currentROuteID in TaskManager", currentRouteId);
+
+    const { latitude, longitude } = locations;
+    //await updateLocation(currentRouteId, latitude, longitude);
+  }
+});
