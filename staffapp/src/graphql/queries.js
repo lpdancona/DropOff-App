@@ -19,9 +19,9 @@ export const getAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
-        userID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -98,10 +98,6 @@ export const getVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -212,9 +208,9 @@ export const getKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
-      userID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -238,46 +234,9 @@ export const listKids = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
-        userID
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const kidsByVans = /* GraphQL */ `
-  query KidsByVans(
-    $vans: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelKidFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    kidsByVans(
-      vans: $vans
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        name
-        parent1Email
-        parent2Email
-        dropOffAddress
-        lat
-        lng
-        birthDate
-        photo
-        vans
-        routeID
-        userID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -312,46 +271,9 @@ export const kidsByRouteID = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
-        userID
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const kidsByUserID = /* GraphQL */ `
-  query KidsByUserID(
-    $userID: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelKidFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    kidsByUserID(
-      userID: $userID
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        name
-        parent1Email
-        parent2Email
-        dropOffAddress
-        lat
-        lng
-        birthDate
-        photo
-        vans
-        routeID
-        userID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -376,10 +298,6 @@ export const getUser = /* GraphQL */ `
       userType
       photo
       pushToken
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename

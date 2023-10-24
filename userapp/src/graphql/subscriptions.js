@@ -21,7 +21,6 @@ export const onCreateAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
         Parent1ID
         Parent2ID
@@ -56,7 +55,6 @@ export const onUpdateAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
         Parent1ID
         Parent2ID
@@ -91,7 +89,6 @@ export const onDeleteAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
         Parent1ID
         Parent2ID
@@ -117,10 +114,6 @@ export const onCreateVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -138,10 +131,6 @@ export const onUpdateVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -159,10 +148,6 @@ export const onDeleteVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -301,7 +286,6 @@ export const onCreateKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
       Parent1ID
       Parent2ID
@@ -323,7 +307,6 @@ export const onUpdateKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
       Parent1ID
       Parent2ID
@@ -345,7 +328,6 @@ export const onDeleteKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
       Parent1ID
       Parent2ID

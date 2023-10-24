@@ -13,10 +13,25 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+      "infoPlist": {
+        "UIBackgroundModes": ["location", "fetch"]
+      },
       "supportsTablet": true,
       "bundleIdentifier": "com.geodarth.dropoffgb"
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": {
+            "env": "GOOGLE_MAPS_APIKEY"
+          }
+        }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

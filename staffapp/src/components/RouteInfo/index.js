@@ -31,12 +31,12 @@ const RouteInfoComponent = ({ vans, addressList, driver, helper }) => {
         <View style={styles.row}>
           <View style={styles.driverInfo}>
             <Text style={styles.driverLabel}>Driver:</Text>
-            <Text style={styles.driverName}>{driver.name}</Text>
+            <Text style={styles.driverName}>{driver?.name}</Text>
           </View>
 
           <View style={styles.helperInfo}>
             <Text style={styles.helperLabel}>Helper:</Text>
-            <Text style={styles.helperName}>{helper.name}</Text>
+            <Text style={styles.helperName}>{helper?.name}</Text>
           </View>
         </View>
         {/* <View style={styles.addressList}>

@@ -1,17 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Pressable } from 'react-native';
-import Checkbox from 'expo-checkbox';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Pressable,
+} from "react-native";
+import Checkbox from "expo-checkbox";
 import { useNavigation } from "@react-navigation/native";
-import { Auth } from 'aws-amplify';
-import { withAuthenticator, useAuthenticator } from '@aws-amplify/ui-react-native';
-import * as SecureStore from 'expo-secure-store';
+import { Auth } from "aws-amplify";
+import {
+  withAuthenticator,
+  useAuthenticator,
+} from "@aws-amplify/ui-react-native";
 import { useAuthContext } from "../../contexts/AuthContext";
 
 const LoginScreen = () => {
   const { user } = useAuthenticator();
   const { userEmail } = useAuthContext();
-  const [email, setEmail] = useState(userEmail || '');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(userEmail || "");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const navigation = useNavigation();
 
@@ -20,15 +29,15 @@ const LoginScreen = () => {
       await Auth.signIn(email, password);
 
       if (rememberMe) {
-        await SecureStore.setItemAsync('userPassword', password);
+        await SecureStore.setItemAsync("userPassword", password);
       } else {
-        await SecureStore.deleteItemAsync('userPassword');
+        await SecureStore.deleteItemAsync("userPassword");
       }
 
-      navigation.navigate('Home', { address: 0 });
+      navigation.navigate("Home", { address: 0 });
     } catch (error) {
-      console.error('Login error:', error);
-      alert('Invalid email or password. Please try again.');
+      console.error("Login error:", error);
+      alert("Invalid email or password. Please try again.");
     }
   };
 
@@ -36,7 +45,9 @@ const LoginScreen = () => {
     const { signOut } = useAuthenticator();
     return (
       <Pressable onPress={signOut} style={styles.buttonContainer}>
-        <Text style={styles.buttonText}>Hello, {user?.username}! Click here to sign out!</Text>
+        <Text style={styles.buttonText}>
+          Hello, {user?.username}! Click here to sign out!
+        </Text>
       </Pressable>
     );
   };
@@ -75,24 +86,24 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   label: {
     fontSize: 18,
     marginTop: 10,
   },
   input: {
-    width: '80%',
+    width: "80%",
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
   },
   rememberMeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 10,
   },
   rememberMeLabel: {
@@ -104,7 +115,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    color: 'blue',
+    color: "blue",
   },
 });
 

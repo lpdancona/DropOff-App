@@ -22,13 +22,13 @@ const RootNavigator = () => {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {/* {dbUser ? (
+      {dbUser ? (
         <Stack.Screen name="Home" component={HomeScreen} />
       ) : (
         <Stack.Screen name="ParentLogin" component={ProfileScreen} />
-      )} */}
-      <Stack.Screen name="ParentLogin" component={ProfileScreen} />
-
+      )}
+      {/* <Stack.Screen name="ParentLogin" component={ProfileScreen} />
+      <Stack.Screen name="Home" component={HomeScreen} /> */}
       {/* <Stack.Screen 
         name='Login' 
         component={LoginScreen}

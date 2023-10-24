@@ -22,9 +22,9 @@ export const createAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
-        userID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -57,9 +57,9 @@ export const updateAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
-        userID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -92,9 +92,9 @@ export const deleteAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
-        userID
+        Parent1ID
+        Parent2ID
         createdAt
         updatedAt
         __typename
@@ -120,10 +120,6 @@ export const createVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -144,10 +140,6 @@ export const updateVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -168,10 +160,6 @@ export const deleteVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -322,9 +310,9 @@ export const createKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
-      userID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -346,9 +334,9 @@ export const updateKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
-      userID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -370,9 +358,9 @@ export const deleteKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
-      userID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -397,10 +385,6 @@ export const createUser = /* GraphQL */ `
       userType
       photo
       pushToken
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -425,10 +409,6 @@ export const updateUser = /* GraphQL */ `
       userType
       photo
       pushToken
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -453,10 +433,6 @@ export const deleteUser = /* GraphQL */ `
       userType
       photo
       pushToken
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename

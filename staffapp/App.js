@@ -27,22 +27,17 @@ function SignOutButton() {
 
 function App() {
   return (
-    <Authenticator.Provider>
-      {/* <SignOutButton /> */}
-      <Authenticator>
-        <NavigationContainer>
-          <PushNotificationsContextProvider>
-            <AuthContextProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <RootNavigator />
-              </GestureHandlerRootView>
-            </AuthContextProvider>
-          </PushNotificationsContextProvider>
-          <StatusBar style="light" />
-        </NavigationContainer>
-      </Authenticator>
-    </Authenticator.Provider>
+    <NavigationContainer>
+      <PushNotificationsContextProvider>
+        <AuthContextProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <RootNavigator />
+          </GestureHandlerRootView>
+        </AuthContextProvider>
+      </PushNotificationsContextProvider>
+      {/* <StatusBar style="light" /> */}
+    </NavigationContainer>
   );
 }
 
-export default App;
+export default withAuthenticator(App);

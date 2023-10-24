@@ -9,7 +9,6 @@ import {
   Pressable,
   Modal,
   SafeAreaView,
-  FlatList,
 } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
@@ -36,66 +35,22 @@ import {
 } from "../../graphql/queries";
 import { updateRoute } from "../../graphql/mutations";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
-
-//import * as SMS from "expo-sms";
-//import SendSMS from "react-native-sms";
-
-// const sendSMS = async () => {
-//   const isAvailable = await SMS.isAvailableAsync();
-//   if (isAvailable) {
-//     const { result } = await SMS.sendSMSAsync(
-//       ["7787899440"], // Array of phone numbers
-//       "Hello, this is a test SMS!"
-//     );
-
-//     if (result === SMS.Sent) {
-//       console.log("SMS sent successfully");
-//     } else {
-//       console.error("Failed to send SMS");
-//     }
-//   } else {
-//     console.error("SMS is not available on this device");
-//   }
-// };
-
-// import vans from "../../../assets/data/vans.json";
-
-// import * as Notifications from 'expo-notifications'
-// import * as Permissions from 'expo-permissions'
-// import * as Device from 'expo-device';
-
-// const sendNotification = async (notificationTitle, notificationBody) => {
-//   const apiUrl = "https://app.nativenotify.com/api/notification";
-//   const currentDate = new Date();
-//   const notificationDate = `${
-//     currentDate.getMonth() + 1
-//   }-${currentDate.getDate()}-${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}${
-//     currentDate.getHours() >= 12 ? "PM" : "AM"
-//   }`;
-//   //console.log(notificationDate);
-//   try {
-//     const response = await axios.post(apiUrl, {
-//       appId: 12497,
-//       appToken: "wDb6oKTWDGkDZd1Rv468rP",
-//       title: notificationTitle,
-//       body: notificationBody,
-//       dateSent: notificationDate,
-//       //pushData: { yourProperty: 'yourPropertyValue' },
-//       //bigPictureURL: 'Big picture URL as a string',
-//     });
-
-//     if (response.status === 200) {
-//       console.log("Notification sent successfully");
-//     } else {
-//       console.error("Failed to send notification");
-//       console.error(response.data);
-//     }
-//   } catch (error) {
-//     console.error("Error sending notification:", error);
-//   }
-// };
+import { Auth } from "aws-amplify";
+import * as TaskManager from "expo-task-manager";
 
 const HomeScreen = () => {
+  TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+    if (error) {
+      // Error occurred - check `error.message` for more details.
+      return;
+    }
+    if (data) {
+      const { locations } = data;
+
+      // do something with the locations captured in the background
+    }
+  });
+
   const { schedulePushNotification, sendPushNotification, expoPushToken } =
     usePushNotificationsContext();
   const { dbUser, isDriver, currentUserData } = useAuthContext();
@@ -119,6 +74,87 @@ const HomeScreen = () => {
   const [destination, setDestination] = useState(null);
   const [nextWaypoints, setNextWaypoints] = useState(null);
   const [notificationSent, setNotificationSent] = useState(false);
+  const [parent1, setParent1] = useState(null);
+  const [parent2, setParent2] = useState(null);
+
+  const LOCATION_TASK_NAME = "background-location-task";
+
+  useEffect(() => {
+    (async () => {
+      const { status: foregroundStatus } =
+        await Location.requestForegroundPermissionsAsync();
+      if (foregroundStatus === "granted") {
+        const { status: backgroundStatus } =
+          await Location.requestBackgroundPermissionsAsync();
+        if (backgroundStatus === "granted") {
+          await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+            accuracy: Location.Accuracy.BestForNavigation,
+          });
+        }
+      }
+
+      // if (!status === "granted") {
+      //   setErrorMsg("Permission to access location was denied");
+      //   return;
+      // }
+
+      let location = await Location.getCurrentPositionAsync({ accuracy: 6 });
+      setBusLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+      // setDbRoute({...dbRoute,
+      //   lat : location.coords.latitude,
+      //   lng : location.coords.longitude
+      // })
+    })();
+
+    const backgroundSubscription = Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.BestForNavigation,
+        distanceInterval: 5,
+      },
+      (updatedLocation) => {
+        setBusLocation({
+          latitude: updatedLocation.coords.latitude,
+          longitude: updatedLocation.coords.longitude,
+        });
+      }
+    );
+    return () => backgroundSubscription;
+  }, []);
+
+  const sendNotificationToAllParents = async () => {
+    if (currentRouteData?.Kid) {
+      // Initialize an array to store all the tokens of parents
+      const parentTokens = [];
+
+      // Loop through each kid in currentRouteData
+      for (const kid of currentRouteData.Kid) {
+        if (kid.Parent1ID !== null && kid.Parent1 && kid.Parent1.pushToken) {
+          const childName = kid.name;
+          const parentToken = kid.Parent1.pushToken;
+          const message = `Dear parent of ${childName}, your child is leaving for drop off. Remember that we care about the maximum safety of the children. Thank you`;
+
+          parentTokens.push({ token: parentToken, message });
+        }
+
+        if (kid.Parent2ID !== null && kid.Parent2 && kid.Parent2.pushToken) {
+          const childName = kid.name;
+          const parentToken = kid.Parent2.pushToken;
+          const message = `Dear parent of ${childName}, your child is leaving for drop off. Remember that we care about the maximum safety of the children. Thank you`;
+
+          parentTokens.push({ token: parentToken, message });
+        }
+      }
+
+      // Send notifications to all parent tokens
+      for (const { token, message } of parentTokens) {
+        await sendPushNotification(token, "Drop-off starting", message);
+      }
+    }
+  };
+  const sendNotificationToNextParents = async () => {};
 
   const renderItem = ({ item, index }) => {
     if (!currentRouteData) {
@@ -231,9 +267,11 @@ const HomeScreen = () => {
       );
 
       setRoutesData(mergedData);
+      return true;
     } catch (error) {
       console.error("Error fetching data getROutesData: ", error);
     }
+    return false;
   };
 
   const checkStaffInRoutes = () => {
@@ -252,12 +290,42 @@ const HomeScreen = () => {
       if (routeWithMatchingRole) {
         // Update the state variable with the route that has matching role
         setCurrentRouteData(routeWithMatchingRole);
+        return true;
       } else {
         // Handle case when no matching route is found
         console.log(
           `No route found for ${roleToCheck} with user ID ${dbUser.id}`
         );
       }
+    }
+    return false;
+  };
+
+  const getParentsInfo = async () => {
+    if (currentRouteData?.Kid) {
+      // Loop through each kid in currentRouteData
+      for (const kid of currentRouteData.Kid) {
+        if (kid.Parent1ID !== null) {
+          const parent1Data = await API.graphql({
+            query: getUser,
+            variables: { id: kid.Parent1ID },
+          });
+
+          // Store the parent1Data in the kid object
+          kid.Parent1 = parent1Data.data.getUser;
+        }
+
+        if (kid.Parent2ID !== null) {
+          const parent2Data = await API.graphql({
+            query: getUser,
+            variables: { id: kid.Parent2ID },
+          });
+
+          // Store the parent2Data in the kid object
+          kid.Parent2 = parent2Data.data.getUser;
+        }
+      }
+      //console.log(currentRouteData.Kid);
     }
   };
 
@@ -267,11 +335,21 @@ const HomeScreen = () => {
       variables: { id: currentRouteData.driver },
     });
     setDriver(driverData.data.getUser);
-    const helperData = await API.graphql({
-      query: getUser,
-      variables: { id: currentRouteData.helper },
-    });
-    setHelper(helperData.data.getUser);
+    if (currentRouteData?.helper !== null) {
+      const helperData = await API.graphql({
+        query: getUser,
+        variables: { id: currentRouteData.helper },
+      });
+      setHelper(helperData.data.getUser);
+    }
+  };
+  const handleLogout = async () => {
+    try {
+      // Sign out the user using Amplify Auth
+      await Auth.signOut();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   useEffect(() => {
@@ -279,12 +357,17 @@ const HomeScreen = () => {
     const fetchInitialData = async () => {
       await getRoutesData();
     };
+
     fetchInitialData();
   }, [dbUser]);
 
   useEffect(() => {
     if (routesData) {
-      checkStaffInRoutes();
+      const isUserOnRoute = checkStaffInRoutes();
+      if (!isUserOnRoute) {
+        handleLogout();
+      }
+      //checkStaffInRoutes();
       //console.log("current route ", currentRouteData);
     }
   }, [routesData]);
@@ -310,8 +393,15 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (currentRouteData) {
+      getParentsInfo();
+    }
+  }, [currentRouteData]);
+
+  useEffect(() => {
+    if (currentRouteData) {
       getStaffInfo();
     }
+    //console.log(currentRouteData);
   }, [currentRouteData]);
 
   const updateRouteStatus = async (status) => {
@@ -354,45 +444,10 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
-    console.log(currentRouteData.Kid);
     if (currentRouteData) {
       updateLocation();
     }
   }, [busLocation]);
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (!status === "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({ accuracy: 6 });
-      setBusLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-      // setDbRoute({...dbRoute,
-      //   lat : location.coords.latitude,
-      //   lng : location.coords.longitude
-      // })
-    })();
-
-    const foregroundSubscription = Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.BestForNavigation,
-        distanceInterval: 5,
-      },
-      (updatedLocation) => {
-        setBusLocation({
-          latitude: updatedLocation.coords.latitude,
-          longitude: updatedLocation.coords.longitude,
-        });
-      }
-    );
-    return () => foregroundSubscription;
-  }, []);
 
   const zoomInOnDriver = () => {
     mapRef.current.animateToRegion({
@@ -445,7 +500,7 @@ const HomeScreen = () => {
 
     setNextWaypoints(nextWaypoints);
   }, [addressList, currentWaypointIndex, busLocation]);
-
+  //console.log(currentRouteData);
   if (!busLocation || !currentRouteData) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
@@ -606,30 +661,30 @@ const HomeScreen = () => {
                     </Text>
                     <Text>
                       <Text style={{ fontWeight: "bold" }}>Parent name:</Text>{" "}
-                      {selectedItem.parentName}
+                      {selectedItem.Parent1?.name}
                     </Text>
                     <Text>
                       <Text style={{ fontWeight: "bold" }}>Unit Number:</Text>{" "}
-                      {selectedItem.unitNumber}
+                      {selectedItem.Parent1?.unitNumber}
                     </Text>
                     <Text>
                       <Text style={{ fontWeight: "bold" }}>
                         Street Address:
                       </Text>{" "}
-                      {selectedItem.streetAddress}
+                      {selectedItem.Parent1?.address}
                     </Text>
-                    <Text>
+                    {/* <Text>
                       <Text style={{ fontWeight: "bold" }}>Comments:</Text>{" "}
                       {selectedItem.commentsAddress}
-                    </Text>
+                    </Text> */}
                     <Text>
                       <Text style={{ fontWeight: "bold" }}>Phone number:</Text>{" "}
-                      {selectedItem.parentPhoneNumber}
+                      {selectedItem.Parent1?.phoneNumber}
                     </Text>
                     <Pressable
                       onPress={() => {
                         // Handle the action to call the parent here
-                        const phoneNumber = selectedItem.parentPhoneNumber;
+                        const phoneNumber = selectedItem.Parent1?.phoneNumber;
                         const phoneNumberWithPrefix = `tel:${phoneNumber}`;
 
                         Linking.canOpenURL(phoneNumberWithPrefix)
@@ -665,61 +720,36 @@ const HomeScreen = () => {
         <View style={styles.buttonDriveContainer}>
           <TouchableOpacity
             onPress={async () => {
-              //console.log("current Route: ", currentRouteData);
-              // schedulePushNotification(
-              //   "Drop-off starting",
-              //   "Dear parents, The children are leaving for drop off. Remember that we care about the maximum safety of the children, so there may be delays in the estimated time depending on traffic. Thank you"
-              // );
-              //console.log("expo token ", expoPushToken.data);
-              await sendPushNotification(
-                "ExponentPushToken[WhEi3_AV1SttGMnLAlIND5]",
-                "drop off start",
-                "dear parents"
-              );
-
-              //updateRouteStatus("IN_PROGRESS");
-              zoomInOnDriver();
-              //console.warn("Initialing the Route");
+              //console.log("address list object ", addressList);
+              //console.log("bus location", busLocation);
               // send push notification to user app
+              sendNotificationToAllParents();
+              // update the route status
+              updateRouteStatus("IN_PROGRESS");
+              zoomInOnDriver();
 
-              // sendNotification(
-              //   "Drop-off starting",
-              //   "Dear parents, The children are leaving for drop off. Remember that we care about the maximum safety of the children, so there may be delays in the estimated time depending on traffic. Thank you"
-              // );
               // Create an array of waypoint coordinates
-              // const waypointsWithoutLast = dbRoute?.route.slice(0, -1);
-              // const waypoints = waypointsWithoutLast.map((waypoint) => {
-              //   return `${waypoint.latitude},${waypoint.longitude}`;
-              // });
+              const waypoints = addressList.map((address) => {
+                return `${address.latitude},${address.longitude}`;
+              });
 
-              //   // Join the waypoints into a single string separated by "|" (pipe)
-              //   const waypointsString = waypoints.join("|");
+              // Separate the first address as the origin
+              const origin = `${busLocation.latitude},${busLocation.longitude}`;
 
-              //   // Get the driver's current location (origin)
-              //   const origin = `${driverLocation.latitude},${driverLocation.longitude}`;
-              //   const lastWaypoint = dbRoute?.route[dbRoute?.route.length - 1];
-              //   const destination = `${lastWaypoint.latitude},${lastWaypoint.longitude}`;
-              //   // Construct the Google Maps URL with the origin and waypoints
-              //   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
+              // Separate the last address as the destination
+              const destination = waypoints.pop();
 
-              //   // Open Google Maps with the origin and waypoints pre-set
-              //   Linking.openURL(googleMapsUrl);
-              //console.log(googleMapsUrl)
-              // Send location data to MongoDB database
-              // You will need to implement this part using a backend server
-              // Use Axios or a similar library to make a POST request to your server
-              // Include the driver's current location, route details, and any other necessary data
-              // Example:
-              // axios.post('your_server_url', {
-              //   driverLocation: {
-              //     latitude: driverLocation.latitude,
-              //     longitude: driverLocation.longitude,
-              //   },
-              //   routeDetails: {
-              //     // Include route details here
-              //   },
-              //   // Other data as needed
-              // });
+              // Join the remaining waypoints into a single string separated by "|"
+              const waypointsString = waypoints.join("|");
+              // console.log(origin);
+              // console.log(waypointsString);
+              // console.log(destination);
+
+              // Construct the Google Maps URL with the origin and waypoints
+              const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
+
+              // Open Google Maps with the origin and waypoints pre-set
+              Linking.openURL(googleMapsUrl);
             }}
             style={{ backgroundColor: "green", padding: 10, borderRadius: 10 }}
           >

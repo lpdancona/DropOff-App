@@ -23,6 +23,7 @@ import { Auth } from "aws-amplify";
 const ProfileScreen = () => {
   const { setDbUser, dbUser, userEmail, kids, sub } = useAuthContext();
   const { expoPushToken } = usePushNotificationsContext();
+  //const [firstLogin, setFirstLogin] = useState(true);
 
   const [name, setName] = useState(dbUser?.name || "");
   //const [setKids] = useState(kids);
@@ -36,7 +37,6 @@ const ProfileScreen = () => {
 
   //const { sub, setDbUser } = useAuthContext();
   const navigation = useNavigation();
-
   const handleConfirm = () => {
     //console.log(phoneInputRef.current)
 
@@ -75,8 +75,10 @@ const ProfileScreen = () => {
       Alert.alert("Error", e.message);
     }
   };
-  const updateKidUserID = async () => {
+
+  const updateKidUserID = async (newUser) => {
     try {
+      //console.log(newUser);
       //console.log(kids);
       for (const kid of kids) {
         //console.log("kid id", kid.id);
@@ -96,15 +98,16 @@ const ProfileScreen = () => {
           const parentField =
             kid.parent1Email !== null ? "Parent1ID" : "Parent2ID";
 
-          console.log("parent 1 Email ", kid.parent1Email);
-          console.log("parent Field ", parentField);
+          // console.log("parent 1 Email ", kid.parent1Email);
+          // console.log("parent Field ", parentField);
+          //console.log(dbUser);
           const variables = {
             input: {
               id: foundKid.id,
             },
           };
 
-          variables.input[parentField] = dbUser.id;
+          variables.input[parentField] = newUser.id;
 
           const updateResult = await API.graphql({
             query: updateKid,
@@ -140,7 +143,7 @@ const ProfileScreen = () => {
       const userId = newUser.id; // Access the ID of the newly created user
 
       //console.log(userId); // Log the user ID
-      await updateKidUserID();
+      await updateKidUserID(newUser);
       setDbUser(newUser);
 
       // const newUser = await API.graphql(
@@ -158,10 +161,16 @@ const ProfileScreen = () => {
   // }, [kids]);
 
   // useEffect(() => {
-  //   if (dbUser) {
-  //     // The dbUser has been set, so you can call onUpdateKid here
+  //   // The dbUser has been set, so you can call onUpdateKid here
+  //   if (firstLogin && dbUser) {
   //     updateKidUserID();
-  //     //navigation.navigate("Home");
+  //   }
+  //   //navigation.navigate("Home");
+  // }, [dbUser, firstLogin]);
+
+  // useEffect(() => {
+  //   if (!firstLogin) {
+  //     navigation.navigate("Home");
   //   }
   // }, [dbUser]);
 
