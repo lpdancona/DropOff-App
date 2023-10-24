@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 import { useAuthContext } from "./AuthContext";
 import { API } from "aws-amplify";
 import { listRoutes, kidsByRouteID, getVan } from "../../src/graphql/queries";
+import { Auth } from "aws-amplify";
 
 const RouteContext = createContext({});
 
@@ -10,6 +11,7 @@ const RouteContextProvider = ({ children }) => {
   const [currentRouteData, setCurrentRouteData] = useState(null);
   const { dbUser, isDriver, currentUserData } = useAuthContext();
 
+  //console.log("isDriver? ", isDriver);
   const handleLogout = async () => {
     try {
       // Sign out the user using Amplify Auth
@@ -64,10 +66,21 @@ const RouteContextProvider = ({ children }) => {
     }
     return false;
   };
-  const checkStaffInRoutes = () => {
-    //console.log("current user ", currentUserData);
+  //
 
-    if (routesData && isDriver) {
+  const callCheckStaffInRoutes = async () => {
+    const isUserOnRoute = await checkStaffInRoutes();
+    //console.log(isUserOnRoute);
+    if (!isUserOnRoute) {
+      handleLogout();
+    }
+  };
+
+  const checkStaffInRoutes = async () => {
+    //console.log("routesData", routesData);
+    //console.log("isDriver", isDriver);
+
+    if (routesData) {
       const roleToCheck = isDriver ? "driver" : "helper";
 
       const routeWithMatchingRole = routesData.find((item) => {
@@ -76,7 +89,7 @@ const RouteContextProvider = ({ children }) => {
         }
         return false;
       });
-
+      //console.log(routeWithMatchingRole);
       if (routeWithMatchingRole) {
         // Update the state variable with the route that has matching role
         setCurrentRouteData(routeWithMatchingRole);
@@ -90,7 +103,7 @@ const RouteContextProvider = ({ children }) => {
     }
     return false;
   };
-
+  // Starting the useEffects
   useEffect(() => {
     // Fetch initial data when the component mounts
     const fetchInitialData = async () => {
@@ -102,12 +115,7 @@ const RouteContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (routesData) {
-      const isUserOnRoute = checkStaffInRoutes();
-      if (!isUserOnRoute) {
-        handleLogout();
-      }
-      //checkStaffInRoutes();
-      //console.log("current route ", currentRouteData);
+      callCheckStaffInRoutes();
     }
   }, [routesData]);
 

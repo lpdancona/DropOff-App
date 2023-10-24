@@ -43,10 +43,13 @@ import { useRouteContext } from "../../contexts/RouteContext";
 //const LOCATION_TASK_NAME = "background-location-task";
 
 const HomeScreen = () => {
+  // const from contexts
   const { schedulePushNotification, sendPushNotification, expoPushToken } =
     usePushNotificationsContext();
   //const { dbUser, isDriver, currentUserData } = useAuthContext();
   const { routesData, currentRouteData } = useRouteContext();
+
+  //
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -122,9 +125,10 @@ const HomeScreen = () => {
       }
     }
   };
+
   const sendNotificationToNextParents = async () => {};
 
-  const renderItem = ({ item, index }) => {
+  const renderKidsItem = ({ item, index }) => {
     if (!currentRouteData) {
       return <ActivityIndicator size="large" color="gray" />;
     }
@@ -441,7 +445,7 @@ const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (currentRouteData) {
+    if (currentRouteData && busLocation) {
       //console.log("bus Location", busLocation);
       updateLocation(
         currentRouteData.id,
@@ -518,7 +522,7 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.mapContainer}>
       <MapView
         ref={mapRef}
-        provider={PROVIDER_GOOGLE}
+        //provider={PROVIDER_GOOGLE}
         style={{ width, height }}
         showsUserLocation={true}
         followsUserLocation={true}
@@ -637,7 +641,7 @@ const HomeScreen = () => {
         >
           <BottomSheetFlatList
             data={currentRouteData.Kid} //data={van.kidsInRoute}
-            renderItem={renderItem}
+            renderItem={renderKidsItem}
             keyExtractor={(item) => item.name.toString()}
             contentContainerStyle={{ backgroundColor: "white" }}
             //ListFooterComponent={() => <View></View>}
@@ -765,15 +769,17 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
+import { useRouteContext } from "./RouteContext";
+
 TaskManager.defineTask("background-location-task", async ({ data, error }) => {
   if (error) {
-    const { routesData, currentRouteData } = useRouteContext();
+    //const { routesData, currentRouteData } = useRouteContext();
     // Error occurred - check `error.message` for more details.
     return;
   }
   if (data) {
     const { locations } = data;
-    console.log(currentRouteData);
+    //console.log(currentRouteData);
     // Update the bus location using the imported function
     //console.log("currentROuteID in TaskManager", currentRouteId);
 

@@ -41,7 +41,8 @@ const AuthContextProvider = ({ children }) => {
     //graphqlOperation(listUsers))
     const response = getUserBySub.data.listUsers.items[0];
     //console.log('getUserBysub', response[0])
-    //console.log(response)
+    //console.log(response);
+
     if (response.userType === "DRIVER") {
       setIsDriver(true);
     }
