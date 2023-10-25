@@ -72,7 +72,57 @@ const HomeScreen = () => {
   const [notificationSent, setNotificationSent] = useState(false);
   const [parent1, setParent1] = useState(null);
   const [parent2, setParent2] = useState(null);
+  const [previousLocation, setPreviousLocation] = useState(null);
 
+  TaskManager.defineTask(
+    "background-location-task",
+    async ({ data, error }) => {
+      if (error) {
+        // Handle errors
+        return;
+      }
+      if (data) {
+        const { locations } = data;
+        const { latitude, longitude } = locations;
+
+        // Check if the current location is different from the previous location
+        if (
+          previousLocation === null ||
+          previousLocation.latitude !== latitude ||
+          previousLocation.longitude !== longitude
+        ) {
+          // Location has changed, so update and log the new location
+          console.log("Location has changed to:", latitude, longitude);
+
+          // Update the previous location
+          setPreviousLocation({ latitude, longitude });
+
+          // Now, you can perform additional tasks like updating the bus location
+          // await updateLocation(currentRouteId, latitude, longitude);
+        }
+      }
+    }
+  );
+
+  // TaskManager.defineTask(
+  //   "background-location-task",
+  //   async ({ data, error }) => {
+  //     if (error) {
+  //       //const { routesData, currentRouteData } = useRouteContext();
+  //       // Error occurred - check `error.message` for more details.
+  //       return;
+  //     }
+  //     if (data) {
+  //       const { locations } = data;
+  //       console.log("current Route Data on Taskman", currentRouteData);
+  //       // Update the bus location using the imported function
+  //       //console.log("currentROuteID in TaskManager", currentRouteId);
+
+  //       const { latitude, longitude } = locations;
+  //       //await updateLocation(currentRouteId, latitude, longitude);
+  //     }
+  //   }
+  // );
   // const updateLocationInComponent = async () => {
   //   const updatedBusLocation = {
   //     latitude: busLocation.latitude,
@@ -769,21 +819,5 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-import { useRouteContext } from "./RouteContext";
-
-TaskManager.defineTask("background-location-task", async ({ data, error }) => {
-  if (error) {
-    //const { routesData, currentRouteData } = useRouteContext();
-    // Error occurred - check `error.message` for more details.
-    return;
-  }
-  if (data) {
-    const { locations } = data;
-    //console.log(currentRouteData);
-    // Update the bus location using the imported function
-    //console.log("currentROuteID in TaskManager", currentRouteId);
-
-    const { latitude, longitude } = locations;
-    //await updateLocation(currentRouteId, latitude, longitude);
-  }
-});
+//import { useRouteContext } from "../../contexts/RouteContext";
+//const { routesData, currentRouteData } = useRouteContext();
