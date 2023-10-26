@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start --config app.config.js",
-    "android": "expo run:android --config app.config.js",
-    "ios": "expo run:ios --config app.config.js",
-    "web": "expo start --web --config app.config.js"
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
   },
   "dependencies": {
     "@aws-amplify/ui-react-native": "^1.2.28",

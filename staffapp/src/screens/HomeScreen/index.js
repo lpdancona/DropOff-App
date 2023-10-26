@@ -16,7 +16,6 @@ import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 //import vans from '../../../assets/data/vans.json';
 import styles from "./styles";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import * as Location from "expo-location";
 import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
@@ -36,51 +35,23 @@ import {
 import { updateRoute } from "../../graphql/mutations";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
 //import { Auth } from "aws-amplify";
+import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
+//import * as BackgroundFetch from "expo-background-fetch";
 import { updateLocation } from "../../components/LocationUtils";
 import { useRouteContext } from "../../contexts/RouteContext";
 
-const BACKGROUND_FETCH_TASK = "background-fetch";
+const LOCATION_TASK_NAME = "background-location-task";
 
-TaskManager.defineTask(BACKGROUND_FETCH_TASK, async (data, error) => {
-  if (error) {
-    // Handle errors
-    return;
-  }
-  if (data) {
-    console.log("data", data);
-    const { locations } = data;
-    const { latitude, longitude } = locations;
-
-    // Check if the current location is different from the previous location
-    if (
-      previousLocation === null ||
-      previousLocation.latitude !== latitude ||
-      previousLocation.longitude !== longitude
-    ) {
-      // Location has changed, so update and log the new location
-      console.log("Location has changed to:", latitude, longitude);
-
-      // Update the previous location
-      setPreviousLocation({ latitude, longitude });
-    }
-  }
-  return BackgroundFetch.BackgroundFetchResult.NewData;
-});
-
-async function registerBackgroundFetchAsync() {
-  return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK);
-}
 //
 const requestLocationPermissions = async () => {
-  //console.log("current Route ID", currentRouteData.id);
   const { status: foregroundStatus } =
     await Location.requestForegroundPermissionsAsync();
   if (foregroundStatus === "granted") {
     const { status: backgroundStatus } =
       await Location.requestBackgroundPermissionsAsync();
     if (backgroundStatus === "granted") {
-      await Location.startLocationUpdatesAsync(BACKGROUND_FETCH_TASK, {
+      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.Balanced,
       });
     }
@@ -95,6 +66,23 @@ const HomeScreen = () => {
   //const { dbUser, isDriver, currentUserData } = useAuthContext();
   const { routesData, currentRouteData } = useRouteContext();
 
+  TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+    if (error) {
+      // Error occurred - check `error.message` for more details.
+      return;
+    }
+    if (data && currentRouteData) {
+      const { locations } = data;
+      console.log("Received new location updates:", locations[0].coords);
+      // console.log("Current Route Id:", currentRouteData.id);
+      //console.log(currentRouteData);
+      updateLocation(
+        currentRouteData.id,
+        locations[0].coords.latitude,
+        locations[0].coords.longitude
+      );
+    }
+  });
   //
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
@@ -118,25 +106,6 @@ const HomeScreen = () => {
   const [notificationSent, setNotificationSent] = useState(false);
   const [parent1, setParent1] = useState(null);
   const [parent2, setParent2] = useState(null);
-  const [previousLocation, setPreviousLocation] = useState(null);
-  const [isRegistered, setIsRegistered] = useState(false);
-
-  const checkStatusAsync = async () => {
-    const status = await BackgroundFetch.getStatusAsync();
-    const isRegistered = await TaskManager.isTaskRegisteredAsync(
-      BACKGROUND_FETCH_TASK
-    );
-    setIsRegistered(isRegistered);
-  };
-  //
-
-  useEffect(() => {
-    registerBackgroundFetchAsync();
-  }, []);
-
-  useEffect(() => {
-    checkStatusAsync();
-  }, []);
 
   useEffect(() => {
     requestLocationPermissions();
@@ -308,6 +277,7 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (currentRouteData) {
+      //console.log("current Route Data ID", currentRouteData.id);
       getStaffInfo();
     }
     //console.log(currentRouteData);
@@ -331,32 +301,71 @@ const HomeScreen = () => {
       console.error("Error updating route", error);
     }
   };
+  // Request location permissions and start tracking location
+  const startLocationTracking = async (routeData) => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
+        return;
+      }
 
-  useEffect(() => {
-    (async () => {
-      let location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      }); //accuracy: 6
+      const location = await Location.getCurrentPositionAsync({ accuracy: 5 });
       setBusLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
-    })();
 
-    // const backgroundSubscription = Location.watchPositionAsync(
-    //   {
-    //     accuracy: Location.Accuracy.Balanced, //6, //Location.Accuracy.BestForNavigation,
-    //     distanceInterval: 5,
-    //   },
-    //   (updatedLocation) => {
-    //     setBusLocation({
-    //       latitude: updatedLocation.coords.latitude,
-    //       longitude: updatedLocation.coords.longitude,
-    //     });
-    //   }
-    // );
-    // return () => backgroundSubscription;
-  }, []);
+      // Start location updates with custom parameters (currentRouteData)
+      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+        accuracy: Location.Accuracy.BestForNavigation,
+        distanceInterval: 5,
+      });
+    } catch (error) {
+      console.error("Error starting location updates: ", error);
+    }
+  };
+
+  useEffect(() => {
+    // Call startLocationTracking with the currentRouteData
+    if (currentRouteData) {
+      startLocationTracking(currentRouteData);
+    }
+
+    return () => {
+      // Stop location updates when the component unmounts
+      Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+    };
+  }, [currentRouteData]);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     let { status } = await Location.requestForegroundPermissionsAsync();
+  //     if (!status === "granted") {
+  //       setErrorMsg("Permission to access location was denied");
+  //       return;
+  //     }
+  //     let location = await Location.getCurrentPositionAsync({ accuracy: 5 });
+  //     setBusLocation({
+  //       latitude: location.coords.latitude,
+  //       longitude: location.coords.longitude,
+  //     });
+  //   })();
+
+  //   const foregroundSubscription = Location.watchPositionAsync(
+  //     {
+  //       accuracy: Location.Accuracy.BestForNavigation,
+  //       distanceInterval: 5,
+  //     },
+  //     (updatedLocation) => {
+  //       setBusLocation({
+  //         latitude: updatedLocation.coords.latitude,
+  //         longitude: updatedLocation.coords.longitude,
+  //       });
+  //     }
+  //   );
+  //   return () => foregroundSubscription;
+  // }, []);
 
   useEffect(() => {
     if (currentRouteData && busLocation) {
