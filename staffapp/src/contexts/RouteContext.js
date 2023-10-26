@@ -72,6 +72,7 @@ const RouteContextProvider = ({ children }) => {
     const isUserOnRoute = await checkStaffInRoutes();
     //console.log(isUserOnRoute);
     if (!isUserOnRoute) {
+      console.warn("not found route for this user");
       handleLogout();
     }
   };
@@ -82,9 +83,10 @@ const RouteContextProvider = ({ children }) => {
 
     if (routesData) {
       const roleToCheck = isDriver ? "driver" : "helper";
-
+      //console.log(roleToCheck);
+      //console.log(routesData);
       const routeWithMatchingRole = routesData.find((item) => {
-        if (item[roleToCheck] && item[roleToCheck] === dbUser.id) {
+        if (item[roleToCheck] && item[roleToCheck] === dbUser?.id) {
           return true;
         }
         return false;
@@ -97,12 +99,13 @@ const RouteContextProvider = ({ children }) => {
       } else {
         // Handle case when no matching route is found
         console.log(
-          `No route found for ${roleToCheck} with user ID ${dbUser.id}`
+          `No route found for ${roleToCheck} with user ID ${dbUser?.id}`
         );
       }
     }
     return false;
   };
+
   // Starting the useEffects
   useEffect(() => {
     // Fetch initial data when the component mounts
@@ -117,7 +120,7 @@ const RouteContextProvider = ({ children }) => {
     if (routesData) {
       callCheckStaffInRoutes();
     }
-  }, [routesData]);
+  }, [routesData, dbUser]);
 
   return (
     <RouteContext.Provider

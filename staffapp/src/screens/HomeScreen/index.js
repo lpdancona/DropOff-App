@@ -43,7 +43,6 @@ import { useRouteContext } from "../../contexts/RouteContext";
 
 const LOCATION_TASK_NAME = "background-location-task";
 
-//
 const requestLocationPermissions = async () => {
   const { status: foregroundStatus } =
     await Location.requestForegroundPermissionsAsync();
@@ -60,30 +59,6 @@ const requestLocationPermissions = async () => {
 //
 
 const HomeScreen = () => {
-  // const from contexts
-  const { schedulePushNotification, sendPushNotification, expoPushToken } =
-    usePushNotificationsContext();
-  //const { dbUser, isDriver, currentUserData } = useAuthContext();
-  const { routesData, currentRouteData } = useRouteContext();
-
-  TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-    if (error) {
-      // Error occurred - check `error.message` for more details.
-      return;
-    }
-    if (data && currentRouteData) {
-      const { locations } = data;
-      console.log("Received new location updates:", locations[0].coords);
-      // console.log("Current Route Id:", currentRouteData.id);
-      //console.log(currentRouteData);
-      updateLocation(
-        currentRouteData.id,
-        locations[0].coords.latitude,
-        locations[0].coords.longitude
-      );
-    }
-  });
-  //
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -96,8 +71,6 @@ const HomeScreen = () => {
   const [helper, setHelper] = useState([]);
   const [driver, setDriver] = useState([]);
   const [busLocation, setBusLocation] = useState(null);
-  // const [routesData, setRoutesData] = useState(null);
-  // const [currentRouteData, setCurrentRouteData] = useState(null);
   const [addressList, setAddressList] = useState(null);
   const [currentWaypointIndex, setCurrentWaypointIndex] = useState(0);
   const [origin, setOrigin] = useState(null);
@@ -106,6 +79,44 @@ const HomeScreen = () => {
   const [notificationSent, setNotificationSent] = useState(false);
   const [parent1, setParent1] = useState(null);
   const [parent2, setParent2] = useState(null);
+  const [previousLocation, setPreviousLocation] = useState(null);
+  const { schedulePushNotification, sendPushNotification, expoPushToken } =
+    usePushNotificationsContext();
+  const { routesData, currentRouteData } = useRouteContext();
+
+  TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+    if (error) {
+      // Error occurred - check `error.message` for more details.
+      return;
+    }
+    if (data && currentRouteData) {
+      const { locations } = data;
+      const newLocation = locations[0].coords;
+
+      if (!areLocationsEqual(newLocation, previousLocation)) {
+        console.log("Received new location updates:", locations[0].coords);
+        // console.log("Current Route Id:", currentRouteData.id);
+        //console.log(currentRouteData);
+        updateLocation(
+          currentRouteData.id,
+          newLocation.latitude,
+          newLocation.longitude
+        );
+        setPreviousLocation(newLocation);
+      }
+    }
+  });
+  //
+
+  function areLocationsEqual(location1, location2) {
+    if (!location1 || !location2) {
+      return false; // At least one location is null, so they are not equal.
+    }
+    return (
+      location1.latitude === location2.latitude &&
+      location1.longitude === location2.longitude
+    );
+  }
 
   useEffect(() => {
     requestLocationPermissions();
