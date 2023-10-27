@@ -26,22 +26,12 @@ import { usePushNotificationsContext } from "../../contexts/PushNotificationsCon
 import * as Location from "expo-location";
 import { updateLocation } from "../../components/LocationUtils";
 import { useRouteContext } from "../../contexts/RouteContext";
+import LocationTrackingComponent from "../../components/LocationTrackingComponent";
 
-const BACKGROUND_FETCH_TASK = "background-location-task";
+//import { useBackgroundTaskContext } from "../../contexts/BackgroundTaskContext";
 
-const requestLocationPermissions = async () => {
-  const { status: foregroundStatus } =
-    await Location.requestForegroundPermissionsAsync();
-  if (foregroundStatus === "granted") {
-    const { status: backgroundStatus } =
-      await Location.requestBackgroundPermissionsAsync();
-    if (backgroundStatus === "granted") {
-      await Location.startLocationUpdatesAsync(BACKGROUND_FETCH_TASK, {
-        accuracy: Location.Accuracy.Balanced,
-      });
-    }
-  }
-};
+//const BACKGROUND_FETCH_TASK = "background-location-task";
+
 //
 
 const HomeScreen = () => {
@@ -69,6 +59,24 @@ const HomeScreen = () => {
   const { schedulePushNotification, sendPushNotification, expoPushToken } =
     usePushNotificationsContext();
   const { routesData, currentRouteData } = useRouteContext();
+  //const { registerBackgroundFetchAsync } = useBackgroundTaskContext();
+
+  // const requestLocationPermissions = async () => {
+  //   const { status: foregroundStatus } =
+  //     await Location.requestForegroundPermissionsAsync();
+  //   if (foregroundStatus === "granted") {
+  //     const { status: backgroundStatus } =
+  //       await Location.requestBackgroundPermissionsAsync();
+  //     if (backgroundStatus === "granted") {
+  //       // await Location.startLocationUpdatesAsync(
+  //       //   registerBackgroundFetchAsync(),
+  //       //   {
+  //       //     accuracy: Location.Accuracy.Balanced,
+  //       //   }
+  //       // );
+  //     }
+  //   }
+  // };
 
   const sendNotificationToAllParents = async () => {
     if (currentRouteData?.Kid) {
@@ -224,9 +232,9 @@ const HomeScreen = () => {
   /////
   /////   starting the useEffects ///
   /////
-  useEffect(() => {
-    requestLocationPermissions();
-  }, []);
+  // useEffect(() => {
+  //   requestLocationPermissions();
+  // }, []);
 
   useEffect(() => {
     (async () => {
@@ -370,8 +378,11 @@ const HomeScreen = () => {
   // console.log("origin", origin);
   // console.log("destination", destination);
   // console.log("next waypoint", nextWaypoints);
+  /// jsx return
+
   return (
     <SafeAreaView style={styles.mapContainer}>
+      <LocationTrackingComponent />
       <MapView
         ref={mapRef}
         //provider={PROVIDER_GOOGLE}
