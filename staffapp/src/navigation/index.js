@@ -7,7 +7,7 @@ import ProfileScreen from "../screens/ProfileScreen";
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
-  const { dbUser, loading, isDriver } = useAuthContext();
+  const { dbUser, loading, isDriver, userEmail } = useAuthContext();
 
   //console.log(isDriver);
   if (loading) {

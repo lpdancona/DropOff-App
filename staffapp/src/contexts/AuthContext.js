@@ -13,7 +13,7 @@ const AuthContextProvider = ({ children }) => {
   const sub = authUser?.attributes?.sub;
   const [userEmail, setUserEmail] = useState(null); //authUser?.attributes?.email
   //const [isEmailVerified, setIsEmailVerified] = useState(false); //authUser?.attributes?.email_verified
-  const [userPassword, setUserPassword] = useState(null);
+  //const [userPassword, setUserPassword] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isDriver, setIsDriver] = useState(null);
   const [currentUserData, setCurrentUserData] = useState(null);
@@ -81,7 +81,6 @@ const AuthContextProvider = ({ children }) => {
         sub,
         setDbUser,
         userEmail,
-        userPassword,
         loading,
         isDriver,
         currentUserData,

@@ -9,7 +9,7 @@ const RouteContext = createContext({});
 const RouteContextProvider = ({ children }) => {
   const [routesData, setRoutesData] = useState(null);
   const [currentRouteData, setCurrentRouteData] = useState(null);
-  const { dbUser, isDriver, currentUserData } = useAuthContext();
+  const { dbUser, isDriver, currentUserData, userEmail } = useAuthContext();
 
   //console.log("isDriver? ", isDriver);
   const handleLogout = async () => {
@@ -58,7 +58,7 @@ const RouteContextProvider = ({ children }) => {
           return { ...route, Kid: kidsData, Van: vansData };
         })
       );
-
+      //console.log("merged Data", mergedData);
       setRoutesData(mergedData);
       return true;
     } catch (error) {
@@ -105,22 +105,26 @@ const RouteContextProvider = ({ children }) => {
     }
     return false;
   };
-
+  ///
   // Starting the useEffects
+  ///
   useEffect(() => {
-    // Fetch initial data when the component mounts
-    const fetchInitialData = async () => {
-      await getRoutesData();
-    };
+    if (dbUser && userEmail) {
+      // Fetch initial data when the component mounts
+      const fetchInitialData = async () => {
+        await getRoutesData();
+      };
 
-    fetchInitialData();
+      fetchInitialData();
+      //console.log("getRoutesData on context", routesData);
+    }
   }, [dbUser]);
 
   useEffect(() => {
-    if (routesData) {
+    if (routesData && dbUser) {
       callCheckStaffInRoutes();
     }
-  }, [routesData, dbUser]);
+  }, [routesData]);
 
   return (
     <RouteContext.Provider
