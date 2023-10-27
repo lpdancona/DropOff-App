@@ -3,6 +3,7 @@ import { useAuthContext } from "../contexts/AuthContext";
 import { ActivityIndicator } from "react-native";
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+//import LoginScreen from "../screens/LoginScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,10 +23,7 @@ const RootNavigator = () => {
         <Stack.Screen name="StaffLogin" component={ProfileScreen} />
       )}
 
-      {/* <Stack.Screen 
-        name='Login' 
-        component={LoginScreen}
-      /> */}
+      {/* <Stack.Screen name="Login" component={LoginScreen} /> */}
     </Stack.Navigator>
   );
 };
