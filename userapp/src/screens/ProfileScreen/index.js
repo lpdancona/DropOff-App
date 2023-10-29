@@ -156,23 +156,6 @@ const ProfileScreen = () => {
       Alert.alert("Error saving new user", e.message);
     }
   };
-  // useEffect(() => {
-  //   console.log("kids object", kids);
-  // }, [kids]);
-
-  // useEffect(() => {
-  //   // The dbUser has been set, so you can call onUpdateKid here
-  //   if (firstLogin && dbUser) {
-  //     updateKidUserID();
-  //   }
-  //   //navigation.navigate("Home");
-  // }, [dbUser, firstLogin]);
-
-  // useEffect(() => {
-  //   if (!firstLogin) {
-  //     navigation.navigate("Home");
-  //   }
-  // }, [dbUser]);
 
   return (
     <SafeAreaView>

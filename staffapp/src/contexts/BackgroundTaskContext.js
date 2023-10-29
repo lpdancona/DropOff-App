@@ -3,21 +3,21 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import * as BackgroundFetch from "expo-background-fetch";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
-import { useRouteContext } from "./RouteContext";
-import { updateLocation } from "../../src/components/LocationUtils";
+import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
+
+const locationEmitter = new EventEmitter();
+const LOCATION_UPDATE = "LOCATION_UPDATE";
 
 const BACKGROUND_FETCH_TASK = "background-location-task"; // Use the same task name
 
-TaskManager.defineTask(BACKGROUND_FETCH_TASK, async (currentRouteData) => {
+TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
   try {
-    const location = await Location.getCurrentPositionAsync({});
+    const location = await Location.getCurrentPositionAsync();
+
     console.log("Location fetched in the background:", location);
-    //console.log(currentRouteData);
-    // updateLocation(
-    //   RouteContextProvider.useRouteContext.currentRouteData,
-    //   location.coords.latitude,
-    //   location.coords.longitude
-    // );
+
+    locationEmitter.emit(LOCATION_UPDATE, location);
+
     return BackgroundFetch.BackgroundFetchResult.NewData;
   } catch (error) {
     console.error("Location fetch error:", error);
@@ -37,7 +37,7 @@ export const BackgroundTaskProvider = ({ children }) => {
   const registerBackgroundFetchAsync = async () => {
     try {
       await BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
-        minimumInterval: 15 * 1, // 15 seconds
+        minimumInterval: 5 * 1, // 5 seconds
         stopOnTerminate: false,
         startOnBoot: true,
       });
@@ -48,7 +48,9 @@ export const BackgroundTaskProvider = ({ children }) => {
   };
 
   return (
-    <BackgroundTaskContext.Provider value={{ registerBackgroundFetchAsync }}>
+    <BackgroundTaskContext.Provider
+      value={{ registerBackgroundFetchAsync, locationEmitter }}
+    >
       {children}
     </BackgroundTaskContext.Provider>
   );

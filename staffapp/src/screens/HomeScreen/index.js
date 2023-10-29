@@ -27,8 +27,7 @@ import * as Location from "expo-location";
 import { updateLocation } from "../../components/LocationUtils";
 import { useRouteContext } from "../../contexts/RouteContext";
 import LocationTrackingComponent from "../../components/LocationTrackingComponent";
-
-//import { useBackgroundTaskContext } from "../../contexts/BackgroundTaskContext";
+import { useBackgroundTaskContext } from "../../contexts/BackgroundTaskContext";
 
 //const BACKGROUND_FETCH_TASK = "background-location-task";
 
@@ -41,7 +40,7 @@ const HomeScreen = () => {
   const { width, height } = useWindowDimensions();
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
-  const [isDriverClose, setIsDriverClose] = useState(false);
+  //const [isDriverClose, setIsDriverClose] = useState(false);
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
   const [helper, setHelper] = useState([]);
@@ -59,24 +58,25 @@ const HomeScreen = () => {
   const { schedulePushNotification, sendPushNotification, expoPushToken } =
     usePushNotificationsContext();
   const { routesData, currentRouteData } = useRouteContext();
+  const { locationEmitter } = useBackgroundTaskContext();
   //const { registerBackgroundFetchAsync } = useBackgroundTaskContext();
 
-  // const requestLocationPermissions = async () => {
-  //   const { status: foregroundStatus } =
-  //     await Location.requestForegroundPermissionsAsync();
-  //   if (foregroundStatus === "granted") {
-  //     const { status: backgroundStatus } =
-  //       await Location.requestBackgroundPermissionsAsync();
-  //     if (backgroundStatus === "granted") {
-  //       // await Location.startLocationUpdatesAsync(
-  //       //   registerBackgroundFetchAsync(),
-  //       //   {
-  //       //     accuracy: Location.Accuracy.Balanced,
-  //       //   }
-  //       // );
-  //     }
-  //   }
-  // };
+  const requestLocationPermissions = async () => {
+    const { status: foregroundStatus } =
+      await Location.requestForegroundPermissionsAsync();
+    if (foregroundStatus === "granted") {
+      const { status: backgroundStatus } =
+        await Location.requestBackgroundPermissionsAsync();
+      if (backgroundStatus === "granted") {
+        // await Location.startLocationUpdatesAsync(
+        //   registerBackgroundFetchAsync(),
+        //   {
+        //     accuracy: Location.Accuracy.Balanced,
+        //   }
+        // );
+      }
+    }
+  };
 
   const sendNotificationToAllParents = async () => {
     if (currentRouteData?.Kid) {
@@ -109,13 +109,66 @@ const HomeScreen = () => {
     }
   };
 
-  const sendNotificationToNextParents = async () => {};
+  const sendNotificationToNextParents = async () => {
+    // Check if the currentWaypointIndex is within valid bounds
+    if (currentWaypointIndex < addressList.length) {
+      // Get the current waypoint
+      const currentWaypoint = addressList[currentWaypointIndex];
+
+      // Check if the current waypoint has a Kid property
+      if (currentWaypoint.Kid) {
+        for (const currentKid of currentWaypoint.Kid) {
+          // Find the corresponding kid in currentRouteData.Kid
+          const matchedKid = currentRouteData.Kid.find(
+            (kid) => kid.id === currentKid.id
+          );
+
+          if (matchedKid) {
+            // Check if the kid has Parent1 or Parent2
+            const parent1 = matchedKid.Parent1;
+            const parent2 = matchedKid.Parent2;
+
+            if (parent1 && parent1.pushToken) {
+              const childName = currentKid.name;
+              const parentToken = parent1.pushToken;
+              const message01 = `Dear parent of ${childName}, The driver is approximately 5 minutes away from your location.`;
+
+              //console.log(message01);
+              // Send a push notification to Parent1
+              await sendPushNotification(
+                parentToken,
+                "Current Stop Alert",
+                message01
+              );
+            }
+
+            if (parent2 && parent2.pushToken) {
+              const childName = currentKid.name;
+              const parentToken = parent2.pushToken;
+              const message02 = `Dear parent of ${childName}, The driver is approximately 5 minutes away from your location.`;
+
+              //console.log(message02);
+              // Send a push notification to Parent2
+              await sendPushNotification(
+                parentToken,
+                "Current Stop Alert",
+                message02
+              );
+            }
+          }
+        }
+      } else {
+        // Handle the case when currentWaypoint.Kid is undefined
+        console.log("No Kid found for the current waypoint");
+      }
+    }
+  };
 
   const renderKidsItem = ({ item, index }) => {
     if (!currentRouteData) {
       return <ActivityIndicator size="large" color="gray" />;
     }
-    //console.log(routeCoords)
+    //console.log("addressList", addressList);
     return (
       <Pressable
         onPress={(e) => {
@@ -158,7 +211,6 @@ const HomeScreen = () => {
               variables: { id: addressListItem.addressListKidId },
             });
             const kidData = responseGetKid.data.getKid;
-            //console.log("kid Data", kidData);
             return {
               ...addressListItem,
               Kid: kidData,
@@ -169,14 +221,29 @@ const HomeScreen = () => {
           }
         })
       );
-      // Filter out addresses with the same latitude and longitude
-      const uniqueAddressList = addressListWithKids.filter(
-        (address, index, self) =>
-          index ===
-          self.findIndex(
-            (a) => a.Kid.dropOffAddress === address.Kid.dropOffAddress
-          )
-      );
+      const groupedAddressList = new Map();
+
+      addressListWithKids.forEach((address) => {
+        const { latitude, longitude } = address;
+        const locationKey = `${latitude}_${longitude}`;
+        //console.log("address", address);
+
+        if (!groupedAddressList.has(locationKey)) {
+          groupedAddressList.set(locationKey, {
+            ...address,
+            Kid: [],
+            latitude,
+            longitude,
+          });
+        }
+
+        const groupedAddress = groupedAddressList.get(locationKey);
+        // groupedAddress.AddressList.push(address);
+        groupedAddress.Kid.push(address.Kid);
+      });
+
+      const uniqueAddressList = Array.from(groupedAddressList.values());
+
       setAddressList(uniqueAddressList);
     } catch (error) {
       console.error("Error fetching getOrderAddress: ", error);
@@ -185,6 +252,7 @@ const HomeScreen = () => {
 
   const handleNextWaypoint = () => {
     setCurrentWaypointIndex((prevIndex) => prevIndex + 1);
+    setNotificationSent(false);
   };
 
   const getParentsInfo = async () => {
@@ -232,9 +300,9 @@ const HomeScreen = () => {
   /////
   /////   starting the useEffects ///
   /////
-  // useEffect(() => {
-  //   requestLocationPermissions();
-  // }, []);
+  useEffect(() => {
+    requestLocationPermissions();
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -304,17 +372,6 @@ const HomeScreen = () => {
     }
   };
 
-  useEffect(() => {
-    if (currentRouteData && busLocation) {
-      //console.log("bus Location", busLocation);
-      updateLocation(
-        currentRouteData.id,
-        busLocation.latitude,
-        busLocation.longitude
-      );
-    }
-  }, [busLocation]);
-
   const zoomInOnDriver = () => {
     mapRef.current.animateToRegion({
       latitude: busLocation.latitude,
@@ -325,6 +382,7 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
+    //console.log(busLocation);
     if (
       !busLocation ||
       !addressList ||
@@ -375,14 +433,21 @@ const HomeScreen = () => {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
 
-  // console.log("origin", origin);
-  // console.log("destination", destination);
-  // console.log("next waypoint", nextWaypoints);
+  function generateMarkerTitle(kids) {
+    return kids.map((kid) => kid.name).join(" and ") + " Houses";
+  }
+
+  function generateMarkerDescription(kids) {
+    return kids.map((kid) => kid.dropOffAddress).join("\n");
+  }
   /// jsx return
 
   return (
     <SafeAreaView style={styles.mapContainer}>
-      <LocationTrackingComponent />
+      <LocationTrackingComponent
+        locationEmitter={locationEmitter}
+        routeID={currentRouteData.id}
+      />
       <MapView
         ref={mapRef}
         //provider={PROVIDER_GOOGLE}
@@ -406,20 +471,15 @@ const HomeScreen = () => {
               longitude: destination.longitude,
             }}
             mode={"DRIVING"}
-            //waypoints={nextWaypoints}
-            // waypoints={
-            //   index < addressList.length - 1 ? [addressList[index + 1]] : []
-            // }
             precision="high"
             strokeWidth={5}
             strokeColor="blue"
+            timePrecision="now"
             onReady={(result) => {
-              //console.log(result);
               const isClose = result.duration <= 5;
               if (isClose && !notificationSent) {
-                //sendNotification("driver is close 5 minutes away");
-                setIsDriverClose(true);
                 setNotificationSent(true);
+                sendNotificationToNextParents();
               }
               setTotalMinutes(result.duration);
               setTotalKm(result.distance);
@@ -449,8 +509,8 @@ const HomeScreen = () => {
               latitude: waypoint.latitude,
               longitude: waypoint.longitude,
             }}
-            title={`${waypoint.Kid.name} House's`}
-            description={`${waypoint.Kid.dropOffAddress}`}
+            title={generateMarkerTitle(waypoint.Kid)}
+            description={generateMarkerDescription(waypoint.Kid)}
           >
             <View
               style={{
@@ -593,6 +653,7 @@ const HomeScreen = () => {
               //console.log("bus location", busLocation);
               // send push notification to user app
               sendNotificationToAllParents();
+              setNotificationSent(false);
               // update the route status
               updateRouteStatus("IN_PROGRESS");
               zoomInOnDriver();
@@ -630,27 +691,4 @@ const HomeScreen = () => {
   );
 };
 
-// TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-//   if (error) {
-//     // Error occurred - check `error.message` for more details.
-//     return;
-//   }
-
-//   if (data) {
-//     const { locations } = data;
-//     console.log("Received new location updates:", locations[0].coords);
-//     // console.log("Current Route Id:", currentRouteData.id);
-//     //console.log(currentRouteData);
-//     // updateLocation(
-//     //   currentRouteData.id,
-//     //   newLocation.latitude,
-//     //   newLocation.longitude
-//     // );
-//     // setPreviousLocation(newLocation);
-//   }
-// });
-
 export default HomeScreen;
-
-//import { useRouteContext } from "../../contexts/RouteContext";
-//const { routesData, currentRouteData } = useRouteContext();

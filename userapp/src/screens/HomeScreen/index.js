@@ -32,14 +32,8 @@ import {
 } from "../../graphql/queries";
 import { onUpdateRoute } from "../../graphql/subscriptions";
 
-// const van = vans[0];
-// const gbLocation = {
-//   latitude: 49.263527201707745,
-//   longitude: -123.10070015042552,
-// }; // gb location (we can import from the database in future)
-
 const HomeScreen = () => {
-  const { kids, dbUser, currentUserData } = useAuthContext();
+  const { kids, dbUser, currentUserData, userEmail } = useAuthContext();
   const [selectedItem, setSelectedItem] = useState(null);
   const [dropOffLatLng, setDropLatLng] = useState(null);
   const [dropOffAddress, setDropOffAddress] = useState(null);
@@ -114,7 +108,6 @@ const HomeScreen = () => {
       });
 
       if (routeWithMatchingKids) {
-        //console.log("RoutewihmatchinKids", routeWithMatchingKids);
         // Update the state variable with the route that has matching kids
         setCurrentRouteData(routeWithMatchingKids);
         //
@@ -144,13 +137,13 @@ const HomeScreen = () => {
 
   useEffect(() => {
     // Fetch initial data when the component mounts
-    if (!dbUser) {
-      return;
+
+    if (dbUser && userEmail) {
+      const fetchInitialData = async () => {
+        await getRoutesData();
+      };
+      fetchInitialData();
     }
-    const fetchInitialData = async () => {
-      await getRoutesData();
-    };
-    fetchInitialData();
   }, [kids]);
 
   useEffect(() => {
@@ -236,6 +229,7 @@ const HomeScreen = () => {
   const handleLogout = async () => {
     try {
       // Sign out the user using Amplify Auth
+      console.log("error user log out");
       await Auth.signOut();
     } catch (error) {
       console.error("Logout error:", error);
@@ -291,6 +285,9 @@ const HomeScreen = () => {
           apikey={GOOGLE_MAPS_APIKEY}
           origin={busLocation} // Start from the first waypoint
           destination={dropOffLatLng} //{van.waypoints[van.waypoints.length - 1]} // End at the last waypoint
+          mode={"DRIVING"}
+          precision="high"
+          timePrecision="now"
           strokeWidth={1}
           strokeColor="rgba(0, 0, 0, 0)"
           onReady={(result) => {
@@ -396,7 +393,9 @@ const HomeScreen = () => {
                     >
                       <Image
                         source={{ uri: driver?.photo }}
-                        style={styles.image}
+                        resizeMethod="scale"
+                        resizeMode="contain"
+                        style={styles.imageDriver}
                       />
                     </Pressable>
                     <Pressable
@@ -406,8 +405,15 @@ const HomeScreen = () => {
                       }}
                     >
                       <Image
-                        source={{ uri: helper?.photo }}
-                        style={styles.image}
+                        //source={{ uri: helper?.photo }}
+                        defaultSource={
+                          helper?.photo
+                            ? { uri: helper.photo }
+                            : require("../../../assets/img/noPhoto.png")
+                        }
+                        style={styles.imageHelper}
+                        resizeMethod="scale"
+                        resizeMode="contain"
                       />
                     </Pressable>
                   </View>

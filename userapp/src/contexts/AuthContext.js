@@ -2,9 +2,10 @@ import { createContext, useState, useEffect, useContext } from "react";
 //import { DataStore } from 'aws-amplify';
 //import { User, Kid } from '../models';
 import { Auth } from "aws-amplify";
-import { API, graphqlOperation } from "aws-amplify";
+import { API } from "aws-amplify";
 import { listUsers, listKids, getUser } from "../graphql/queries";
-//import { usePushNotificationsContext } from "./PushNotificationsContext";
+import { usePushNotificationsContext } from "./PushNotificationsContext";
+import { updateUser } from "../graphql/mutations";
 
 const AuthContext = createContext({});
 
@@ -17,12 +18,9 @@ const AuthContextProvider = ({ children }) => {
   const [kids, setKids] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUserData, setCurrentUserData] = useState(null);
-  //const { expoPushToken } = usePushNotificationsContext();
+  const { expoPushToken } = usePushNotificationsContext();
 
   useEffect(() => {
-    // if (!authUser) {
-    //   return;
-    // }
     Auth.currentAuthenticatedUser({ bypassCache: true })
       .then((user) => {
         setAuthUser(user);
@@ -49,13 +47,34 @@ const AuthContextProvider = ({ children }) => {
     setDbUser(response);
     setLoading(false);
   };
-
+  const updatePushToken = async (id, updatedPushToken) => {
+    try {
+      const userDetails = {
+        id: id,
+        pushToken: updatedPushToken,
+      };
+      const updatedUser = await API.graphql({
+        query: updateUser,
+        variables: { input: userDetails },
+      });
+    } catch (error) {
+      console.log("error updating token", error);
+    }
+  };
   const getCurrentUserData = async () => {
+    // get current user data and check the expopushToken
     const responseGetUser = await API.graphql({
       query: getUser,
       variables: { id: dbUser.id },
     });
-    //const userData =
+    const actualPushToken = responseGetUser.data.getUser.pushToken;
+    if (actualPushToken !== expoPushToken.data || actualPushToken === null) {
+      await updatePushToken(
+        responseGetUser.data.getUser.id,
+        expoPushToken.data
+      );
+      //console.log("Same push token");
+    }
     setCurrentUserData(responseGetUser.data.getUser);
   };
 
@@ -109,10 +128,6 @@ const AuthContextProvider = ({ children }) => {
       getCurrentUserData();
     }
   }, [dbUser]);
-
-  useEffect(() => {
-    //console.log(expoPushToken.data);
-  }, [currentUserData]);
 
   useEffect(() => {
     fetchKidsData(userEmail);

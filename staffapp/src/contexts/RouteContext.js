@@ -72,7 +72,7 @@ const RouteContextProvider = ({ children }) => {
     const isUserOnRoute = await checkStaffInRoutes();
     //console.log(isUserOnRoute);
     if (!isUserOnRoute) {
-      console.warn("not found route for this user");
+      console.warn("no route found for this user");
       handleLogout();
     }
   };

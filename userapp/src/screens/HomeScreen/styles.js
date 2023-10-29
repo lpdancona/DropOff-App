@@ -94,11 +94,18 @@ export default StyleSheet.create({
     justifyContent: "space-between",
     padding: 20,
   },
-  image: {
+  imageDriver: {
     // flex: 1,
-    width: 180,
+    width: 170,
     aspectRatio: 2 / 3,
     marginBottom: 5,
+  },
+  imageHelper: {
+    // flex: 1,
+    width: 180,
+    //height: 271,
+    aspectRatio: 3 / 3,
+    marginTop: 13,
   },
   modalContainer: {
     flex: 1,
