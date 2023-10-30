@@ -1,6 +1,111 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createAddressList = /* GraphQL */ `
+  mutation CreateAddressList(
+    $input: CreateAddressListInput!
+    $condition: ModelAddressListConditionInput
+  ) {
+    createAddressList(input: $input, condition: $condition) {
+      id
+      order
+      latitude
+      longitude
+      routeID
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        routeID
+        Parent1ID
+        Parent2ID
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      addressListKidId
+      __typename
+    }
+  }
+`;
+export const updateAddressList = /* GraphQL */ `
+  mutation UpdateAddressList(
+    $input: UpdateAddressListInput!
+    $condition: ModelAddressListConditionInput
+  ) {
+    updateAddressList(input: $input, condition: $condition) {
+      id
+      order
+      latitude
+      longitude
+      routeID
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        routeID
+        Parent1ID
+        Parent2ID
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      addressListKidId
+      __typename
+    }
+  }
+`;
+export const deleteAddressList = /* GraphQL */ `
+  mutation DeleteAddressList(
+    $input: DeleteAddressListInput!
+    $condition: ModelAddressListConditionInput
+  ) {
+    deleteAddressList(input: $input, condition: $condition) {
+      id
+      order
+      latitude
+      longitude
+      routeID
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        routeID
+        Parent1ID
+        Parent2ID
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      addressListKidId
+      __typename
+    }
+  }
+`;
 export const createVan = /* GraphQL */ `
   mutation CreateVan(
     $input: CreateVanInput!
@@ -15,10 +120,6 @@ export const createVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -39,10 +140,6 @@ export const updateVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -63,10 +160,6 @@ export const deleteVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -102,6 +195,10 @@ export const createRoute = /* GraphQL */ `
       }
       status
       Kids {
+        nextToken
+        __typename
+      }
+      AddressLists {
         nextToken
         __typename
       }
@@ -144,6 +241,10 @@ export const updateRoute = /* GraphQL */ `
         nextToken
         __typename
       }
+      AddressLists {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       routeVanId
@@ -183,6 +284,10 @@ export const deleteRoute = /* GraphQL */ `
         nextToken
         __typename
       }
+      AddressLists {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       routeVanId
@@ -205,8 +310,9 @@ export const createKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -228,8 +334,9 @@ export const updateKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -251,8 +358,9 @@ export const deleteKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -275,6 +383,8 @@ export const createUser = /* GraphQL */ `
       lat
       phoneNumber
       userType
+      photo
+      pushToken
       createdAt
       updatedAt
       __typename
@@ -297,6 +407,8 @@ export const updateUser = /* GraphQL */ `
       lat
       phoneNumber
       userType
+      photo
+      pushToken
       createdAt
       updatedAt
       __typename
@@ -319,6 +431,8 @@ export const deleteUser = /* GraphQL */ `
       lat
       phoneNumber
       userType
+      photo
+      pushToken
       createdAt
       updatedAt
       __typename

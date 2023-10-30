@@ -1,3 +1,5 @@
+import React from "react";
+import ReactDOM from "react-dom";
 import "./App.css";
 import { Amplify } from "aws-amplify";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -5,9 +7,12 @@ import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import Students from "./components/Students";
 import Vans from "./components/Vans";
+import RoutesPage from "./pages/RoutesPage";
 import Employees from "./components/Employees";
 import VanDetailPage from "./pages/VanDetailPage";
 import awsExports from "./aws-exports";
+import RouteDetailsPage from "./pages/RouteDetailsPage";
+
 Amplify.configure(awsExports);
 function App() {
   return (
@@ -21,6 +26,8 @@ function App() {
             <Route path="/vans" element={<Vans />} />
             <Route path="/employees" element={<Employees />} />
             <Route path="/vans/:vanId" element={<VanDetailPage />} />
+            <Route path="/routes" element={<RoutesPage />} />
+            <Route path="/routes/:vanId" element={<RouteDetailsPage />} />
           </Routes>
         </div>
       </BrowserRouter>

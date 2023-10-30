@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { API, graphqlOperation } from "aws-amplify";
-import { DataStore } from "@aws-amplify/datastore";
+//import { DataStore } from "@aws-amplify/datastore";
 import { listVans, listKids } from "../graphql/queries";
-import { Kid, Van } from "../models";
+//import { Kid, Van } from "../models";
 
 const AddStudentToVan = () => {
   const [selectedVanId, setSelectedVanId] = useState("");
@@ -28,32 +28,34 @@ const AddStudentToVan = () => {
     fetchData();
   }, []);
 
-  const handleUpdateVanKids = async () => {
-    try {
-      if (!selectedVanId || !selectedStudentId) {
-        console.error("Please select a van and a student.");
-        return;
-      }
+  const handleUpdateVanKids = async () => {};
 
-      console.log("Selected Van ID:", selectedVanId);
-      console.log("Selected Student ID:", selectedStudentId);
+  // const handleUpdateVanKids = async () => {
+  //   try {
+  //     if (!selectedVanId || !selectedStudentId) {
+  //       console.error("Please select a van and a student.");
+  //       return;
+  //     }
 
-      const selectedVan = await DataStore.query(Van, selectedVanId);
-      const selectedStudent = await DataStore.query(Kid, selectedStudentId);
+  //     console.log("Selected Van ID:", selectedVanId);
+  //     console.log("Selected Student ID:", selectedStudentId);
 
-      console.log("Selected Van:", selectedVan);
-      console.log("Selected Student:", selectedStudent);
+  //     const selectedVan = await DataStore.query(Van, selectedVanId);
+  //     const selectedStudent = await DataStore.query(Kid, selectedStudentId);
 
-      if (!selectedVan || !selectedStudent) {
-        console.error("Selected van or student not found.");
-        return;
-      }
+  //     console.log("Selected Van:", selectedVan);
+  //     console.log("Selected Student:", selectedStudent);
 
-      // ...rest of your code
-    } catch (error) {
-      console.error("Error updating van's kids:", error);
-    }
-  };
+  //     if (!selectedVan || !selectedStudent) {
+  //       console.error("Selected van or student not found.");
+  //       return;
+  //     }
+
+  //     // ...rest of your code
+  //   } catch (error) {
+  //     console.error("Error updating van's kids:", error);
+  //   }
+  // };
 
   return (
     <div>

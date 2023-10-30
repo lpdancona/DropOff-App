@@ -22,6 +22,7 @@ type Van @model @auth(rules: [{allow: public}]) {
   year: String
   seats: String
   bosterSeats: String
+  Kids: [Kid] @hasMany(indexName: "byVan", fields: ["id"])
 }
 
 type Route @model @auth(rules: [{allow: public}]) {
@@ -52,6 +53,7 @@ type Kid @model @auth(rules: [{allow: public}]) {
   routeID: ID @index(name: "byRoute")
   Parent1ID: ID
   Parent2ID: ID
+  vanID: ID! @index(name: "byVan")
 }
 
 enum UserTypes {

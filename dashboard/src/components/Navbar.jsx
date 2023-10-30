@@ -1,9 +1,11 @@
-import { useState } from "react";
+import React, { Component, useState } from "react";
+import ReactDOM from "react-dom";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 import gbLogo from "../docs/gb-logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTv } from "@fortawesome/free-solid-svg-icons";
+
 export default function Navbar() {
   const [view, setView] = useState("navbar-container");
   const toggleView = () => {
@@ -32,6 +34,9 @@ export default function Navbar() {
           </Link>
           <Link to="/employees">
             <h2>Employees</h2>
+          </Link>
+          <Link to="/routes">
+            <h2>Routes</h2>
           </Link>
         </div>
       </div>

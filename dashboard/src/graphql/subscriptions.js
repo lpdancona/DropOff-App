@@ -1,6 +1,108 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateAddressList = /* GraphQL */ `
+  subscription OnCreateAddressList(
+    $filter: ModelSubscriptionAddressListFilterInput
+  ) {
+    onCreateAddressList(filter: $filter) {
+      id
+      order
+      latitude
+      longitude
+      routeID
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        routeID
+        Parent1ID
+        Parent2ID
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      addressListKidId
+      __typename
+    }
+  }
+`;
+export const onUpdateAddressList = /* GraphQL */ `
+  subscription OnUpdateAddressList(
+    $filter: ModelSubscriptionAddressListFilterInput
+  ) {
+    onUpdateAddressList(filter: $filter) {
+      id
+      order
+      latitude
+      longitude
+      routeID
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        routeID
+        Parent1ID
+        Parent2ID
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      addressListKidId
+      __typename
+    }
+  }
+`;
+export const onDeleteAddressList = /* GraphQL */ `
+  subscription OnDeleteAddressList(
+    $filter: ModelSubscriptionAddressListFilterInput
+  ) {
+    onDeleteAddressList(filter: $filter) {
+      id
+      order
+      latitude
+      longitude
+      routeID
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        routeID
+        Parent1ID
+        Parent2ID
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      addressListKidId
+      __typename
+    }
+  }
+`;
 export const onCreateVan = /* GraphQL */ `
   subscription OnCreateVan($filter: ModelSubscriptionVanFilterInput) {
     onCreateVan(filter: $filter) {
@@ -12,10 +114,6 @@ export const onCreateVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -33,10 +131,6 @@ export const onUpdateVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -54,10 +148,6 @@ export const onDeleteVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -90,6 +180,10 @@ export const onCreateRoute = /* GraphQL */ `
       }
       status
       Kids {
+        nextToken
+        __typename
+      }
+      AddressLists {
         nextToken
         __typename
       }
@@ -129,6 +223,10 @@ export const onUpdateRoute = /* GraphQL */ `
         nextToken
         __typename
       }
+      AddressLists {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       routeVanId
@@ -165,6 +263,10 @@ export const onDeleteRoute = /* GraphQL */ `
         nextToken
         __typename
       }
+      AddressLists {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       routeVanId
@@ -184,8 +286,9 @@ export const onCreateKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -204,8 +307,9 @@ export const onUpdateKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -224,8 +328,9 @@ export const onDeleteKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
+      Parent1ID
+      Parent2ID
       createdAt
       updatedAt
       __typename
@@ -245,6 +350,8 @@ export const onCreateUser = /* GraphQL */ `
       lat
       phoneNumber
       userType
+      photo
+      pushToken
       createdAt
       updatedAt
       __typename
@@ -264,6 +371,8 @@ export const onUpdateUser = /* GraphQL */ `
       lat
       phoneNumber
       userType
+      photo
+      pushToken
       createdAt
       updatedAt
       __typename
@@ -283,6 +392,8 @@ export const onDeleteUser = /* GraphQL */ `
       lat
       phoneNumber
       userType
+      photo
+      pushToken
       createdAt
       updatedAt
       __typename
