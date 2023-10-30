@@ -74,7 +74,7 @@ export default function RouteUpdateForm(props) {
       const record = idProp
         ? (
             await API.graphql({
-              query: getRoute,
+              query: getRoute.replaceAll("__typename", ""),
               variables: { id: idProp },
             })
           )?.data?.getRoute
@@ -158,7 +158,7 @@ export default function RouteUpdateForm(props) {
             }
           });
           await API.graphql({
-            query: updateRoute,
+            query: updateRoute.replaceAll("__typename", ""),
             variables: {
               input: {
                 id: routeRecord.id,

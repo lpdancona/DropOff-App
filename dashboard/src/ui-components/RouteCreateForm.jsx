@@ -133,7 +133,7 @@ export default function RouteCreateForm(props) {
             }
           });
           await API.graphql({
-            query: createRoute,
+            query: createRoute.replaceAll("__typename", ""),
             variables: {
               input: {
                 ...modelFields,

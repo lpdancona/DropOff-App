@@ -62,7 +62,7 @@ export default function AddKidVan(props) {
       const record = idProp
         ? (
             await API.graphql({
-              query: getVan,
+              query: getVan.replaceAll("__typename", ""),
               variables: { id: idProp },
             })
           )?.data?.getVan
@@ -144,7 +144,7 @@ export default function AddKidVan(props) {
             }
           });
           await API.graphql({
-            query: updateVan,
+            query: updateVan.replaceAll("__typename", ""),
             variables: {
               input: {
                 id: vanRecord.id,

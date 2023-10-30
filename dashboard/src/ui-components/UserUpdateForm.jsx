@@ -41,6 +41,7 @@ export default function UserUpdateForm(props) {
     phoneNumber: "",
     userType: "",
     photo: "",
+    pushToken: "",
   };
   const [sub, setSub] = React.useState(initialValues.sub);
   const [name, setName] = React.useState(initialValues.name);
@@ -54,6 +55,7 @@ export default function UserUpdateForm(props) {
   );
   const [userType, setUserType] = React.useState(initialValues.userType);
   const [photo, setPhoto] = React.useState(initialValues.photo);
+  const [pushToken, setPushToken] = React.useState(initialValues.pushToken);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = userRecord
@@ -69,6 +71,7 @@ export default function UserUpdateForm(props) {
     setPhoneNumber(cleanValues.phoneNumber);
     setUserType(cleanValues.userType);
     setPhoto(cleanValues.photo);
+    setPushToken(cleanValues.pushToken);
     setErrors({});
   };
   const [userRecord, setUserRecord] = React.useState(userModelProp);
@@ -77,7 +80,7 @@ export default function UserUpdateForm(props) {
       const record = idProp
         ? (
             await API.graphql({
-              query: getUser,
+              query: getUser.replaceAll("__typename", ""),
               variables: { id: idProp },
             })
           )?.data?.getUser
@@ -98,6 +101,7 @@ export default function UserUpdateForm(props) {
     phoneNumber: [],
     userType: [],
     photo: [],
+    pushToken: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -135,6 +139,7 @@ export default function UserUpdateForm(props) {
           phoneNumber: phoneNumber ?? null,
           userType: userType ?? null,
           photo: photo ?? null,
+          pushToken: pushToken ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -165,7 +170,7 @@ export default function UserUpdateForm(props) {
             }
           });
           await API.graphql({
-            query: updateUser,
+            query: updateUser.replaceAll("__typename", ""),
             variables: {
               input: {
                 id: userRecord.id,
@@ -205,6 +210,7 @@ export default function UserUpdateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.sub ?? value;
@@ -238,6 +244,7 @@ export default function UserUpdateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -271,6 +278,7 @@ export default function UserUpdateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -304,6 +312,7 @@ export default function UserUpdateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.unitNumber ?? value;
@@ -337,6 +346,7 @@ export default function UserUpdateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.address ?? value;
@@ -374,6 +384,7 @@ export default function UserUpdateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.lng ?? value;
@@ -411,6 +422,7 @@ export default function UserUpdateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.lat ?? value;
@@ -444,6 +456,7 @@ export default function UserUpdateForm(props) {
               phoneNumber: value,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.phoneNumber ?? value;
@@ -477,6 +490,7 @@ export default function UserUpdateForm(props) {
               phoneNumber,
               userType: value,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.userType ?? value;
@@ -526,6 +540,7 @@ export default function UserUpdateForm(props) {
               phoneNumber,
               userType,
               photo: value,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.photo ?? value;
@@ -539,6 +554,40 @@ export default function UserUpdateForm(props) {
         errorMessage={errors.photo?.errorMessage}
         hasError={errors.photo?.hasError}
         {...getOverrideProps(overrides, "photo")}
+      ></TextField>
+      <TextField
+        label="Push token"
+        isRequired={false}
+        isReadOnly={false}
+        value={pushToken}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              sub,
+              name,
+              email,
+              unitNumber,
+              address,
+              lng,
+              lat,
+              phoneNumber,
+              userType,
+              photo,
+              pushToken: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.pushToken ?? value;
+          }
+          if (errors.pushToken?.hasError) {
+            runValidationTasks("pushToken", value);
+          }
+          setPushToken(value);
+        }}
+        onBlur={() => runValidationTasks("pushToken", pushToken)}
+        errorMessage={errors.pushToken?.errorMessage}
+        hasError={errors.pushToken?.hasError}
+        {...getOverrideProps(overrides, "pushToken")}
       ></TextField>
       <Flex
         justifyContent="space-between"

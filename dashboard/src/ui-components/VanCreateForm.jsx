@@ -123,7 +123,7 @@ export default function VanCreateForm(props) {
             }
           });
           await API.graphql({
-            query: createVan,
+            query: createVan.replaceAll("__typename", ""),
             variables: {
               input: {
                 ...modelFields,
