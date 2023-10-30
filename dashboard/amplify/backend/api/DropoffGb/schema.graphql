@@ -53,7 +53,7 @@ type Kid @model @auth(rules: [{allow: public}]) {
   routeID: ID @index(name: "byRoute")
   Parent1ID: ID
   Parent2ID: ID
-  vanID: ID! @index(name: "byVan")
+  vanID: ID @index(name: "byVan")
 }
 
 enum UserTypes {
