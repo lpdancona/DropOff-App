@@ -25,7 +25,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.16.0",
     "react-scripts": "^3.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "webpack": "^4.42.0"
   },
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start",
@@ -52,7 +53,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "webpack-cli": "^5.1.4"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }
