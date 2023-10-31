@@ -22,6 +22,7 @@ export const getAddressList = /* GraphQL */ `
         routeID
         Parent1ID
         Parent2ID
+        vanID
         createdAt
         updatedAt
         __typename
@@ -98,6 +99,10 @@ export const getVan = /* GraphQL */ `
       year
       seats
       bosterSeats
+      Kids {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -211,6 +216,7 @@ export const getKid = /* GraphQL */ `
       routeID
       Parent1ID
       Parent2ID
+      vanID
       createdAt
       updatedAt
       __typename
@@ -237,6 +243,7 @@ export const listKids = /* GraphQL */ `
         routeID
         Parent1ID
         Parent2ID
+        vanID
         createdAt
         updatedAt
         __typename
@@ -274,6 +281,45 @@ export const kidsByRouteID = /* GraphQL */ `
         routeID
         Parent1ID
         Parent2ID
+        vanID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const kidsByVanID = /* GraphQL */ `
+  query KidsByVanID(
+    $vanID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelKidFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    kidsByVanID(
+      vanID: $vanID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        routeID
+        Parent1ID
+        Parent2ID
+        vanID
         createdAt
         updatedAt
         __typename
