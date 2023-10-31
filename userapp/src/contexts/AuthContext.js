@@ -67,13 +67,15 @@ const AuthContextProvider = ({ children }) => {
       query: getUser,
       variables: { id: dbUser.id },
     });
-    const actualPushToken = responseGetUser.data.getUser.pushToken;
-    if (actualPushToken !== expoPushToken.data || actualPushToken === null) {
-      await updatePushToken(
-        responseGetUser.data.getUser.id,
-        expoPushToken.data
-      );
-      //console.log("Same push token");
+    if (expoPushToken) {
+      const actualPushToken = responseGetUser.data.getUser.pushToken;
+      if (actualPushToken !== expoPushToken.data || actualPushToken === null) {
+        await updatePushToken(
+          responseGetUser.data.getUser.id,
+          expoPushToken.data
+        );
+        //console.log("Same push token");
+      }
     }
     setCurrentUserData(responseGetUser.data.getUser);
   };

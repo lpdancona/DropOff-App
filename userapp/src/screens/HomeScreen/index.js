@@ -270,10 +270,10 @@ const HomeScreen = () => {
       </Menu>
       <MapView
         ref={mapRef}
-        provider={MapView.PROVIDER_GOOGLE}
+        //provider={MapView.PROVIDER_GOOGLE}
         style={{ width, height }}
         showsUserLocation={true}
-        //followsUserLocation={true}
+        followsUserLocation={true}
         initialRegion={{
           latitude: busLocation?.latitude,
           longitude: busLocation?.longitude,

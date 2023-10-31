@@ -70,8 +70,8 @@ const LocationTrackingComponent = ({ locationEmitter, routeID }) => {
       }
 
       locationEmitter.addListener(LOCATION_UPDATE, (location) => {
-        //console.log("location Emitter Fired", location);
-        //console.log("can possible change the location on db", routeID);
+        console.log("location Emitter Fired", location);
+        console.log("can possible change the location on db", routeID);
         try {
           updateLocation(
             routeID,
