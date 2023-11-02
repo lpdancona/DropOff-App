@@ -156,7 +156,7 @@ const ProfileScreen = () => {
       Alert.alert("Error saving new user", e.message);
     }
   };
-
+  //console.log(GOOGLE_MAPS_APIKEY);
   return (
     <SafeAreaView>
       <Text style={styles.title}>Complete your Profile</Text>

@@ -46,7 +46,6 @@ const HomeScreen = () => {
   const [currentRouteData, setCurrentRouteData] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
-  const [showMessage, setShowMessage] = useState(false);
   const [matchingKids, setMatchingKids] = useState(null);
   const [driver, setDriver] = useState(null);
   const [helper, setHelper] = useState(null);
@@ -56,7 +55,6 @@ const HomeScreen = () => {
 
   const getRoutesData = async () => {
     try {
-      //console.log(dbUser);
       const variables = {
         filter: {
           status: { eq: "IN_PROGRESS" },
@@ -69,6 +67,12 @@ const HomeScreen = () => {
         variables: variables,
       });
       const routeData = responseListRoutes.data.listRoutes.items;
+      if (routeData.length === 0) {
+        alert(
+          "Hi there, there is no route in progress now! come back later or contact us for more information!"
+        );
+        await handleLogout();
+      }
 
       // Fetch kids data for each route
       const mergedData = await Promise.all(
@@ -123,7 +127,6 @@ const HomeScreen = () => {
           // Loop through matching kids and extract dropOffAddress and dropOffLatLng
           matchingKidsArray.forEach((matchingKid) => {
             const { dropOffAddress, lat, lng } = matchingKid;
-            // Do something with dropOffAddress and dropOffLatLng
             setDropLatLng({ latitude: lat, longitude: lng });
             setDropOffAddress(dropOffAddress);
           });
@@ -150,7 +153,9 @@ const HomeScreen = () => {
     if (routesData) {
       // Check kids in routes after fetching initial data
       if (!checkKidsInRoutes()) {
-        setShowMessage(true);
+        alert(
+          `We sorry but, your child ${kids[0].name} is not on any route today!`
+        );
         handleLogout();
       }
     }
@@ -169,14 +174,11 @@ const HomeScreen = () => {
       variables: { id: currentRouteData.helper },
     });
     const helperData = responseGetHelper.data.getUser;
-    // console.log("driver Data", driverData);
-    // console.log("helper Data", helperData);
     setDriver(driverData);
     setHelper(helperData);
   };
 
   useEffect(() => {
-    //console.log(kids);
     if (!currentRouteData) {
       return;
     }
@@ -185,8 +187,6 @@ const HomeScreen = () => {
 
   useEffect(() => {
     // Update the bus location state when currentRouteData changes
-    //console.log("current Route data", currentRouteData);
-    //console.log(driver);
     if (currentRouteData) {
       const initialBusLocation = {
         latitude: currentRouteData.lat,
@@ -202,7 +202,6 @@ const HomeScreen = () => {
     }
     const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
       next: ({ value }) => {
-        //console.log(value);
         const newBusLocation = {
           latitude: value.data.onUpdateRoute.lat,
           longitude: value.data.onUpdateRoute.lng,
@@ -211,7 +210,6 @@ const HomeScreen = () => {
           newBusLocation.latitude !== busLocation.lat ||
           newBusLocation.longitude !== busLocation.lng
         ) {
-          // Update your state or take any necessary action
           setBusLocation(newBusLocation);
         }
       },
@@ -229,7 +227,6 @@ const HomeScreen = () => {
   const handleLogout = async () => {
     try {
       // Sign out the user using Amplify Auth
-      console.log("error user log out");
       await Auth.signOut();
     } catch (error) {
       console.error("Logout error:", error);
@@ -243,27 +240,22 @@ const HomeScreen = () => {
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
-  //console.log(driver);
   if (!busLocation || !dropOffLatLng) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
 
   return (
     <View style={styles.mapContainer}>
-      {showMessage && (
-        <View>
-          <Text>Your kids are not on any of your routes for the day!</Text>
-        </View>
-      )}
-
-      <Appbar.Header>
-        <Appbar.Action icon="menu" onPress={openMenu} />
-      </Appbar.Header>
-
       <Menu
         visible={menuVisible}
         onDismiss={closeMenu}
-        anchor={<Appbar.Action icon="menu" onPress={openMenu} />}
+        anchor={
+          <Appbar.Action
+            icon="menu"
+            onPress={openMenu}
+            style={{ marginTop: 30 }}
+          />
+        }
       >
         <Menu.Item onPress={handleLogout} title="Logout" />
         {/* <Menu.Item onPress={handleGoBack} title="Go Back to Login" /> */}
