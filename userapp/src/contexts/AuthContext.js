@@ -58,6 +58,7 @@ const AuthContextProvider = ({ children }) => {
       variables: { id: dbUser.id },
     });
     if (expoPushToken) {
+      //console.log(expoPushToken);
       const actualPushToken = responseGetUser.data.getUser.pushToken;
       if (actualPushToken !== expoPushToken.data || actualPushToken === null) {
         await updatePushToken(
@@ -85,7 +86,7 @@ const AuthContextProvider = ({ children }) => {
           variables: variables,
         });
         const fetchedKids = response.data.listKids.items;
-        console.log(fetchedKids);
+        //console.log(fetchedKids);
 
         if (fetchedKids.length === 0) {
           await Auth.signOut();

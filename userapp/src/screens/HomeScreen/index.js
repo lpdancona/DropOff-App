@@ -401,7 +401,7 @@ const HomeScreen = () => {
                         defaultSource={
                           helper?.photo
                             ? { uri: helper.photo }
-                            : require("../../../assets/img/noPhoto.png")
+                            : { uri: "https://ibb.co/9yZHV6t" }
                         }
                         style={styles.imageHelper}
                         resizeMethod="scale"

@@ -39,14 +39,17 @@ const AuthContextProvider = ({ children }) => {
       variables: { filter: { sub: { eq: sub } } },
     });
     //graphqlOperation(listUsers))
-    const response = getUserBySub.data.listUsers.items[0];
-    //console.log('getUserBysub', response[0])
+    const response = getUserBySub.data.listUsers.items;
     //console.log(response);
+    if (response.length > 0) {
+      const userResponse = response[0];
+      //console.log("getUserBysub", response);
 
-    if (response.userType === "DRIVER") {
-      setIsDriver(true);
+      if (userResponse.userType === "DRIVER") {
+        setIsDriver(true);
+      }
+      setDbUser(userResponse);
     }
-    setDbUser(response);
     setLoading(false);
   };
 
@@ -67,7 +70,7 @@ const AuthContextProvider = ({ children }) => {
   }, [sub]);
 
   useEffect(() => {
-    if (!sub) {
+    if (!dbUser) {
       return;
     }
     getCurrentUserData();

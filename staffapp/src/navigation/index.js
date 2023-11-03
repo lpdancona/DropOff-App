@@ -3,6 +3,7 @@ import { useAuthContext } from "../contexts/AuthContext";
 import { ActivityIndicator } from "react-native";
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import RouteScreen from "../screens/RouteScreen";
 //import LoginScreen from "../screens/LoginScreen";
 
 const Stack = createNativeStackNavigator();
@@ -10,7 +11,7 @@ const Stack = createNativeStackNavigator();
 const RootNavigator = () => {
   const { dbUser, loading, isDriver, userEmail } = useAuthContext();
 
-  //console.log(isDriver);
+  //console.log(dbUser);
   if (loading) {
     return <ActivityIndicator size="large" color="gray" />;
   }
@@ -22,8 +23,7 @@ const RootNavigator = () => {
       ) : (
         <Stack.Screen name="StaffLogin" component={ProfileScreen} />
       )}
-
-      {/* <Stack.Screen name="Login" component={LoginScreen} /> */}
+      <Stack.Screen name="Route" component={RouteScreen} />
     </Stack.Navigator>
   );
 };

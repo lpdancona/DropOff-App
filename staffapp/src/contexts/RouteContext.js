@@ -1,12 +1,19 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { useAuthContext } from "./AuthContext";
 import { API } from "aws-amplify";
-import { listRoutes, kidsByRouteID, getVan } from "../../src/graphql/queries";
+import {
+  listRoutes,
+  kidsByRouteID,
+  getVan,
+  getUser,
+} from "../../src/graphql/queries";
 import { Auth } from "aws-amplify";
+import { useNavigation } from "@react-navigation/native";
 
 const RouteContext = createContext({});
 
 const RouteContextProvider = ({ children }) => {
+  const navigation = useNavigation();
   const [routesData, setRoutesData] = useState(null);
   const [currentRouteData, setCurrentRouteData] = useState(null);
   const { dbUser, isDriver, currentUserData, userEmail } = useAuthContext();
@@ -55,7 +62,33 @@ const RouteContextProvider = ({ children }) => {
           });
           const vansData = responseGetVan.data.getVan;
 
-          return { ...route, Kid: kidsData, Van: vansData };
+          let driverUser = null;
+          let helperUser = null;
+
+          // Fetch the driver's user data
+
+          if (route.driver) {
+            const responseGetDriverUser = await API.graphql({
+              query: getUser,
+              variables: { id: route.driver },
+            });
+            driverUser = responseGetDriverUser.data.getUser;
+          }
+          // Fetch the helper's user data
+          if (route.helper) {
+            const responseGetHelperUser = await API.graphql({
+              query: getUser,
+              variables: { id: route.helper },
+            });
+            helperUser = responseGetHelperUser.data.getUser;
+          }
+          return {
+            ...route,
+            Kid: kidsData,
+            Van: vansData,
+            driverUser,
+            helperUser,
+          };
         })
       );
       //console.log("merged Data", mergedData);
@@ -72,8 +105,9 @@ const RouteContextProvider = ({ children }) => {
     const isUserOnRoute = await checkStaffInRoutes();
     //console.log(isUserOnRoute);
     if (!isUserOnRoute) {
-      console.warn("no route found for this user");
-      handleLogout();
+      //console.warn("no route found for this user");
+      navigation.navigate("Home");
+      //handleLogout();
     }
   };
 
@@ -122,6 +156,7 @@ const RouteContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (routesData && dbUser) {
+      //console.log("dbUser", dbUser);
       callCheckStaffInRoutes();
     }
   }, [routesData]);
