@@ -438,11 +438,12 @@ const RouteScreen = () => {
 
     setNextWaypoints(nextWaypoints);
   }, [addressList, currentWaypointIndex, busLocation]);
-  //console.log(currentRouteData);
+
   if (!busLocation || !currentRouteData) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
 
+  //console.log("addressList", addressList);
   if (addressList === null || origin === null || destination === null) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
