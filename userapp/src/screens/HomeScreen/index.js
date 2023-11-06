@@ -401,7 +401,7 @@ const HomeScreen = () => {
                         defaultSource={
                           helper?.photo
                             ? { uri: helper.photo }
-                            : { uri: "https://ibb.co/9yZHV6t" }
+                            : { uri: "https://i.imgur.com/5gc6290.jpg" }
                         }
                         style={styles.imageHelper}
                         resizeMethod="scale"
