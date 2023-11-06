@@ -154,18 +154,18 @@ const RouteContextProvider = ({ children }) => {
     }
   }, [dbUser]);
 
-  useEffect(() => {
-    if (routesData && dbUser) {
-      //console.log("dbUser", dbUser);
-      callCheckStaffInRoutes();
-    }
-  }, [routesData]);
+  // useEffect(() => {
+  //   if (routesData && dbUser) {
+  //     //console.log("dbUser", dbUser);
+  //     callCheckStaffInRoutes();
+  //   }
+  // }, [routesData]);
 
   return (
     <RouteContext.Provider
       value={{
         routesData,
-        currentRouteData,
+        //currentRouteData,
       }}
     >
       {children}

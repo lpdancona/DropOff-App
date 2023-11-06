@@ -17,7 +17,7 @@ import styles from "./styles";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
-import { useNavigation } from "@react-navigation/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import RouteInfoComponent from "../../components/RouteInfo";
 import { API, graphqlOperation } from "aws-amplify";
 import { getUser, listAddressLists, getKid } from "../../graphql/queries";
@@ -34,15 +34,17 @@ import { useBackgroundTaskContext } from "../../contexts/BackgroundTaskContext";
 //
 
 const RouteScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const id = route.params?.id;
+
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const { width, height } = useWindowDimensions();
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
-  //const [isDriverClose, setIsDriverClose] = useState(false);
   const snapPoints = useMemo(() => ["12%", "95%"], []);
-  const navigation = useNavigation();
   const [helper, setHelper] = useState([]);
   const [driver, setDriver] = useState([]);
   const [busLocation, setBusLocation] = useState(null);
@@ -52,12 +54,16 @@ const RouteScreen = () => {
   const [destination, setDestination] = useState(null);
   const [nextWaypoints, setNextWaypoints] = useState(null);
   const [notificationSent, setNotificationSent] = useState(false);
-  const [parent1, setParent1] = useState(null);
-  const [parent2, setParent2] = useState(null);
-  const [previousLocation, setPreviousLocation] = useState(null);
+  const [currentRouteData, setCurrentRouteData] = useState(null);
+  // const [parent1, setParent1] = useState(null);
+  // const [parent2, setParent2] = useState(null);
+  // const [previousLocation, setPreviousLocation] = useState(null);
+
+  // data from contexts
   const { schedulePushNotification, sendPushNotification, expoPushToken } =
     usePushNotificationsContext();
-  const { routesData, currentRouteData } = useRouteContext();
+  //const { routesData, currentRouteData } = useRouteContext();
+  const { routesData } = useRouteContext();
   const { locationEmitter } = useBackgroundTaskContext();
   //const { registerBackgroundFetchAsync } = useBackgroundTaskContext();
 
@@ -191,7 +197,7 @@ const RouteScreen = () => {
       //console.log(GOOGLE_MAPS_APIKEY);
       const variables = {
         filter: {
-          routeID: { eq: currentRouteData.routeID },
+          routeID: { eq: currentRouteData.id },
         },
       };
       const responseListAddress = await API.graphql({
@@ -297,6 +303,7 @@ const RouteScreen = () => {
       setHelper(helperData.data.getUser);
     }
   };
+
   /////
   /////   starting the useEffects ///
   /////
@@ -332,6 +339,13 @@ const RouteScreen = () => {
     );
     return () => foregroundSubscription;
   }, []);
+
+  useEffect(() => {
+    if (routesData) {
+      const routeWithId = routesData.find((route) => route.id === id);
+      setCurrentRouteData(routeWithId);
+    }
+  }, [routesData, id]);
 
   useEffect(() => {
     if (currentRouteData) {

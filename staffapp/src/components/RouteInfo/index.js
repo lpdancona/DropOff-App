@@ -9,13 +9,15 @@ import {
 } from "react-native";
 import { Auth } from "aws-amplify";
 import styles from "./styles";
+import { AntDesign } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const RouteInfoComponent = ({ vans, addressList, driver, helper }) => {
-  // const waypoints = routeCoords.waypoints;
-  // const splitIndex = 6; // Split after the 6th item
-  // const firstColumn = routeCoords.slice(0, splitIndex);
-  // const secondColumn = routeCoords.slice(splitIndex);
+  const navigation = useNavigation();
 
+  const goBackToHome = () => {
+    navigation.goBack();
+  };
   const handleLogout = async () => {
     try {
       await Auth.signOut();
@@ -26,6 +28,9 @@ const RouteInfoComponent = ({ vans, addressList, driver, helper }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.goBackButton} onPress={goBackToHome}>
+        <AntDesign name="arrowleft" size={30} color="black" />
+      </TouchableOpacity>
       <View>
         <Text style={styles.heading}>Route Information</Text>
         <View style={styles.row}>

@@ -9,14 +9,15 @@ export default StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 10,
     padding: 10,
-    // shadowColor: "#000",
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 3.84,
     elevation: 5,
+  },
+  goBackButton: {
+    backgroundColor: "#f2f2f2",
+    width: 50, // Adjust the width and height as needed for your circle
+    height: 50,
+    borderRadius: 25, // Make the borderRadius half of the width/height to make it circular
+    alignItems: "center",
+    justifyContent: "center",
   },
   logoutButton: {
     backgroundColor: "red",
