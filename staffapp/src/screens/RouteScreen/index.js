@@ -351,9 +351,19 @@ const RouteScreen = () => {
     }
   };
 
+  const currentDateTime = new Date(); // Get the current date and time
+  currentDateTime.setMinutes(currentDateTime.getMinutes() + totalMinutes); // Add the totalMinutes to the current time
+
+  // Extract hours and minutes from the updated time
+  const etaHours = currentDateTime.getHours();
+  const etaMinutes = currentDateTime.getMinutes();
+
+  const timeArrival = `${etaHours}:${etaMinutes}`;
+
   /////
   /////   starting the useEffects ///
   /////
+
   useEffect(() => {
     requestLocationPermissions();
   }, []);
@@ -538,6 +548,7 @@ const RouteScreen = () => {
             strokeColor="blue"
             timePrecision="now"
             onReady={(result) => {
+              console.log(result);
               const isClose = result.duration <= 5;
               if (isClose && !notificationSent) {
                 setNotificationSent(true);
@@ -604,7 +615,7 @@ const RouteScreen = () => {
         <View style={styles.handleIndicatorContainer}>
           <Text style={styles.routeDetailsText}>
             {" "}
-            ETA - {totalMinutes.toFixed(0)} min
+            ETA {timeArrival} - {totalMinutes.toFixed(0)} min
           </Text>
           <FontAwesome5
             name="bus"

@@ -138,6 +138,15 @@ const HomeScreen = () => {
     return false;
   };
 
+  const currentDateTime = new Date(); // Get the current date and time
+  currentDateTime.setMinutes(currentDateTime.getMinutes() + totalMinutes); // Add the totalMinutes to the current time
+
+  // Extract hours and minutes from the updated time
+  const etaHours = currentDateTime.getHours();
+  const etaMinutes = currentDateTime.getMinutes();
+
+  const timeArrival = `${etaHours}:${etaMinutes}`;
+
   useEffect(() => {
     // Fetch initial data when the component mounts
 
@@ -324,7 +333,7 @@ const HomeScreen = () => {
         <View style={styles.handleIndicatorContainer}>
           <Text style={styles.routeDetailsText}>
             {" "}
-            ETA - {totalMinutes.toFixed(0)} min
+            ETA {timeArrival} - {totalMinutes.toFixed(0)} min
           </Text>
           <FontAwesome5
             name="bus"
