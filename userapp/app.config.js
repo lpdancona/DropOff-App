@@ -16,6 +16,7 @@ export default {
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.geodarth.DropoffUser",
+    buildNumber: "2",
   },
   android: {
     adaptiveIcon: {

@@ -20,6 +20,7 @@ export default {
     },
     supportsTablet: true,
     bundleIdentifier: "com.geodarth.dropoffgb",
+    buildNumber: "2",
   },
   android: {
     config: {
