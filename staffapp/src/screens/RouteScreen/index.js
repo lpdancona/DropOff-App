@@ -28,6 +28,8 @@ import { updateLocation } from "../../components/LocationUtils";
 import { useRouteContext } from "../../contexts/RouteContext";
 import LocationTrackingComponent from "../../components/LocationTrackingComponent";
 import { useBackgroundTaskContext } from "../../contexts/BackgroundTaskContext";
+import ShowMessage from "../../components/ShowMessage";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 //const BACKGROUND_FETCH_TASK = "background-location-task";
 
@@ -55,9 +57,13 @@ const RouteScreen = () => {
   const [nextWaypoints, setNextWaypoints] = useState(null);
   const [notificationSent, setNotificationSent] = useState(false);
   const [currentRouteData, setCurrentRouteData] = useState(null);
-  // const [parent1, setParent1] = useState(null);
-  // const [parent2, setParent2] = useState(null);
-  // const [previousLocation, setPreviousLocation] = useState(null);
+  const [showDriveConfirmation, setShowDriveConfirmation] = useState(false);
+  const [driveConfirmationResponse, setDriveConfirmationResponse] =
+    useState(null);
+
+  const [confirmationMessage, setConfirmationMessage] = useState(
+    "Do you want to start the drive?"
+  );
 
   // data from contexts
   const { schedulePushNotification, sendPushNotification, expoPushToken } =
@@ -65,6 +71,7 @@ const RouteScreen = () => {
   //const { routesData, currentRouteData } = useRouteContext();
   const { routesData } = useRouteContext();
   const { locationEmitter } = useBackgroundTaskContext();
+  const { currentUserData } = useAuthContext();
   //const { registerBackgroundFetchAsync } = useBackgroundTaskContext();
 
   const requestLocationPermissions = async () => {
@@ -301,6 +308,46 @@ const RouteScreen = () => {
         variables: { id: currentRouteData.helper },
       });
       setHelper(helperData.data.getUser);
+    }
+  };
+
+  const showDriveConfirmationMessage = () => {
+    setShowDriveConfirmation(true);
+  };
+
+  const handleDriveConfirmationResponse = (response) => {
+    setDriveConfirmationResponse(response);
+    setShowDriveConfirmation(false);
+
+    // Handle the user's response
+    //console.log(response);
+    if (response === "Confirm") {
+      // send push notification to user app
+      sendNotificationToAllParents();
+      setNotificationSent(false);
+      // update the route status
+      updateRouteStatus("IN_PROGRESS");
+      zoomInOnDriver();
+
+      // Create an array of waypoint coordinates
+      const waypoints = addressList.map((address) => {
+        return `${address.latitude},${address.longitude}`;
+      });
+
+      // Separate the first address as the origin
+      const origin = `${busLocation.latitude},${busLocation.longitude}`;
+
+      // Separate the last address as the destination
+      const destination = waypoints.pop();
+
+      // Join the remaining waypoints into a single string separated by "|"
+      const waypointsString = waypoints.join("|");
+
+      // Construct the Google Maps URL with the origin and waypoints
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
+
+      // Open Google Maps with the origin and waypoints pre-set
+      Linking.openURL(googleMapsUrl);
     }
   };
 
@@ -662,44 +709,26 @@ const RouteScreen = () => {
           </Modal>
         </View>
         <View style={styles.buttonDriveContainer}>
-          <TouchableOpacity
-            onPress={async () => {
-              //console.log("address list object ", addressList);
-              //console.log("bus location", busLocation);
-              // send push notification to user app
-              sendNotificationToAllParents();
-              setNotificationSent(false);
-              // update the route status
-              updateRouteStatus("IN_PROGRESS");
-              zoomInOnDriver();
-
-              // Create an array of waypoint coordinates
-              const waypoints = addressList.map((address) => {
-                return `${address.latitude},${address.longitude}`;
-              });
-
-              // Separate the first address as the origin
-              const origin = `${busLocation.latitude},${busLocation.longitude}`;
-
-              // Separate the last address as the destination
-              const destination = waypoints.pop();
-
-              // Join the remaining waypoints into a single string separated by "|"
-              const waypointsString = waypoints.join("|");
-              // console.log(origin);
-              // console.log(waypointsString);
-              // console.log(destination);
-
-              // Construct the Google Maps URL with the origin and waypoints
-              const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
-
-              // Open Google Maps with the origin and waypoints pre-set
-              Linking.openURL(googleMapsUrl);
-            }}
-            style={{ backgroundColor: "green", padding: 10, borderRadius: 10 }}
-          >
-            <Text style={{ color: "white", fontSize: 20 }}>Drive</Text>
-          </TouchableOpacity>
+          {currentUserData.id === currentRouteData.driver && (
+            <TouchableOpacity
+              onPress={async () => {
+                showDriveConfirmationMessage();
+              }}
+              style={{
+                backgroundColor: "green",
+                padding: 10,
+                borderRadius: 10,
+              }}
+            >
+              <Text style={{ color: "white", fontSize: 20 }}>Drive</Text>
+            </TouchableOpacity>
+          )}
+          <ShowMessage
+            visible={showDriveConfirmation}
+            message={confirmationMessage}
+            buttons={["Confirm", "Cancel"]}
+            onResponse={handleDriveConfirmationResponse}
+          />
         </View>
       </BottomSheet>
     </SafeAreaView>

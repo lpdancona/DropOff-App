@@ -7,11 +7,13 @@ import {
   ActivityIndicator,
   Pressable,
   Image,
+  TouchableOpacity,
 } from "react-native";
 import styles from "./styles";
 import { useRouteContext } from "../../../src/contexts/RouteContext";
 import { useAuthContext } from "../../../src/contexts/AuthContext";
 import { useNavigation } from "@react-navigation/native";
+import { Auth } from "aws-amplify";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -19,6 +21,7 @@ const HomeScreen = () => {
   const { dbUser, currentUserData } = useAuthContext();
   const [images, setImages] = useState({});
   const defaultImageUrl = "https://i.imgur.com/R2PRpbV.jpg";
+  const [assignedRoute, setAssignedRoute] = useState(null);
 
   const fetchImage = async (imageURL) => {
     try {
@@ -30,12 +33,19 @@ const HomeScreen = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await Auth.signOut();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   useEffect(() => {
     if (routesData) {
       // Fetch images for each route
       const imagePromises = routesData.map((route) => {
         const imageURL = route.Van.image;
-        //console.log("imageUrl", imageURL);
         if (imageURL) {
           return fetchImage(imageURL);
         }
@@ -55,37 +65,51 @@ const HomeScreen = () => {
     }
   }, [routesData]);
 
+  useEffect(() => {
+    if (currentUserData && routesData) {
+      // Check if the user is a Driver
+      if (currentUserData.userType === "DRIVER") {
+        // Find the route where the current user is assigned as the Driver
+        const driverAssignedRoute = routesData.find(
+          (route) => route.driver === currentUserData.id
+        );
+
+        setAssignedRoute(driverAssignedRoute);
+      } else if (currentUserData.userType === "STAFF") {
+        // Find the route where the current user is assigned as the Driver
+        const helperAssignedRoute = routesData.find(
+          (route) => route.helper === currentUserData.id
+        );
+
+        setAssignedRoute(helperAssignedRoute);
+      }
+    }
+  }, [currentUserData, routesData]);
+
   if (!routesData) {
     return <ActivityIndicator size="large" color="gray" />;
   }
-  const isUserDriverOrHelper = (route) => {
-    return route.driver === dbUser?.id || route.helper === dbUser?.id;
-  };
 
   const handleBusPress = (item, index) => {
     navigation.navigate("Route", { id: item.id });
-    // //console.log("route", routesData);
-    // if (isUserDriverOrHelper(item)) {
-    //   // Handle the action for the user being the driver or helper
-    //   console.log("User is the driver or helper for this route.", dbUser.name);
-    // } else {
-    //   // Handle the action for the user not being the driver or helper
-    //   console.log("User is not the driver or helper for this route.");
-    // }
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Logout</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>{`Hello, ${currentUserData.name}`}</Text>
       <Text style={styles.subTitle}>
         You assigned as{" "}
         <Text
           style={{
-            color: isUserDriverOrHelper ? "red" : "yellow",
+            color: currentUserData?.userType === "DRIVER" ? "red" : "blue",
           }}
         >
-          {isUserDriverOrHelper ? "Driver" : "Helper"}
+          {currentUserData?.userType === "DRIVER" ? "Driver" : "Helper"}
         </Text>
+        <Text> on {`(${assignedRoute?.Van.name})`} </Text>
       </Text>
       <Text style={styles.subTitleDropOff}>List of Drop-Off's</Text>
       <View style={styles.busContainer}>

@@ -1,13 +1,6 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import { Auth } from "aws-amplify";
+import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
+//import { Auth } from "aws-amplify";
 import styles from "./styles";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -17,13 +10,6 @@ const RouteInfoComponent = ({ vans, addressList, driver, helper }) => {
 
   const goBackToHome = () => {
     navigation.goBack();
-  };
-  const handleLogout = async () => {
-    try {
-      await Auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
   };
 
   return (
@@ -62,9 +48,6 @@ const RouteInfoComponent = ({ vans, addressList, driver, helper }) => {
             </Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

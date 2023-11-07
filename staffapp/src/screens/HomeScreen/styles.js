@@ -53,4 +53,16 @@ export default StyleSheet.create({
   driverHelperContainer: {
     flexDirection: "row",
   },
+  logoutButton: {
+    backgroundColor: "red",
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  logoutButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

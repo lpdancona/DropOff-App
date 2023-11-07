@@ -19,18 +19,7 @@ export default StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  logoutButton: {
-    backgroundColor: "red",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  logoutButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+
   row: {
     flexDirection: "row",
     justifyContent: "space-around",
