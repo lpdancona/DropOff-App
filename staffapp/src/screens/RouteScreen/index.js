@@ -144,7 +144,7 @@ const RouteScreen = () => {
             if (parent1 && parent1.pushToken) {
               const childName = currentKid.name;
               const parentToken = parent1.pushToken;
-              const message01 = `Dear parent of ${childName}, The driver is approximately 5 minutes away from your location.`;
+              const message01 = `Dear parent of ${childName}, The driver is approximately ${timeArrival} minutes away from your location.`;
 
               //console.log(message01);
               // Send a push notification to Parent1
@@ -548,7 +548,7 @@ const RouteScreen = () => {
             strokeColor="blue"
             timePrecision="now"
             onReady={(result) => {
-              console.log(result);
+              //console.log(result);
               const isClose = result.duration <= 5;
               if (isClose && !notificationSent) {
                 setNotificationSent(true);
