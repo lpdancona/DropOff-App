@@ -43,6 +43,7 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (routesData) {
+      console.log(routesData);
       // Fetch images for each route
       const imagePromises = routesData.map((route) => {
         const imageURL = route.Van.image;
@@ -157,7 +158,7 @@ const HomeScreen = () => {
                         color: "red",
                       }}
                     >
-                      In progress
+                      In progress - Departed Time {routesData[index].departTime}
                     </Text>
                   )}
                 </Text>

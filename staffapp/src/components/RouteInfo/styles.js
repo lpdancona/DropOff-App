@@ -33,7 +33,7 @@ export default StyleSheet.create({
   infoColumn: {
     flex: 1,
     alignItems: "center",
-    marginTop: 2,
+    marginTop: 8,
   },
   vehicleInfo: {
     flexDirection: "row",

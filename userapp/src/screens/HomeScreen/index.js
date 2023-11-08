@@ -142,14 +142,20 @@ const HomeScreen = () => {
   currentDateTime.setMinutes(currentDateTime.getMinutes() + totalMinutes); // Add the totalMinutes to the current time
 
   // Extract hours and minutes from the updated time
-  const etaHours = currentDateTime.getHours();
-  const etaMinutes = currentDateTime.getMinutes();
+  // const etaHours = currentDateTime.getHours();
+  // const etaMinutes = currentDateTime.getMinutes();
 
-  const timeArrival = `${etaHours}:${etaMinutes}`;
+  // const timeArrival = `${etaHours}:${etaMinutes}`;
+  // // Format the time with AM/PM
+
+  const timeArrival = currentDateTime.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
 
   useEffect(() => {
     // Fetch initial data when the component mounts
-
     if (dbUser && userEmail) {
       const fetchInitialData = async () => {
         await getRoutesData();

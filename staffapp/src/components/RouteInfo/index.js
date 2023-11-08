@@ -5,7 +5,7 @@ import styles from "./styles";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-const RouteInfoComponent = ({ vans, addressList, driver, helper }) => {
+const RouteInfoComponent = ({ currentRoute, addressList, driver, helper }) => {
   const navigation = useNavigation();
 
   const goBackToHome = () => {
@@ -30,21 +30,34 @@ const RouteInfoComponent = ({ vans, addressList, driver, helper }) => {
             <Text style={styles.helperName}>{helper?.name}</Text>
           </View>
         </View>
-        {/* <View style={styles.addressList}>
-          {addressList.map((waypoint, index) => (
-            <View key={index} style={styles.addressItem}>
-              <Text style={styles.addressItemText}>
-                {index + 1} - {waypoint.kidName}
-              </Text>
-              <Text style={styles.addressText}>{waypoint.description}</Text>
-            </View>
-          ))}
-        </View> */}
         <View style={styles.infoColumn}>
+          <View>
+            {currentRoute.status === "WAITING_TO_START" ? (
+              <Text style={{ color: "green", fontSize: 15 }}>
+                Waiting to start
+              </Text>
+            ) : (
+              <Text
+                style={{
+                  color: "red",
+                  fontSize: 15,
+                }}
+              >
+                In progress - Departed Time {currentRoute.departTime}
+              </Text>
+            )}
+            {/* <Text>
+              {" "}
+              Route Status{" - "}
+              {currentRoute.status === "IN_PROGRESS"
+                ? `In progress  Time started: ${currentRoute.departTime}`
+                : "Waiting to start"}
+            </Text> */}
+          </View>
           <View style={styles.vehicleInfo}>
             <Text style={styles.vehicleLabel}>Vehicle:</Text>
             <Text style={styles.vehicleName}>
-              {vans.name} - {vans.model}{" "}
+              {currentRoute.Van.name} - {currentRoute.Van.model}{" "}
             </Text>
           </View>
         </View>

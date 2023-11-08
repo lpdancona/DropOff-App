@@ -24,7 +24,7 @@ import { getUser, listAddressLists, getKid } from "../../graphql/queries";
 import { updateRoute } from "../../graphql/mutations";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
 import * as Location from "expo-location";
-import { updateLocation } from "../../components/LocationUtils";
+//import { updateLocation } from "../../components/LocationUtils";
 import { useRouteContext } from "../../contexts/RouteContext";
 import LocationTrackingComponent from "../../components/LocationTrackingComponent";
 import { useBackgroundTaskContext } from "../../contexts/BackgroundTaskContext";
@@ -297,17 +297,20 @@ const RouteScreen = () => {
   };
 
   const getStaffInfo = async () => {
-    const driverData = await API.graphql({
-      query: getUser,
-      variables: { id: currentRouteData.driver },
-    });
-    setDriver(driverData.data.getUser);
-    if (currentRouteData.helper !== null) {
-      const helperData = await API.graphql({
+    console.log(currentRouteData);
+    if (currentRouteData.driver && currentRouteData.helper) {
+      const driverData = await API.graphql({
         query: getUser,
-        variables: { id: currentRouteData.helper },
+        variables: { id: currentRouteData.driver },
       });
-      setHelper(helperData.data.getUser);
+      setDriver(driverData.data.getUser);
+      if (currentRouteData.helper !== null) {
+        const helperData = await API.graphql({
+          query: getUser,
+          variables: { id: currentRouteData.helper },
+        });
+        setHelper(helperData.data.getUser);
+      }
     }
   };
 
@@ -355,10 +358,16 @@ const RouteScreen = () => {
   currentDateTime.setMinutes(currentDateTime.getMinutes() + totalMinutes); // Add the totalMinutes to the current time
 
   // Extract hours and minutes from the updated time
-  const etaHours = currentDateTime.getHours();
-  const etaMinutes = currentDateTime.getMinutes();
+  // const etaHours = currentDateTime.getHours();
+  // const etaMinutes = currentDateTime.getMinutes();
 
-  const timeArrival = `${etaHours}:${etaMinutes}`;
+  const timeArrival = currentDateTime.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  //const timeArrival = `${etaHours}:${etaMinutes}`;
 
   /////
   /////   starting the useEffects ///
@@ -601,7 +610,7 @@ const RouteScreen = () => {
       </MapView>
 
       <RouteInfoComponent
-        vans={currentRouteData.Van}
+        currentRoute={currentRouteData}
         addressList={addressList}
         driver={driver}
         helper={helper}
