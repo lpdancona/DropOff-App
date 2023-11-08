@@ -15,6 +15,10 @@ export default {
   assetBundlePatterns: ["**/*"],
   ios: {
     infoPlist: {
+      NSLocationWhenInUseUsageDescription:
+        "this is a app for drive kids to home (drop off) and i need to get the location of the driver to inform the parents",
+      NSLocationAlwaysUsageDescription:
+        "this is a app for drive kids to home (drop off) and i need to get the location of the driver to inform the parents",
       UIBackgroundModes: ["location", "fetch"],
       GMSApiKey: process.env.GOOGLE_MAPS_APIKEY,
     },

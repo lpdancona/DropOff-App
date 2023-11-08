@@ -1,7 +1,7 @@
 //import 'core-js/full/symbol/async-iterator';
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
-import { Button } from "react-native";
+import { Button, LogBox } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import {
   Authenticator,
@@ -24,6 +24,8 @@ function SignOutButton() {
   const { signOut } = useAuthenticator();
   return <Button title="Sign Out" onPress={signOut} />;
 }
+
+LogBox.ignoreLogs(["NSLocation*UsageDescription"]);
 
 function App() {
   return (

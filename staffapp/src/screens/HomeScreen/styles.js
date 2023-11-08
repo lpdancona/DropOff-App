@@ -31,6 +31,16 @@ export default StyleSheet.create({
     alignItems: "flex-start",
     padding: 8,
   },
+  noRoutesContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noRoutesText: {
+    fontSize: 28,
+    color: "gray",
+    textAlign: "center",
+  },
   image: {
     width: "100%",
     aspectRatio: 5 / 3,

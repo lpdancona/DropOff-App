@@ -17,6 +17,7 @@ const RouteContextProvider = ({ children }) => {
   const [routesData, setRoutesData] = useState(null);
   const [currentRouteData, setCurrentRouteData] = useState(null);
   const { dbUser, isDriver, currentUserData, userEmail } = useAuthContext();
+  const [refreshing, setRefreshing] = useState(false);
 
   //console.log("isDriver? ", isDriver);
   const handleLogout = async () => {
@@ -28,6 +29,25 @@ const RouteContextProvider = ({ children }) => {
     }
   };
 
+  const updateRoutesData = async () => {
+    setRefreshing(true); // Start refreshing indicator
+
+    try {
+      // Fetch new data and update the routesData state
+      const success = await getRoutesData();
+      if (success) {
+        // Data fetching was successful
+        setRefreshing(false); // Stop refreshing indicator
+      } else {
+        // Handle the case where data fetching failed
+        setRefreshing(false); // Stop refreshing indicator
+      }
+    } catch (error) {
+      console.error("Error updating data:", error);
+      setRefreshing(false); // Stop refreshing indicator
+    }
+  };
+
   const getRoutesData = async () => {
     try {
       //console.log("isDriver? ", isDriver);
@@ -36,6 +56,7 @@ const RouteContextProvider = ({ children }) => {
           or: [
             { status: { eq: "WAITING_TO_START" } },
             { status: { eq: "IN_PROGRESS" } }, //status: { eq: "IN_PROGRESS" }, //
+            { status: { eq: "PAUSED" } }, //status: { eq: "IN_PROGRESS" }, //
           ],
         },
       };
@@ -105,16 +126,11 @@ const RouteContextProvider = ({ children }) => {
     const isUserOnRoute = await checkStaffInRoutes();
     //console.log(isUserOnRoute);
     if (!isUserOnRoute) {
-      //console.warn("no route found for this user");
       navigation.navigate("Home");
-      //handleLogout();
     }
   };
 
   const checkStaffInRoutes = async () => {
-    //console.log("routesData", routesData);
-    //console.log("isDriver", isDriver);
-
     if (routesData) {
       const roleToCheck = isDriver ? "driver" : "helper";
       //console.log(roleToCheck);
@@ -125,7 +141,6 @@ const RouteContextProvider = ({ children }) => {
         }
         return false;
       });
-      //console.log(routeWithMatchingRole);
       if (routeWithMatchingRole) {
         // Update the state variable with the route that has matching role
         setCurrentRouteData(routeWithMatchingRole);
@@ -150,21 +165,14 @@ const RouteContextProvider = ({ children }) => {
       };
 
       fetchInitialData();
-      //console.log("getRoutesData on context", routesData);
     }
   }, [dbUser]);
-
-  // useEffect(() => {
-  //   if (routesData && dbUser) {
-  //     //console.log("dbUser", dbUser);
-  //     callCheckStaffInRoutes();
-  //   }
-  // }, [routesData]);
 
   return (
     <RouteContext.Provider
       value={{
         routesData,
+        updateRoutesData,
         //currentRouteData,
       }}
     >

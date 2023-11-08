@@ -11,6 +11,7 @@ enum RouteStatus {
   IN_PROGRESS
   FINISHED
   WAITING_TO_START
+  PAUSED
 }
 
 type Van @model @auth(rules: [{allow: public}]) {

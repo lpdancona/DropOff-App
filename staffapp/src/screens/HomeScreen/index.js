@@ -8,6 +8,7 @@ import {
   Pressable,
   Image,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import styles from "./styles";
 import { useRouteContext } from "../../../src/contexts/RouteContext";
@@ -17,11 +18,12 @@ import { Auth } from "aws-amplify";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const { routesData } = useRouteContext();
+  const { routesData, updateRoutesData } = useRouteContext();
   const { dbUser, currentUserData } = useAuthContext();
   const [images, setImages] = useState({});
   const defaultImageUrl = "https://i.imgur.com/R2PRpbV.jpg";
   const [assignedRoute, setAssignedRoute] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchImage = async (imageURL) => {
     try {
@@ -40,10 +42,12 @@ const HomeScreen = () => {
       console.error("Logout error:", error);
     }
   };
+  // const fetchData = () => {
+  //   setRefreshing(false);
+  // };
 
   useEffect(() => {
     if (routesData) {
-      console.log(routesData);
       // Fetch images for each route
       const imagePromises = routesData.map((route) => {
         const imageURL = route.Van.image;
@@ -110,7 +114,7 @@ const HomeScreen = () => {
         >
           {currentUserData?.userType === "DRIVER" ? "Driver" : "Helper"}
         </Text>
-        <Text> on {`(${assignedRoute?.Van.name})`} </Text>
+        {assignedRoute && <Text> on {`(${assignedRoute?.Van.name})`} </Text>}
       </Text>
       <Text style={styles.subTitleDropOff}>List of Drop-Off's</Text>
       <View style={styles.busContainer}>
@@ -118,12 +122,24 @@ const HomeScreen = () => {
           data={routesData}
           style={{ padding: 2 }}
           keyExtractor={(item) => item.id}
+          ListEmptyComponent={() => (
+            <View style={styles.noRoutesContainer}>
+              <Text style={styles.noRoutesText}>
+                Sorry, but there are no routes available.
+              </Text>
+            </View>
+          )}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={updateRoutesData}
+            />
+          }
           renderItem={({ item, index }) => (
             <Pressable
               onPress={() => {
                 handleBusPress(item, index);
               }}
-              //style={styles.busContainer}
             >
               <Image
                 source={
@@ -152,13 +168,17 @@ const HomeScreen = () => {
                 <Text style={styles.itemTitle}>
                   {item.status === "WAITING_TO_START" ? (
                     <Text style={{ color: "green" }}>Waiting to start</Text>
-                  ) : (
+                  ) : item.status === "IN_PROGRESS" ? (
                     <Text
                       style={{
-                        color: "red",
+                        color: "blue",
                       }}
                     >
                       In progress - Departed Time {routesData[index].departTime}
+                    </Text>
+                  ) : (
+                    <Text style={{ color: "red" }}>
+                      PAUSED (waiting to resume)
                     </Text>
                   )}
                 </Text>

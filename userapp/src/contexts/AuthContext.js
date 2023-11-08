@@ -26,7 +26,7 @@ const AuthContextProvider = ({ children }) => {
       .catch((error) => {
         console.error("Error fetching authenticated user:", error);
       });
-  }, [authUser]);
+  }, []);
 
   const listUserFromQl = async () => {
     const getUserBySub = await API.graphql({

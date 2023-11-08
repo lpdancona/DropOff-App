@@ -17,7 +17,7 @@ export default StyleSheet.create({
     paddingBottom: 50,
   },
   routeDetailsText: {
-    fontSize: 25,
+    fontSize: 20,
     letterSpacing: 1,
   },
   deliveryDetailsContainer: {

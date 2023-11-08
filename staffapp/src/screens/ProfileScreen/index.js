@@ -129,12 +129,6 @@ const ProfileScreen = () => {
           components: "country:ca",
         }}
       />
-      {/* <TextInput
-        value={unitNumber}
-        onChangeText={setUnitNumber}
-        placeholder="Unit Number"
-        style={styles.input}
-      /> */}
       <View style={styles.phoneInputContainer}>
         <PhoneInput
           ref={phoneInputRef}
@@ -159,33 +153,10 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
       <View>
-        {/* <Text style={styles.subTitle}>
-          Please confirm your child{kids.length > 1 ? 's' : ''} name{kids.length > 1 ? 's' : ''}
-        </Text>
-        {kids.map((kid, index) => (
-          <View key={index} style={styles.kidContainer}>
-            <Text style={styles.kidName}>{kid.name}</Text>
-            <TouchableOpacity
-              style={styles.confirmButton}
-              //title={kid.confirmed ? "Confirmed" : "Confirm"}
-              onPress={() => toggleConfirmation(index)}
-              >
-              <Text style={styles.confirmButtonText}>
-                {kid.confirmed ? "Confirmed" : "Confirm"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ))} */}
         <View style={styles.saveContainer}>
           <TouchableOpacity style={styles.saveButton} onPress={onSave}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={styles.signOutButton}
-            onPress={() => Auth.signOut()}
-          >
-            <Text style={styles.signOutButtonText}>Sign out</Text>
-          </TouchableOpacity> */}
         </View>
       </View>
     </SafeAreaView>
