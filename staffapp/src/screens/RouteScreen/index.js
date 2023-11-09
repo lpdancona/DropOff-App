@@ -190,14 +190,10 @@ const RouteScreen = () => {
       <Pressable
         onPress={(e) => {
           setSelectedItem(item);
-          //setClickPositionY(e.nativeEvent.pageY);
         }}
       >
         <View style={styles.itemContainer}>
-          <Text style={styles.itemText}>
-            {/* {item.first_name} {item.last_name} */}
-            {item.name}
-          </Text>
+          <Text style={styles.itemText}>{item.name}</Text>
         </View>
       </Pressable>
     );

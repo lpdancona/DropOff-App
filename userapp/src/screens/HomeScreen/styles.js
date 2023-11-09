@@ -107,6 +107,16 @@ export default StyleSheet.create({
     aspectRatio: 3 / 3,
     marginTop: 13,
   },
+  zoomButton: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    backgroundColor: "blue",
+    borderRadius: 50,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",

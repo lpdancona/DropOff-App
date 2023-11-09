@@ -38,7 +38,7 @@ export const BackgroundTaskProvider = ({ children }) => {
     try {
       await BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
         minimumInterval: 5 * 1, // 5 seconds
-        stopOnTerminate: false,
+        stopOnTerminate: true,
         startOnBoot: true,
       });
       console.log("Background fetch task registered.");

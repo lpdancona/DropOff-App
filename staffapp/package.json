@@ -28,7 +28,7 @@
     "expo": "^49.0.0",
     "expo-background-fetch": "~11.3.0",
     "expo-constants": "~14.4.2",
-    "expo-dev-client": "~2.4.11",
+    "expo-dev-client": "~2.4.12",
     "expo-device": "~5.4.0",
     "expo-file-system": "~15.4.4",
     "expo-location": "~16.1.0",

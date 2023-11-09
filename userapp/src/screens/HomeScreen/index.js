@@ -13,14 +13,12 @@ import {
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Appbar, Menu } from "react-native-paper";
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
-//import vans from "../../../assets/data/vans.json";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import styles from "./styles";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-//import * as Location from "expo-location";
 import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
-//import { FlatList } from "react-native-gesture-handler";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { Auth } from "aws-amplify";
 import { API, graphqlOperation } from "aws-amplify";
@@ -49,6 +47,8 @@ const HomeScreen = () => {
   const [matchingKids, setMatchingKids] = useState(null);
   const [driver, setDriver] = useState(null);
   const [helper, setHelper] = useState(null);
+  const [strokeWidth, setStrokeWidth] = useState(1);
+  const [strokeColor, setStrokeColor] = useState("rgba(0, 0, 0, 0)");
 
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
@@ -141,19 +141,38 @@ const HomeScreen = () => {
   const currentDateTime = new Date(); // Get the current date and time
   currentDateTime.setMinutes(currentDateTime.getMinutes() + totalMinutes); // Add the totalMinutes to the current time
 
-  // Extract hours and minutes from the updated time
-  // const etaHours = currentDateTime.getHours();
-  // const etaMinutes = currentDateTime.getMinutes();
-
-  // const timeArrival = `${etaHours}:${etaMinutes}`;
-  // // Format the time with AM/PM
-
   const timeArrival = currentDateTime.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
   });
+  const zoomInOnDriver = () => {
+    mapRef.current.animateToRegion({
+      latitude: busLocation.latitude,
+      longitude: busLocation.longitude,
+      latitudeDelta: 0.0007,
+      longitudeDelta: 0.0007,
+    });
+  };
+  const handleLogout = async () => {
+    try {
+      // Sign out the user using Amplify Auth
+      await Auth.signOut();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
+  const handleGoBack = () => {
+    // Navigate back to the login screen
+    navigation.goBack();
+  };
+
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
+  ///
+  /// Start UseEffect
+  ///
   useEffect(() => {
     // Fetch initial data when the component mounts
     if (dbUser && userEmail) {
@@ -176,7 +195,6 @@ const HomeScreen = () => {
     }
   }, [routesData, kids]);
 
-  //const getParents
   const getStaffData = async () => {
     const responseGetDriver = await API.graphql({
       query: getUser,
@@ -239,22 +257,6 @@ const HomeScreen = () => {
     };
   }, [busLocation]);
 
-  const handleLogout = async () => {
-    try {
-      // Sign out the user using Amplify Auth
-      await Auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
-
-  const handleGoBack = () => {
-    // Navigate back to the login screen
-    navigation.goBack();
-  };
-
-  const openMenu = () => setMenuVisible(true);
-  const closeMenu = () => setMenuVisible(false);
   if (!busLocation || !dropOffLatLng) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
@@ -275,12 +277,13 @@ const HomeScreen = () => {
         <Menu.Item onPress={handleLogout} title="Logout" />
         {/* <Menu.Item onPress={handleGoBack} title="Go Back to Login" /> */}
       </Menu>
+
       <MapView
         ref={mapRef}
         //provider={MapView.PROVIDER_GOOGLE}
         style={{ width, height }}
-        showsUserLocation={true}
-        followsUserLocation={true}
+        //showsUserLocation={true}
+        //followsUserLocation={true}
         initialRegion={{
           latitude: busLocation?.latitude,
           longitude: busLocation?.longitude,
@@ -288,6 +291,9 @@ const HomeScreen = () => {
           longitudeDelta: 0.007,
         }}
       >
+        <TouchableOpacity style={styles.zoomButton} onPress={zoomInOnDriver}>
+          <MaterialIcons name="place" size={24} color="white" />
+        </TouchableOpacity>
         <MapViewDirections
           apikey={GOOGLE_MAPS_APIKEY}
           origin={busLocation} // Start from the first waypoint
@@ -295,9 +301,17 @@ const HomeScreen = () => {
           mode={"DRIVING"}
           precision="high"
           timePrecision="now"
-          strokeWidth={1}
-          strokeColor="rgba(0, 0, 0, 0)"
+          strokeWidth={strokeWidth}
+          strokeColor={strokeColor}
           onReady={(result) => {
+            const isClose = result.distance <= 2;
+            if (isClose) {
+              setStrokeWidth(5);
+              setStrokeColor("blue");
+            } else {
+              setStrokeWidth(1);
+              setStrokeColor("rgba(0, 0, 0, 0)");
+            }
             // Handle the route information here
             //setIsDriverClose(result.distance <= 0.1);
             setTotalMinutes(result.duration);
@@ -379,9 +393,6 @@ const HomeScreen = () => {
                   <View
                     style={{
                       flexDirection: "row",
-                      //alignItems: "center",
-                      //textAlign: "center",
-                      //justifyContent: "space-between",
                       marginLeft: 20,
                       position: "absolute",
                     }}
@@ -395,7 +406,6 @@ const HomeScreen = () => {
                     <Pressable
                       onPress={(e) => {
                         setSelectedItem(driver);
-                        //setClickPositionY(e.nativeEvent.pageY);
                       }}
                     >
                       <Image
@@ -408,12 +418,11 @@ const HomeScreen = () => {
                     <Pressable
                       onPress={(e) => {
                         setSelectedItem(helper);
-                        //setClickPositionY(e.nativeEvent.pageY);
                       }}
                     >
                       <Image
                         //source={{ uri: helper?.photo }}
-                        defaultSource={
+                        source={
                           helper?.photo
                             ? { uri: helper.photo }
                             : { uri: "https://i.imgur.com/5gc6290.jpg" }
@@ -427,7 +436,7 @@ const HomeScreen = () => {
                   <View style={{ alignItems: "center", marginTop: 1 }}>
                     <TouchableOpacity
                       onPress={() => {
-                        const phoneNumber = "2368652297"; // Replace with the actual phone number of the helper
+                        const phoneNumber = "2368652297";
                         const phoneNumberWithPrefix = `tel:${phoneNumber}`;
 
                         Linking.canOpenURL(phoneNumberWithPrefix)
