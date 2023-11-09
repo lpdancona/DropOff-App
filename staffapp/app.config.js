@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 export default {
-  name: "DropoffStaff",
+  name: "GB ASP Drop Off Staff",
   slug: "drop-off-gb",
   version: "1.0.0",
   orientation: "portrait",
