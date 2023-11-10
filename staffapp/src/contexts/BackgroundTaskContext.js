@@ -28,17 +28,11 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
 const BackgroundTaskContext = createContext({});
 
 export const BackgroundTaskProvider = ({ children }) => {
-  //const { currentRouteData } = useRouteContext();
-
-  // useEffect(() => {
-  //   registerBackgroundFetchAsync();
-  // }, []);
-
   const registerBackgroundFetchAsync = async () => {
     try {
       await BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
         minimumInterval: 5 * 1, // 5 seconds
-        stopOnTerminate: true,
+        stopOnTerminate: false,
         startOnBoot: true,
       });
       console.log("Background fetch task registered.");
@@ -47,9 +41,22 @@ export const BackgroundTaskProvider = ({ children }) => {
     }
   };
 
+  const unregisterBackgroundFetchAsync = async () => {
+    try {
+      await BackgroundFetch.unregisterTaskAsync(BACKGROUND_FETCH_TASK);
+      console.log("Background fetch task unregistered.");
+    } catch (error) {
+      console.error("Background fetch task unregistration error:", error);
+    }
+  };
+
   return (
     <BackgroundTaskContext.Provider
-      value={{ registerBackgroundFetchAsync, locationEmitter }}
+      value={{
+        registerBackgroundFetchAsync,
+        unregisterBackgroundFetchAsync,
+        locationEmitter,
+      }}
     >
       {children}
     </BackgroundTaskContext.Provider>

@@ -1,7 +1,7 @@
 import { Text, SafeAreaView, View, Image } from "react-native";
 import { useTheme } from "@aws-amplify/ui-react-native";
 
-const MyAppHeader = () => {
+const CustomHeader = () => {
   const {
     tokens: { space, fontSizes },
   } = useTheme();
@@ -28,4 +28,4 @@ const MyAppHeader = () => {
     </SafeAreaView>
   );
 };
-export default MyAppHeader;
+export default CustomHeader;

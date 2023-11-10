@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 export default {
-  name: "GB ASP Drop Off Staff",
+  name: "DropOff Staff",
   slug: "drop-off-gb",
   version: "1.0.0",
   orientation: "portrait",
@@ -24,7 +24,7 @@ export default {
     },
     supportsTablet: true,
     bundleIdentifier: "com.geodarth.dropoffgb",
-    buildNumber: "3",
+    buildNumber: "4",
   },
   android: {
     config: {

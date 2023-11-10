@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { useTheme } from "@aws-amplify/ui-react-native";
 
-const MyAppFooter = () => {
+const CustomFooter = () => {
   const {
     tokens: { space, fontSizes },
   } = useTheme();
@@ -19,4 +19,4 @@ const MyAppFooter = () => {
     </View>
   );
 };
-export default MyAppFooter;
+export default CustomFooter;

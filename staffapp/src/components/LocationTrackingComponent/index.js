@@ -11,7 +11,8 @@ import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
 const LOCATION_UPDATE = "LOCATION_UPDATE";
 
 const LocationTrackingComponent = ({ locationEmitter, routeID }) => {
-  const { registerBackgroundFetchAsync } = useBackgroundTaskContext();
+  const { registerBackgroundFetchAsync, unregisterBackgroundFetchAsync } =
+    useBackgroundTaskContext();
   const [isTracking, setIsTracking] = useState(false);
 
   useEffect(() => {
@@ -86,7 +87,12 @@ const LocationTrackingComponent = ({ locationEmitter, routeID }) => {
     startForegroundLocationTracking();
     startBackgroundLocationTracking();
     registerBackgroundFetchAsync();
-  }, [registerBackgroundFetchAsync]);
+
+    // Clean up Logic
+    return () => {
+      unregisterBackgroundFetchAsync();
+    };
+  }, [registerBackgroundFetchAsync, unregisterBackgroundFetchAsync]);
 
   return (
     <View>
