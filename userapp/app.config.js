@@ -14,6 +14,9 @@ export default {
   },
   assetBundlePatterns: ["**/*"],
   ios: {
+    infoPlist: {
+      GMSApiKey: process.env.GOOGLE_MAPS_APIKEY,
+    },
     supportsTablet: true,
     bundleIdentifier: "com.geodarth.DropoffUser",
     buildNumber: "4",

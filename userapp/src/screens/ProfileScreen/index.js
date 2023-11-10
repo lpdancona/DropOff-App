@@ -26,7 +26,7 @@ const ProfileScreen = () => {
   //const [firstLogin, setFirstLogin] = useState(true);
 
   const [name, setName] = useState(dbUser?.name || "");
-  //const [setKids] = useState(kids);
+  // const [setKids] = useState(kids);
   const [unitNumber, setUnitNumber] = useState(dbUser?.unitNumber || "");
   const [address, setAddress] = useState(dbUser?.address || "");
   const [phoneNumber, setPhoneNumber] = useState(dbUser?.phoneNumber || "");
@@ -34,9 +34,11 @@ const ProfileScreen = () => {
 
   const [lat, setLat] = useState(dbUser?.lat || null);
   const [lng, setLng] = useState(dbUser?.lng || null);
+  const [confirmations, setConfirmations] = useState(kids.map(() => false));
 
   //const { sub, setDbUser } = useAuthContext();
   const navigation = useNavigation();
+
   const handleConfirm = () => {
     //console.log(phoneInputRef.current)
 
@@ -49,18 +51,23 @@ const ProfileScreen = () => {
     }
   };
 
-  const allKidsConfirmed = kids.every((kid) => kid.confirmed);
+  //const allKidsConfirmed = kids.every((kid) => kid.confirmed);
 
   const isSaveButtonVisible =
     name.trim() !== "" &&
     address.trim() !== "" &&
     phoneNumber.trim() !== "" &&
-    allKidsConfirmed;
+    confirmations.every((confirmed) => confirmed);
 
-  const toggleConfirmation = (index) => {
-    const updatedKids = [...kids];
-    updatedKids[index].confirmed = !updatedKids[index].confirmed;
-    // kids = updatedKids;
+  // const toggleKidsConfirmation = (index) => {
+  //   const updatedKids = kids.map(([...kids];
+  //   updatedKids[index].confirmed = !updatedKids[index].confirmed;
+  // };
+
+  const toggleKidConfirmation = (index) => {
+    const updatedConfirmations = [...confirmations];
+    updatedConfirmations[index] = !updatedConfirmations[index];
+    setConfirmations(updatedConfirmations);
   };
 
   const onSave = async () => {
@@ -142,16 +149,8 @@ const ProfileScreen = () => {
       const newUser = response.data.createUser; // Access the user data from the response
       const userId = newUser.id; // Access the ID of the newly created user
 
-      //console.log(userId); // Log the user ID
       await updateKidUserID(newUser);
       setDbUser(newUser);
-
-      // const newUser = await API.graphql(
-      //   graphqlOperation(createUser, { input: userDetails })
-      // );
-      // console.log(newUser.id);
-      // //console.log(User);
-      // setDbUser(newUser);
     } catch (e) {
       Alert.alert("Error saving new user", e.message);
     }
@@ -229,21 +228,14 @@ const ProfileScreen = () => {
             <Text style={styles.kidName}>{kid.name}</Text>
             <TouchableOpacity
               style={
-                (styles.confirmButton,
-                kid.confirmed ? styles.confirmedButton : styles.confirmButton)
+                confirmations[index]
+                  ? styles.confirmedButton
+                  : styles.confirmButton
               }
-              //title={kid.confirmed ? "Confirmed" : "Confirm"}
-              onPress={() => toggleConfirmation(index)}
+              onPress={() => toggleKidConfirmation(index)}
             >
-              <Text
-                style={
-                  (styles.confirmButtonText,
-                  kid.confirmed
-                    ? styles.confirmedButtonText
-                    : styles.confirmButtonText)
-                }
-              >
-                {kid.confirmed ? "Confirmed" : "Confirm"}
+              <Text style={styles.confirmButtonText}>
+                {confirmations[index] ? "Confirmed" : "Confirm"}
               </Text>
             </TouchableOpacity>
           </View>

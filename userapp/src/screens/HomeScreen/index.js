@@ -196,19 +196,23 @@ const HomeScreen = () => {
   }, [routesData, kids]);
 
   const getStaffData = async () => {
-    const responseGetDriver = await API.graphql({
-      query: getUser,
-      variables: { id: currentRouteData.driver },
-    });
-    const driverData = responseGetDriver.data.getUser;
-    //
-    const responseGetHelper = await API.graphql({
-      query: getUser,
-      variables: { id: currentRouteData.helper },
-    });
-    const helperData = responseGetHelper.data.getUser;
-    setDriver(driverData);
-    setHelper(helperData);
+    if (currentRouteData.driver) {
+      const responseGetDriver = await API.graphql({
+        query: getUser,
+        variables: { id: currentRouteData.driver },
+      });
+      const driverData = responseGetDriver.data.getUser;
+      setDriver(driverData);
+    }
+    if (currentRouteData.helper) {
+      //
+      const responseGetHelper = await API.graphql({
+        query: getUser,
+        variables: { id: currentRouteData.helper },
+      });
+      const helperData = responseGetHelper.data.getUser;
+      setHelper(helperData);
+    }
   };
 
   useEffect(() => {
@@ -400,7 +404,7 @@ const HomeScreen = () => {
                     <Text style={{ marginRight: 20 }}>
                       Driver: {driver?.name}
                     </Text>
-                    <Text>Helper: {helper?.name} </Text>
+                    {helper && <Text>Helper: {helper?.name} </Text>}
                   </View>
                   <View style={styles.container}>
                     <Pressable
@@ -415,23 +419,25 @@ const HomeScreen = () => {
                         style={styles.imageDriver}
                       />
                     </Pressable>
-                    <Pressable
-                      onPress={(e) => {
-                        setSelectedItem(helper);
-                      }}
-                    >
-                      <Image
-                        //source={{ uri: helper?.photo }}
-                        source={
-                          helper?.photo
-                            ? { uri: helper.photo }
-                            : { uri: "https://i.imgur.com/5gc6290.jpg" }
-                        }
-                        style={styles.imageHelper}
-                        resizeMethod="scale"
-                        resizeMode="contain"
-                      />
-                    </Pressable>
+                    {helper && (
+                      <Pressable
+                        onPress={(e) => {
+                          setSelectedItem(helper);
+                        }}
+                      >
+                        <Image
+                          //source={{ uri: helper?.photo }}
+                          source={
+                            helper?.photo
+                              ? { uri: helper.photo }
+                              : { uri: "https://i.imgur.com/5gc6290.jpg" }
+                          }
+                          style={styles.imageHelper}
+                          resizeMethod="scale"
+                          resizeMode="contain"
+                        />
+                      </Pressable>
+                    )}
                   </View>
                   <View style={{ alignItems: "center", marginTop: 1 }}>
                     <TouchableOpacity
