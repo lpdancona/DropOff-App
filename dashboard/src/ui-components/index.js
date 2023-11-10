@@ -5,6 +5,10 @@
  **************************************************************************/
 
 export { default as AddKidVan } from "./AddKidVan";
+export { default as AddressListCreateForm } from "./AddressListCreateForm";
+export { default as AddressListUpdateForm } from "./AddressListUpdateForm";
+export { default as ConfigsCreateForm } from "./ConfigsCreateForm";
+export { default as ConfigsUpdateForm } from "./ConfigsUpdateForm";
 export { default as KidCreateForm } from "./KidCreateForm";
 export { default as KidUpdateForm } from "./KidUpdateForm";
 export { default as RouteCreateForm } from "./RouteCreateForm";

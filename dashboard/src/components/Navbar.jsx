@@ -33,6 +33,9 @@ export default function Navbar() {
           <Link to="/employees">
             <h2>Employees</h2>
           </Link>
+          <Link to="/maps">
+            <h2>Vans map</h2>
+          </Link>
         </div>
       </div>
       <button onClick={toggleView}>

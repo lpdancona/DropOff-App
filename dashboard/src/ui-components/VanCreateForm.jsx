@@ -7,8 +7,7 @@
 /* eslint-disable */
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { fetchByPath, validateField } from "./utils";
+import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
 import { createVan } from "../graphql/mutations";
 export default function VanCreateForm(props) {
@@ -123,7 +122,7 @@ export default function VanCreateForm(props) {
             }
           });
           await API.graphql({
-            query: createVan,
+            query: createVan.replaceAll("__typename", ""),
             variables: {
               input: {
                 ...modelFields,

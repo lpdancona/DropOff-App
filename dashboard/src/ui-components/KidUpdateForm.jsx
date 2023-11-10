@@ -7,8 +7,7 @@
 /* eslint-disable */
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { fetchByPath, validateField } from "./utils";
+import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
 import { getKid } from "../graphql/queries";
 import { updateKid } from "../graphql/mutations";
@@ -33,6 +32,8 @@ export default function KidUpdateForm(props) {
     lng: "",
     birthDate: "",
     photo: "",
+    Parent1ID: "",
+    Parent2ID: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [parent1Email, setParent1Email] = React.useState(
@@ -48,6 +49,8 @@ export default function KidUpdateForm(props) {
   const [lng, setLng] = React.useState(initialValues.lng);
   const [birthDate, setBirthDate] = React.useState(initialValues.birthDate);
   const [photo, setPhoto] = React.useState(initialValues.photo);
+  const [Parent1ID, setParent1ID] = React.useState(initialValues.Parent1ID);
+  const [Parent2ID, setParent2ID] = React.useState(initialValues.Parent2ID);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = kidRecord
@@ -61,6 +64,8 @@ export default function KidUpdateForm(props) {
     setLng(cleanValues.lng);
     setBirthDate(cleanValues.birthDate);
     setPhoto(cleanValues.photo);
+    setParent1ID(cleanValues.Parent1ID);
+    setParent2ID(cleanValues.Parent2ID);
     setErrors({});
   };
   const [kidRecord, setKidRecord] = React.useState(kidModelProp);
@@ -69,7 +74,7 @@ export default function KidUpdateForm(props) {
       const record = idProp
         ? (
             await API.graphql({
-              query: getKid,
+              query: getKid.replaceAll("__typename", ""),
               variables: { id: idProp },
             })
           )?.data?.getKid
@@ -88,6 +93,8 @@ export default function KidUpdateForm(props) {
     lng: [],
     birthDate: [],
     photo: [],
+    Parent1ID: [],
+    Parent2ID: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -123,6 +130,8 @@ export default function KidUpdateForm(props) {
           lng: lng ?? null,
           birthDate: birthDate ?? null,
           photo: photo ?? null,
+          Parent1ID: Parent1ID ?? null,
+          Parent2ID: Parent2ID ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -153,7 +162,7 @@ export default function KidUpdateForm(props) {
             }
           });
           await API.graphql({
-            query: updateKid,
+            query: updateKid.replaceAll("__typename", ""),
             variables: {
               input: {
                 id: kidRecord.id,
@@ -191,6 +200,8 @@ export default function KidUpdateForm(props) {
               lng,
               birthDate,
               photo,
+              Parent1ID,
+              Parent2ID,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -222,6 +233,8 @@ export default function KidUpdateForm(props) {
               lng,
               birthDate,
               photo,
+              Parent1ID,
+              Parent2ID,
             };
             const result = onChange(modelFields);
             value = result?.parent1Email ?? value;
@@ -253,6 +266,8 @@ export default function KidUpdateForm(props) {
               lng,
               birthDate,
               photo,
+              Parent1ID,
+              Parent2ID,
             };
             const result = onChange(modelFields);
             value = result?.parent2Email ?? value;
@@ -284,6 +299,8 @@ export default function KidUpdateForm(props) {
               lng,
               birthDate,
               photo,
+              Parent1ID,
+              Parent2ID,
             };
             const result = onChange(modelFields);
             value = result?.dropOffAddress ?? value;
@@ -319,6 +336,8 @@ export default function KidUpdateForm(props) {
               lng,
               birthDate,
               photo,
+              Parent1ID,
+              Parent2ID,
             };
             const result = onChange(modelFields);
             value = result?.lat ?? value;
@@ -354,6 +373,8 @@ export default function KidUpdateForm(props) {
               lng: value,
               birthDate,
               photo,
+              Parent1ID,
+              Parent2ID,
             };
             const result = onChange(modelFields);
             value = result?.lng ?? value;
@@ -386,6 +407,8 @@ export default function KidUpdateForm(props) {
               lng,
               birthDate: value,
               photo,
+              Parent1ID,
+              Parent2ID,
             };
             const result = onChange(modelFields);
             value = result?.birthDate ?? value;
@@ -417,6 +440,8 @@ export default function KidUpdateForm(props) {
               lng,
               birthDate,
               photo: value,
+              Parent1ID,
+              Parent2ID,
             };
             const result = onChange(modelFields);
             value = result?.photo ?? value;
@@ -430,6 +455,72 @@ export default function KidUpdateForm(props) {
         errorMessage={errors.photo?.errorMessage}
         hasError={errors.photo?.hasError}
         {...getOverrideProps(overrides, "photo")}
+      ></TextField>
+      <TextField
+        label="Parent1 id"
+        isRequired={false}
+        isReadOnly={false}
+        value={Parent1ID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              parent1Email,
+              parent2Email,
+              dropOffAddress,
+              lat,
+              lng,
+              birthDate,
+              photo,
+              Parent1ID: value,
+              Parent2ID,
+            };
+            const result = onChange(modelFields);
+            value = result?.Parent1ID ?? value;
+          }
+          if (errors.Parent1ID?.hasError) {
+            runValidationTasks("Parent1ID", value);
+          }
+          setParent1ID(value);
+        }}
+        onBlur={() => runValidationTasks("Parent1ID", Parent1ID)}
+        errorMessage={errors.Parent1ID?.errorMessage}
+        hasError={errors.Parent1ID?.hasError}
+        {...getOverrideProps(overrides, "Parent1ID")}
+      ></TextField>
+      <TextField
+        label="Parent2 id"
+        isRequired={false}
+        isReadOnly={false}
+        value={Parent2ID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              parent1Email,
+              parent2Email,
+              dropOffAddress,
+              lat,
+              lng,
+              birthDate,
+              photo,
+              Parent1ID,
+              Parent2ID: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.Parent2ID ?? value;
+          }
+          if (errors.Parent2ID?.hasError) {
+            runValidationTasks("Parent2ID", value);
+          }
+          setParent2ID(value);
+        }}
+        onBlur={() => runValidationTasks("Parent2ID", Parent2ID)}
+        errorMessage={errors.Parent2ID?.errorMessage}
+        hasError={errors.Parent2ID?.hasError}
+        {...getOverrideProps(overrides, "Parent2ID")}
       ></TextField>
       <Flex
         justifyContent="space-between"

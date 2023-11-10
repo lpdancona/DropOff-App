@@ -7,8 +7,7 @@
 /* eslint-disable */
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { fetchByPath, validateField } from "./utils";
+import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
 import { getVan } from "../graphql/queries";
 import { updateVan } from "../graphql/mutations";
@@ -62,7 +61,7 @@ export default function AddKidVan(props) {
       const record = idProp
         ? (
             await API.graphql({
-              query: getVan,
+              query: getVan.replaceAll("__typename", ""),
               variables: { id: idProp },
             })
           )?.data?.getVan
@@ -144,7 +143,7 @@ export default function AddKidVan(props) {
             }
           });
           await API.graphql({
-            query: updateVan,
+            query: updateVan.replaceAll("__typename", ""),
             variables: {
               input: {
                 id: vanRecord.id,

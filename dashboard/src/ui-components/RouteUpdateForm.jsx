@@ -14,8 +14,7 @@ import {
   TextAreaField,
   TextField,
 } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { fetchByPath, validateField } from "./utils";
+import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
 import { getRoute } from "../graphql/queries";
 import { updateRoute } from "../graphql/mutations";
@@ -74,7 +73,7 @@ export default function RouteUpdateForm(props) {
       const record = idProp
         ? (
             await API.graphql({
-              query: getRoute,
+              query: getRoute.replaceAll("__typename", ""),
               variables: { id: idProp },
             })
           )?.data?.getRoute
@@ -158,7 +157,7 @@ export default function RouteUpdateForm(props) {
             }
           });
           await API.graphql({
-            query: updateRoute,
+            query: updateRoute.replaceAll("__typename", ""),
             variables: {
               input: {
                 id: routeRecord.id,
@@ -449,6 +448,11 @@ export default function RouteUpdateForm(props) {
           children="Waiting to start"
           value="WAITING_TO_START"
           {...getOverrideProps(overrides, "statusoption2")}
+        ></option>
+        <option
+          children="Paused"
+          value="PAUSED"
+          {...getOverrideProps(overrides, "statusoption3")}
         ></option>
       </SelectField>
       <Flex

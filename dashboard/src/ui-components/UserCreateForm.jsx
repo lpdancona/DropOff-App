@@ -13,8 +13,7 @@ import {
   SelectField,
   TextField,
 } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { fetchByPath, validateField } from "./utils";
+import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
 import { createUser } from "../graphql/mutations";
 export default function UserCreateForm(props) {
@@ -39,6 +38,7 @@ export default function UserCreateForm(props) {
     phoneNumber: "",
     userType: "",
     photo: "",
+    pushToken: "",
   };
   const [sub, setSub] = React.useState(initialValues.sub);
   const [name, setName] = React.useState(initialValues.name);
@@ -52,6 +52,7 @@ export default function UserCreateForm(props) {
   );
   const [userType, setUserType] = React.useState(initialValues.userType);
   const [photo, setPhoto] = React.useState(initialValues.photo);
+  const [pushToken, setPushToken] = React.useState(initialValues.pushToken);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setSub(initialValues.sub);
@@ -64,6 +65,7 @@ export default function UserCreateForm(props) {
     setPhoneNumber(initialValues.phoneNumber);
     setUserType(initialValues.userType);
     setPhoto(initialValues.photo);
+    setPushToken(initialValues.pushToken);
     setErrors({});
   };
   const validations = {
@@ -77,6 +79,7 @@ export default function UserCreateForm(props) {
     phoneNumber: [],
     userType: [],
     photo: [],
+    pushToken: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -114,6 +117,7 @@ export default function UserCreateForm(props) {
           phoneNumber,
           userType,
           photo,
+          pushToken,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -144,7 +148,7 @@ export default function UserCreateForm(props) {
             }
           });
           await API.graphql({
-            query: createUser,
+            query: createUser.replaceAll("__typename", ""),
             variables: {
               input: {
                 ...modelFields,
@@ -186,6 +190,7 @@ export default function UserCreateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.sub ?? value;
@@ -219,6 +224,7 @@ export default function UserCreateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -252,6 +258,7 @@ export default function UserCreateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -285,6 +292,7 @@ export default function UserCreateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.unitNumber ?? value;
@@ -318,6 +326,7 @@ export default function UserCreateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.address ?? value;
@@ -355,6 +364,7 @@ export default function UserCreateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.lng ?? value;
@@ -392,6 +402,7 @@ export default function UserCreateForm(props) {
               phoneNumber,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.lat ?? value;
@@ -425,6 +436,7 @@ export default function UserCreateForm(props) {
               phoneNumber: value,
               userType,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.phoneNumber ?? value;
@@ -458,6 +470,7 @@ export default function UserCreateForm(props) {
               phoneNumber,
               userType: value,
               photo,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.userType ?? value;
@@ -507,6 +520,7 @@ export default function UserCreateForm(props) {
               phoneNumber,
               userType,
               photo: value,
+              pushToken,
             };
             const result = onChange(modelFields);
             value = result?.photo ?? value;
@@ -520,6 +534,40 @@ export default function UserCreateForm(props) {
         errorMessage={errors.photo?.errorMessage}
         hasError={errors.photo?.hasError}
         {...getOverrideProps(overrides, "photo")}
+      ></TextField>
+      <TextField
+        label="Push token"
+        isRequired={false}
+        isReadOnly={false}
+        value={pushToken}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              sub,
+              name,
+              email,
+              unitNumber,
+              address,
+              lng,
+              lat,
+              phoneNumber,
+              userType,
+              photo,
+              pushToken: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.pushToken ?? value;
+          }
+          if (errors.pushToken?.hasError) {
+            runValidationTasks("pushToken", value);
+          }
+          setPushToken(value);
+        }}
+        onBlur={() => runValidationTasks("pushToken", pushToken)}
+        errorMessage={errors.pushToken?.errorMessage}
+        hasError={errors.pushToken?.hasError}
+        {...getOverrideProps(overrides, "pushToken")}
       ></TextField>
       <Flex
         justifyContent="space-between"

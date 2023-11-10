@@ -14,8 +14,7 @@ import {
   TextAreaField,
   TextField,
 } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { fetchByPath, validateField } from "./utils";
+import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
 import { createRoute } from "../graphql/mutations";
 export default function RouteCreateForm(props) {
@@ -133,7 +132,7 @@ export default function RouteCreateForm(props) {
             }
           });
           await API.graphql({
-            query: createRoute,
+            query: createRoute.replaceAll("__typename", ""),
             variables: {
               input: {
                 ...modelFields,
@@ -425,6 +424,11 @@ export default function RouteCreateForm(props) {
           children="Waiting to start"
           value="WAITING_TO_START"
           {...getOverrideProps(overrides, "statusoption2")}
+        ></option>
+        <option
+          children="Paused"
+          value="PAUSED"
+          {...getOverrideProps(overrides, "statusoption3")}
         ></option>
       </SelectField>
       <Flex
