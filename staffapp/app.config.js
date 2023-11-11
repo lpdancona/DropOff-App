@@ -24,7 +24,6 @@ export default {
     },
     supportsTablet: true,
     bundleIdentifier: "com.geodarth.dropoffgb",
-    buildNumber: "4",
   },
   android: {
     config: {
@@ -52,7 +51,7 @@ export default {
       projectId: "86aaefd7-300b-4ba0-9f96-ede028a516c4",
     },
   },
-  owner: "geodarth",
+  owner: "x3_web_services",
   runtimeVersion: {
     policy: "appVersion",
   },

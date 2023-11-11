@@ -19,7 +19,6 @@ export default {
     },
     supportsTablet: true,
     bundleIdentifier: "com.geodarth.DropoffUser",
-    buildNumber: "4",
   },
   android: {
     adaptiveIcon: {
@@ -37,6 +36,7 @@ export default {
       projectId: "7c8a0c2e-12a3-4b4c-b54b-6db24b05ed92",
     },
   },
+  owner: "x3_web_services",
   runtimeVersion: {
     policy: "appVersion",
   },
