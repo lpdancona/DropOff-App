@@ -1,6 +1,40 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getConfigs = /* GraphQL */ `
+  query GetConfigs($id: ID!) {
+    getConfigs(id: $id) {
+      id
+      defaultVanPhoto
+      defaultUserPhoto
+      phoneNumberManager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listConfigs = /* GraphQL */ `
+  query ListConfigs(
+    $filter: ModelConfigsFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listConfigs(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        defaultVanPhoto
+        defaultUserPhoto
+        phoneNumberManager
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getAddressList = /* GraphQL */ `
   query GetAddressList($id: ID!) {
     getAddressList(id: $id) {
@@ -19,8 +53,10 @@ export const getAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
+        Parent1ID
+        Parent2ID
+        vanID
         createdAt
         updatedAt
         __typename
@@ -211,8 +247,10 @@ export const getKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
+      Parent1ID
+      Parent2ID
+      vanID
       createdAt
       updatedAt
       __typename
@@ -236,44 +274,10 @@ export const listKids = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const kidsByVans = /* GraphQL */ `
-  query KidsByVans(
-    $vans: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelKidFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    kidsByVans(
-      vans: $vans
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        name
-        parent1Email
-        parent2Email
-        dropOffAddress
-        lat
-        lng
-        birthDate
-        photo
-        vans
-        routeID
+        Parent1ID
+        Parent2ID
+        vanID
         createdAt
         updatedAt
         __typename
@@ -308,8 +312,48 @@ export const kidsByRouteID = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
+        Parent1ID
+        Parent2ID
+        vanID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const kidsByVanID = /* GraphQL */ `
+  query KidsByVanID(
+    $vanID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelKidFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    kidsByVanID(
+      vanID: $vanID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        routeID
+        Parent1ID
+        Parent2ID
+        vanID
         createdAt
         updatedAt
         __typename
@@ -333,6 +377,7 @@ export const getUser = /* GraphQL */ `
       phoneNumber
       userType
       photo
+      pushToken
       createdAt
       updatedAt
       __typename
@@ -358,6 +403,7 @@ export const listUsers = /* GraphQL */ `
         phoneNumber
         userType
         photo
+        pushToken
         createdAt
         updatedAt
         __typename

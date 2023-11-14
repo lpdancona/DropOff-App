@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { API, graphqlOperation } from "aws-amplify";
-import { createKid, updateKid, deleteKid } from "../graphql/mutations";
+import { API } from "aws-amplify";
+import { updateKid, deleteKid } from "../graphql/mutations";
 import { listKids } from "../graphql/queries";
-import { DataStore } from "@aws-amplify/datastore";
-import { Kid } from "../models";
 import "./Students.css";
 import StudentForm from "../components/StudentForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,6 +11,8 @@ import {
   faArrowRight,
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
+import { Card } from "antd";
+
 function Students() {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -28,17 +28,17 @@ function Students() {
   const [updatedPhoto, setUpdatedPhoto] = useState("");
   const studentsPerPage = 4;
 
+  const fetchKids = async () => {
+    try {
+      const response = await API.graphql({ query: listKids });
+      const kidsData = response.data.listKids.items;
+      setStudents(kidsData);
+    } catch (error) {
+      console.error("Error fetching kids", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchKids = async () => {
-      try {
-        const response = await API.graphql({ query: listKids });
-        console.log(response);
-        const kidsData = response.data.listKids.items;
-        setStudents(kidsData);
-      } catch (error) {
-        console.error("Error fetching kids", error);
-      }
-    };
     fetchKids();
   }, []);
 
@@ -68,33 +68,47 @@ function Students() {
 
   const handleStudentClick = (student) => {
     setSelectedStudent(student);
-    setUpdatedName(student.name);
-    setUpdatedAddress(student.dropOffAddress);
-    setUpdatedAge(student.birthDate);
-    setUpdatedParent1Email(student.parent1Email);
-    setUpdatedParent2Email(student.parent2Email);
-    setUpdatedPhoto(student.photo);
     setMode("details");
   };
+
+  // Use useEffect to perform actions after setSelectedStudent has completed
+  useEffect(() => {
+    // Ensure that selectedStudent is updated before executing the following statements
+    if (selectedStudent) {
+      setUpdatedName(selectedStudent.name);
+      setUpdatedAddress(selectedStudent.dropOffAddress);
+      setUpdatedAge(selectedStudent.birthDate);
+      setUpdatedParent1Email(selectedStudent.parent1Email);
+      setUpdatedParent2Email(selectedStudent.parent2Email);
+      setUpdatedPhoto(selectedStudent.photo);
+    }
+  }, [selectedStudent]);
+
   const handleDeleteClick = (student) => {
     setSelectedStudent(student);
+    console.log("handle delete");
     setMode("delete");
   };
+
   const handleDeleteStudent = async () => {
     if (!selectedStudent) {
       return;
     }
 
     try {
-      await API.graphql(
-        graphqlOperation(deleteKid, { input: { id: selectedStudent.id } })
-      );
-      const updatedStudents = students.filter(
-        (student) => student.id !== selectedStudent.id
-      );
-      setStudents(updatedStudents);
+      const nameDeleted = selectedStudent.name;
+      await API.graphql({
+        query: deleteKid,
+        variables: { input: { id: selectedStudent.id } },
+      });
+      // const updatedStudents = students.filter(
+      //   (student) => student.id !== selectedStudent.id
+      // );
+      // setStudents(updatedStudents);
       setSelectedStudent(null);
+      await fetchKids();
       setMode("list");
+      alert(`Kid - ${nameDeleted}, successful deleted! `);
     } catch (error) {
       console.error("Error deleting student:", error);
     }
@@ -104,10 +118,11 @@ function Students() {
     if (!selectedStudent) {
       return;
     }
+    const nameUpdated = selectedStudent.name;
     try {
-      console.log("Updating student...");
-      await API.graphql(
-        graphqlOperation(updateKid, {
+      await API.graphql({
+        query: updateKid,
+        variables: {
           input: {
             id: selectedStudent.id,
             name: updatedName,
@@ -120,14 +135,17 @@ function Students() {
             photo: updatedPhoto,
             vans: selectedStudent.vans,
           },
-        })
-      );
-      const updatedStudents = students.map((student) =>
-        student.id === selectedStudent.id
-          ? { ...student, name: updatedName, dropOffAddress: updatedAddress }
-          : student
-      );
-      setStudents(updatedStudents);
+        },
+      });
+      alert(`Kid - ${nameUpdated}, updated successfully!`);
+
+      // const updatedStudents = students.map((student) =>
+      //   student.id === selectedStudent.id
+      //     ? { ...student, name: updatedName, dropOffAddress: updatedAddress }
+      //     : student
+      // );
+      await fetchKids();
+      //setStudents(updatedStudents);
       setSelectedStudent(null);
       setMode("list");
       setUpdatedName("");
@@ -136,7 +154,6 @@ function Students() {
       setUpdatedParent1Email("");
       setUpdatedParent2Email("");
       setUpdatedPhoto("");
-      console.log("Student updated successfully!");
     } catch (error) {
       console.error("Error updating student:", error);
     }
@@ -144,25 +161,24 @@ function Students() {
 
   const handleStudentAdded = async () => {
     try {
-      // Use DataStore.query to fetch students
-      const studentsData = await DataStore.query(Kid);
-      setStudents(studentsData);
+      fetchKids();
     } catch (error) {
       console.error("Error fetching students:", error);
     }
   };
   const handleBackToList = (e) => {
     e.preventDefault();
+    setSelectedStudent(null);
     setMode("list");
   };
   return (
     <div className="home-main">
       <div className="home">
         <div className="home-container">
-          <div className="students-container">
+          <div className="student-container">
             {mode === "list" && (
               <div>
-                <h3>Students</h3>
+                <h3>Kids</h3>
                 <div className="filters">
                   <input
                     type="text"
@@ -229,7 +245,7 @@ function Students() {
                 <h2>Update Student</h2>
                 <div className="update-student">
                   <h4>{selectedStudent.name}</h4>
-                  <form onSubmit={handleUpdateStudent}>
+                  <Card>
                     <label>Name:</label>
                     <input
                       type="text"
@@ -266,13 +282,13 @@ function Students() {
                       value={updatedParent2Email || ""}
                       onChange={(e) => setUpdatedParent2Email(e.target.value)}
                     />
-                    <button type="submit" className="btn">
+                    <button onClick={handleUpdateStudent} className="btn">
                       Update Student
                     </button>
                     <button onClick={handleBackToList} className="btn">
                       Back to List
                     </button>
-                  </form>
+                  </Card>
                 </div>
               </div>
             )}

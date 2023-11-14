@@ -25,13 +25,16 @@ export default function Navbar() {
 
         <div className="link-header-container">
           <Link to="/students">
-            <h2>Students</h2>
+            <h2>Kids</h2>
           </Link>
           <Link to="/vans">
             <h2>Vans</h2>
           </Link>
           <Link to="/employees">
             <h2>Employees</h2>
+          </Link>
+          <Link to="/routes">
+            <h2>Routes</h2>
           </Link>
           <Link to="/maps">
             <h2>Vans map</h2>

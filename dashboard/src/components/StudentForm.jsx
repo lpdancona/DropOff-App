@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { DataStore } from "@aws-amplify/datastore";
-import { Kid } from "../models";
+import React, { useState, useRef } from "react";
+import { API } from "aws-amplify";
+import { createKid } from "../graphql/mutations";
 import "./StudentForm.css";
 import GoogleMapsAutocomplete from "./GoogleMapsAutocomplete";
+import { Card } from "antd";
+
 function StudentForm({ onStudentAdded }) {
   const [name, setName] = useState("");
   const [parent1Email, setParent1Email] = useState("");
@@ -12,35 +14,57 @@ function StudentForm({ onStudentAdded }) {
   const [lng, setLng] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [photo, setPhoto] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
+  const autocompleteRef = useRef();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Validation checks
+    if (
+      !name ||
+      !(parent1Email || parent2Email) ||
+      !dropOffAddress ||
+      lat === null ||
+      lng === null ||
+      !birthDate
+    ) {
+      // If any required field is blank, show an error message and return early
+      setError("Please fill in all required fields.");
+      alert("Please fill in all required fields.");
+      return;
+    }
     try {
       // Create a new Kid object
-      const newKid = await DataStore.save(
-        new Kid({
-          name: name,
-          parent1Email: parent1Email,
-          parent2Email: parent2Email,
-          dropOffAddress: dropOffAddress,
-          lat: lat,
-          lng: lng,
-          birthDate: birthDate,
-          photo: photo,
-        })
-      );
+
+      const newKidDetails = {
+        name: name,
+        parent1Email: parent1Email,
+        parent2Email: parent2Email,
+        dropOffAddress: dropOffAddress,
+        lat: lat,
+        lng: lng,
+        birthDate: birthDate,
+        photo: photo,
+      };
+      const newKid = await API.graphql({
+        query: createKid,
+        variables: { input: newKidDetails },
+      });
       // Reset form fields and clear errors on success
       setName("");
       setParent1Email("");
       setParent2Email("");
       setDropOffAddress("");
+      if (autocompleteRef.current) {
+        autocompleteRef.current.resetAutocompleteInput();
+      }
       setLat(null);
       setLng(null);
       setBirthDate("");
       setPhoto("");
       // Clear the photo state
       setError(null);
-      console.log("New Kid added", newKid);
+      //console.log("New Kid added", newKid);
       alert("New Kid added!");
       onStudentAdded();
     } catch (error) {
@@ -49,25 +73,29 @@ function StudentForm({ onStudentAdded }) {
       alert("Failed to add Kid.");
     }
   };
+
   const handleAddressSelect = (selectedPlace) => {
+    //console.log("selectd Place", selectedPlace);
     setDropOffAddress(selectedPlace.formatted_address);
     setLat(selectedPlace.geometry.location.lat());
     setLng(selectedPlace.geometry.location.lng());
   };
+
   const handlePhotoChange = (e) => {
     // Handle photo upload or selection here and update the 'photo' state // For example, you can use FileReader to read the selected file and set it in the state.
     const selectedPhoto = e.target.files[0];
     setPhoto(selectedPhoto);
   };
+
   return (
-    <form className="create" onSubmit={handleSubmit}>
+    <Card className="create">
       {" "}
-      <h3>Add a New Kid</h3>{" "}
+      <h3>Add a New Kid </h3>{" "}
       <div className="form-container">
         {" "}
         <div className="form-item">
           {" "}
-          <label>Kid's Name:</label>{" "}
+          <label>Kid Name:</label>{" "}
           <input
             type="text"
             onChange={(e) => setName(e.target.value)}
@@ -94,8 +122,11 @@ function StudentForm({ onStudentAdded }) {
         </div>{" "}
         <div className="form-item">
           {" "}
-          <label>Drop-Off Address:</label>{" "}
-          <GoogleMapsAutocomplete onPlaceSelect={handleAddressSelect} />{" "}
+          <label>Drop-Off Address:</label>
+          <GoogleMapsAutocomplete
+            onPlaceSelect={handleAddressSelect}
+            ref={autocompleteRef}
+          />{" "}
         </div>{" "}
         <div className="form-item">
           {" "}
@@ -111,10 +142,12 @@ function StudentForm({ onStudentAdded }) {
           <label>Photo:</label>{" "}
           <input type="text" onChange={(e) => setPhoto(e.target.value)} />{" "}
         </div>{" "}
-        <button className="create-btn">Add Kid</button>{" "}
+        <button className="create-btn" onClick={handleSubmit}>
+          Add Kid
+        </button>{" "}
         {error && <div className="error">{error}</div>}{" "}
       </div>{" "}
-    </form>
+    </Card>
   );
 }
 export default StudentForm;

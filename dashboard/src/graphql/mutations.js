@@ -1,6 +1,54 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createConfigs = /* GraphQL */ `
+  mutation CreateConfigs(
+    $input: CreateConfigsInput!
+    $condition: ModelConfigsConditionInput
+  ) {
+    createConfigs(input: $input, condition: $condition) {
+      id
+      defaultVanPhoto
+      defaultUserPhoto
+      phoneNumberManager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateConfigs = /* GraphQL */ `
+  mutation UpdateConfigs(
+    $input: UpdateConfigsInput!
+    $condition: ModelConfigsConditionInput
+  ) {
+    updateConfigs(input: $input, condition: $condition) {
+      id
+      defaultVanPhoto
+      defaultUserPhoto
+      phoneNumberManager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteConfigs = /* GraphQL */ `
+  mutation DeleteConfigs(
+    $input: DeleteConfigsInput!
+    $condition: ModelConfigsConditionInput
+  ) {
+    deleteConfigs(input: $input, condition: $condition) {
+      id
+      defaultVanPhoto
+      defaultUserPhoto
+      phoneNumberManager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createAddressList = /* GraphQL */ `
   mutation CreateAddressList(
     $input: CreateAddressListInput!
@@ -22,8 +70,10 @@ export const createAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
+        Parent1ID
+        Parent2ID
+        vanID
         createdAt
         updatedAt
         __typename
@@ -56,8 +106,10 @@ export const updateAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
+        Parent1ID
+        Parent2ID
+        vanID
         createdAt
         updatedAt
         __typename
@@ -90,8 +142,10 @@ export const deleteAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        vans
         routeID
+        Parent1ID
+        Parent2ID
+        vanID
         createdAt
         updatedAt
         __typename
@@ -319,8 +373,10 @@ export const createKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
+      Parent1ID
+      Parent2ID
+      vanID
       createdAt
       updatedAt
       __typename
@@ -342,8 +398,10 @@ export const updateKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
+      Parent1ID
+      Parent2ID
+      vanID
       createdAt
       updatedAt
       __typename
@@ -365,8 +423,10 @@ export const deleteKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      vans
       routeID
+      Parent1ID
+      Parent2ID
+      vanID
       createdAt
       updatedAt
       __typename
@@ -390,6 +450,7 @@ export const createUser = /* GraphQL */ `
       phoneNumber
       userType
       photo
+      pushToken
       createdAt
       updatedAt
       __typename
@@ -413,6 +474,7 @@ export const updateUser = /* GraphQL */ `
       phoneNumber
       userType
       photo
+      pushToken
       createdAt
       updatedAt
       __typename
@@ -436,6 +498,7 @@ export const deleteUser = /* GraphQL */ `
       phoneNumber
       userType
       photo
+      pushToken
       createdAt
       updatedAt
       __typename

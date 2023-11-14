@@ -1,313 +1,307 @@
 import React, { useEffect, useState } from "react";
+import { API } from "aws-amplify";
+import { updateVan, deleteVan } from "../graphql/mutations";
+import { listVans } from "../graphql/queries";
 import "./Vans.css";
-import AddStudent from "../components/AddStudent";
-import AddEmployee from "../components/AddEmployee";
-import { DataStore } from "@aws-amplify/datastore";
-import { API, graphqlOperation } from "aws-amplify";
-import { Van } from "../models";
+import VansForm from "../components/VansForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUserXmark,
-  faArrowUpRightFromSquare,
+  faPenToSquare,
+  faTrash,
+  faArrowRight,
+  faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
-import AddVan from "./AddVan";
-import { Link } from "react-router-dom";
-import { createVan, updateVan, deleteVan } from "../graphql/mutations";
-import { listVans, getVan } from "../graphql/queries";
+import { Card } from "antd";
 
-function Vans() {
-  const [students, setStudents] = useState([]);
+function Students() {
   const [vans, setVans] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [selectedVanModel, setSelectedVanModel] = useState("");
   const [selectedVan, setSelectedVan] = useState(null);
-  const [showNewVanForm, setShowNewVanForm] = useState(false);
-  const [newVanData, setNewVanData] = useState({
-    plate: "",
-    model: "",
-    year: "",
-  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [modelFilter, setModelFilter] = useState("");
+  const [plateFilter, setPlateFilter] = useState("");
+  const [mode, setMode] = useState("list");
+  const [updatedVanName, setUpdatedVanName] = useState("");
+  const [updatedVanPicture, setUpdatedVanPicture] = useState("");
+  const [updatedVanPlate, setUpdatedVanPlate] = useState("");
+  const [updatedVanModel, setUpdatedVanModel] = useState("");
+  const [updatedVanYear, setUpdatedVanYear] = useState("");
+  const [updatedVanSeats, setUpdatedVanSeats] = useState("");
+  const [updatedVanBosterSeats, setUpdatedVanBosterSeats] = useState("");
+
+  const vansPerPage = 4;
+
+  const fetchVans = async () => {
+    try {
+      const response = await API.graphql({ query: listVans });
+      const vansData = response.data.listVans.items;
+      setVans(vansData);
+    } catch (error) {
+      console.error("Error fetching vans", error);
+    }
+  };
 
   useEffect(() => {
-    // Fetch the list of vans using the GraphQL query
-    const fetchVans = async () => {
-      try {
-        const response = await API.graphql(
-          graphqlOperation(listVans, { limit: 100 })
-        );
-        const vansData = response.data.listVans.items;
-        console.log("fetched data", vansData);
-        setVans(vansData);
-      } catch (error) {
-        console.error("Error fetching vans:", error);
-      }
-    };
     fetchVans();
   }, []);
-  async function getVanById(vanId) {
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prevPage) => prevPage - 1);
+  };
+
+  const startIndex = (currentPage - 1) * vansPerPage;
+  const endIndex = startIndex + vansPerPage;
+
+  const filteredVans = vans.filter((van) => {
+    return (
+      (modelFilter === "" ||
+        van.name.toLowerCase().includes(modelFilter.toLowerCase())) &&
+      (plateFilter === "" ||
+        van.dropOffAddress.toLowerCase().includes(plateFilter.toLowerCase()))
+    );
+  });
+
+  const displayedVans = filteredVans.slice(startIndex, endIndex);
+
+  const handleVanClick = (van) => {
+    setSelectedVan(van);
+    setMode("details");
+  };
+
+  useEffect(() => {
+    if (selectedVan) {
+      setUpdatedVanName(selectedVan.name);
+      setUpdatedVanPicture(selectedVan.image);
+      setUpdatedVanPlate(selectedVan.plate);
+      setUpdatedVanModel(selectedVan.model);
+      setUpdatedVanYear(selectedVan.year);
+      setUpdatedVanSeats(selectedVan.seats);
+      setUpdatedVanBosterSeats(selectedVan.bosterSeats);
+    }
+  }, [selectedVan]);
+
+  const handleDeleteClick = (van) => {
+    setSelectedVan(van);
+    setMode("delete");
+  };
+
+  const handleDeleteVan = async () => {
+    if (!selectedVan) {
+      return;
+    }
+
     try {
-      const response = await API.graphql({
-        query: getVan,
-        variables: { id: vanId },
+      const nameDeleted = selectedVan.name;
+      await API.graphql({
+        query: deleteVan,
+        variables: { input: { id: selectedVan.id } },
       });
-      console.log(vanId);
-      const vanData = response.data.getVan;
-      console.log("van data", vanData);
-      console.log("Fetched van data:", vanData);
-
-      return vanData;
-    } catch (error) {
-      console.error("Error fetching van:", error);
-      throw error;
-    }
-  }
-  const handleVanModelSelect = async (e) => {
-    const model = e.target.value;
-    setSelectedVanModel(model);
-
-    // Find the first van with the selected model
-    const selectedVanData = vans.find((van) => van && van.model === model);
-
-    if (selectedVanData) {
-      const vanDetails = await getVanById(selectedVanData.id);
-      setSelectedVan(vanDetails);
-    } else {
       setSelectedVan(null);
-    }
-  };
-
-  useEffect(() => {
-    const fetchStudents = async () => {
-      const response = await fetch(
-        "https://drop-off-app-dere.onrender.com/api/students"
-      );
-      const json = await response.json();
-
-      if (response.ok) {
-        setStudents(json.students);
-      }
-    };
-    fetchStudents();
-  }, []);
-
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      const response = await fetch(
-        "https://drop-off-app-dere.onrender.com/api/employes"
-      );
-      const json = await response.json();
-
-      if (response.ok) {
-        setEmployees(json.employes);
-      }
-    };
-    fetchEmployees();
-  }, []);
-
-  // Function to handle input changes for new van data
-  const handleNewVanChange = (e) => {
-    const { name, value } = e.target;
-    setNewVanData({
-      ...newVanData,
-      [name]: value,
-    });
-  };
-
-  const createNewVan = async () => {
-    try {
-      await DataStore.save(
-        new Van(newVanData) // Create a new Van object with the provided data
-      );
-
-      // Refresh the page after creating a new van
-      // window.location.reload();
+      await fetchVans();
+      setMode("list");
+      alert(`Van - ${nameDeleted}, successful deleted! `);
     } catch (error) {
-      console.error("Error creating a new van:", error);
+      console.error("Error deleting student:", error);
     }
   };
-  const handleUnaddStudent = async (studentId) => {
+
+  const handleUpdateVan = async () => {
+    if (!selectedVan) {
+      return;
+    }
+    const nameUpdated = selectedVan.name;
     try {
-      const response = await fetch(
-        `https://drop-off-app-dere.onrender.com/api/vans/${selectedVan._id}/unadd-student`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
+      await API.graphql({
+        query: updateVan,
+        variables: {
+          input: {
+            id: selectedVan.id,
+            name: updatedVanName,
+            image: updatedVanPicture,
+            plate: updatedVanPlate,
+            model: updatedVanModel,
+            year: updatedVanYear,
+            seats: updatedVanSeats,
+            bosterSeats: updatedVanBosterSeats,
           },
-          body: JSON.stringify({ studentId }),
-        }
-      );
+        },
+      });
+      alert(`Van - ${nameUpdated}, updated successfully!`);
 
-      if (response.ok) {
-        // Update the selected van's data after unadding
-        const updatedVan = { ...selectedVan };
-        updatedVan.students = updatedVan.students.filter(
-          (id) => id !== studentId
-        );
-        setSelectedVan(updatedVan);
-      } else {
-        console.error("Failed to unadd student from the van.");
-      }
+      await fetchVans();
+      setSelectedVan(null);
+      setMode("list");
+      setUpdatedVanName("");
+      setUpdatedVanPicture("");
+      setUpdatedVanPlate("");
+      setUpdatedVanModel("");
+      setUpdatedVanYear("");
+      setUpdatedVanSeats("");
+      setUpdatedVanBosterSeats("");
     } catch (error) {
-      console.error("Error unadding student from the van:", error);
+      console.error("Error updating student:", error);
     }
   };
-  const handleUnaddEmployee = async (employeId) => {
+
+  const handleVanAdded = async () => {
     try {
-      const response = await fetch(
-        `https://drop-off-app-dere.onrender.com/api/vans/${selectedVan._id}/unadd-employe`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ employeId }),
-        }
-      );
-
-      if (response.ok) {
-        // Update the selected van's data after unadding
-        const updatedVan = { ...selectedVan };
-        updatedVan.employes = updatedVan.employes.filter(
-          (id) => id !== employeId
-        );
-        setSelectedVan(updatedVan);
-      } else {
-        console.error("Failed to unadd employee from the van.");
-      }
+      fetchVans();
     } catch (error) {
-      console.error("Error unadding employee from the van:", error);
+      console.error("Error fetching students:", error);
     }
   };
-
+  const handleBackToList = (e) => {
+    e.preventDefault();
+    setSelectedVan(null);
+    setMode("list");
+  };
   return (
-    <div className="home">
-      <div className="home-container"></div>
-      <div className="create-van-dropdown">
-        <button
-          className="create-van-button"
-          onClick={() => setShowNewVanForm(!showNewVanForm)}
-        >
-          Create Van
-        </button>
-        <div
-          className={`create-new-van-form ${showNewVanForm ? "active" : ""}`}
-        >
-          <h3>Create New Van</h3>
-          <input
-            type="text"
-            name="plate"
-            placeholder="Plate"
-            value={newVanData.plate}
-            onChange={handleNewVanChange}
-          />
-          <input
-            type="text"
-            name="model"
-            placeholder="Model"
-            value={newVanData.model}
-            onChange={handleNewVanChange}
-          />
-          <input
-            type="text"
-            name="year"
-            placeholder="Year"
-            value={newVanData.year}
-            onChange={handleNewVanChange}
-          />
-          <button onClick={createNewVan}>Create Van</button>
-        </div>
-      </div>
-      <div className="vans-container">
-        <div className="vans">
-          <h2>Vans</h2>
-          <label>Select a Van Model: </label>
-          <select
-            value={selectedVanModel}
-            onChange={handleVanModelSelect}
-            className="model-select"
-          >
-            <option value="">Select a Model</option>
-            {vans.map((van) => (
-              <option key={van._id} value={van.model}>
-                {van && van.model ? van.model : "Unknown Model"}
-              </option>
-            ))}
-          </select>
-
-          {selectedVan && (
-            <div className="selected-van-info">
-              <div className="share-van">
-                <h3>Selected Van: {selectedVan.model}</h3>{" "}
-                <Link
-                  to={`/vans/${selectedVan._id}`}
-                  className="view-details-button"
-                >
-                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-                </Link>
+    <div className="home-main">
+      <div className="home">
+        <div className="home-container">
+          <div className="van-container">
+            {mode === "list" && (
+              <div>
+                <h3>Vans</h3>
+                <div className="filters">
+                  <input
+                    type="text"
+                    placeholder="Filter by Model"
+                    value={modelFilter}
+                    onChange={(e) => setModelFilter(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Filter by Plate"
+                    value={plateFilter}
+                    onChange={(e) => setPlateFilter(e.target.value)}
+                  />
+                </div>
+                <div className="van">
+                  {displayedVans.map((van) => (
+                    <div className="van-details-container" key={van.id}>
+                      <img src={van.image} className="van-picture" />
+                      <div className="van-details">
+                        <div className="van-name">{van.name}</div>
+                        <div className="van-model">{van.model}</div>
+                        <div className="van-plate">{van.plate}</div>
+                      </div>
+                      <div className="van-details-btn">
+                        <button
+                          onClick={() => handleVanClick(van)}
+                          className="btn btn-van-edit"
+                        >
+                          <FontAwesomeIcon icon={faPenToSquare} />
+                        </button>
+                        <button
+                          className="btn btn-van-delete"
+                          onClick={() => {
+                            handleDeleteClick(van);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="pagination">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    className="btn"
+                  >
+                    <FontAwesomeIcon icon={faArrowLeft} beat />
+                  </button>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={endIndex >= filteredVans.length}
+                    className="btn"
+                  >
+                    <FontAwesomeIcon icon={faArrowRight} beat />
+                  </button>
+                </div>
               </div>
-              {/* <h4>Employees:</h4> */}
-              {/* <ul className="van-employees">
-                {selectedVan.employes.map((employeeId) => {
-                  const employee = employees.find((e) => e._id === employeeId);
-                  return (
-                    <li key={employee._id} className="van-employee">
-                      <img src={employee.photo} alt="" />
-                      <div>{employee.name}</div>
-                      <div>{employee.role}</div>
-                      <button onClick={() => handleUnaddEmployee(employee._id)}>
-                        Remove
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul> */}
-              <h4>Students:</h4>
-              <ul className="van-students">
-                {selectedVan &&
-                selectedVan.Kids &&
-                selectedVan.Kids.length > 0 ? (
-                  selectedVan.Kids.map((studentId) => {
-                    const student = students.find((s) => s._id === studentId);
-                    if (student) {
-                      return (
-                        <li key={student._id} className="van-student">
-                          <img src={student.photo} alt="" />
-                          <div className="van-student-info">
-                            <div className="van-student-name">
-                              {student.name}
-                            </div>
-                            <div className="van-student-address">
-                              {student.address}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleUnaddStudent(student._id)}
-                          >
-                            <FontAwesomeIcon icon={faUserXmark} />
-                          </button>
-                        </li>
-                      );
-                    } else {
-                      return null; // Handle the case where the student is not found
-                    }
-                  })
-                ) : (
-                  <p>No students in this van.</p>
-                )}
-              </ul>
-            </div>
-          )}
-        </div>
-        <div className="add-van-info">
-          <div className="add-student">
-            <AddStudent students={students} vans={vans} />
+            )}
+            {mode === "details" && selectedVan && (
+              <div className="update-van-container">
+                <h2>Update Van</h2>
+                <div className="update-van">
+                  <h4>{selectedVan.name}</h4>
+                  <Card>
+                    <label>Name:</label>
+                    <input
+                      type="text"
+                      value={updatedVanName}
+                      onChange={(e) => setUpdatedVanName(e.target.value)}
+                    />
+                    <label>Picture:</label>
+                    <input
+                      type="text"
+                      value={updatedVanPicture}
+                      onChange={(e) => setUpdatedVanPicture(e.target.value)}
+                    />
+                    <label>Plate:</label>
+                    <input
+                      type="text"
+                      value={updatedVanPlate}
+                      onChange={(e) => setUpdatedVanPlate(e.target.value)}
+                    />
+                    <label>Model:</label>
+                    <input
+                      type="text"
+                      value={updatedVanModel}
+                      onChange={(e) => setUpdatedVanModel(e.target.value)}
+                    />
+                    <label>Year:</label>
+                    <input
+                      type="text"
+                      value={updatedVanYear}
+                      onChange={(e) => setUpdatedVanYear(e.target.value)}
+                    />
+                    <label>Seats:</label>
+                    <input
+                      type="text"
+                      value={updatedVanSeats}
+                      onChange={(e) => setUpdatedVanSeats(e.target.value)}
+                    />
+                    <label>Booster Seats:</label>
+                    <input
+                      type="text"
+                      value={updatedVanBosterSeats}
+                      onChange={(e) => setUpdatedVanBosterSeats(e.target.value)}
+                    />
+                    <button onClick={handleUpdateVan} className="btn">
+                      Update Van
+                    </button>
+                    <button onClick={handleBackToList} className="btn">
+                      Back to List
+                    </button>
+                  </Card>
+                </div>
+              </div>
+            )}
+            {mode === "delete" && selectedVan && (
+              <div className="delete-van-container">
+                <h2>Delete Van</h2>
+                <div className="delete-van">
+                  <h4>{selectedVan.name}</h4>
+                  <p>Are you sure you want to delete this van?</p>
+                  <button onClick={handleDeleteVan} className="btn">
+                    Yes
+                  </button>
+                  <button onClick={() => setMode("list")} className="btn">
+                    No
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="add-employee">
-            <AddEmployee employees={employees} vans={vans} />
-          </div>
-          <div className="add-van">
-            <AddVan />
+          <div className="left-container">
+            <VansForm onVanAdded={handleVanAdded} />
           </div>
         </div>
       </div>
@@ -315,4 +309,4 @@ function Vans() {
   );
 }
 
-export default Vans;
+export default Students;
