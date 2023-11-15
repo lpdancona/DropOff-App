@@ -5595,10 +5595,10 @@ expo-updates@~0.18.17:
     fbemitter "^3.0.0"
     resolve-from "^5.0.0"
 
-expo@^49.0.0:
-  version "49.0.16"
-  resolved "https://registry.yarnpkg.com/expo/-/expo-49.0.16.tgz#60399f25f141d649707cef928b90305057000923"
-  integrity sha512-1TcpWUEpzCQ7FjtwO1j+l/UvNgrEDZWfQm4kOo9eVZVDNKavYo+KL4XXHeljSAOOGhI/plmpD3bvhfYoywOAFQ==
+expo@^49.0.17:
+  version "49.0.17"
+  resolved "https://registry.yarnpkg.com/expo/-/expo-49.0.17.tgz#10d40e60aed410a2f36e549a641d7c3afe864c69"
+  integrity sha512-NZRvA7tqbAM2ZSAaXYVl1tuODLA5GfxY6+IJk23kcWdRclfG2Djc65pgCqJoAchyncKYfqEQDzuAw1q8fOncdQ==
   dependencies:
     "@babel/runtime" "^7.20.0"
     "@expo/cli" "0.10.14"

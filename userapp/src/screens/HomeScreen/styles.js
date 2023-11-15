@@ -2,8 +2,8 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   mapContainer: {
-    //top:50,
-    backgroundColor: "lightblue",
+    paddingTop: 15,
+    backgroundColor: "#FF7276",
     flex: 1,
     position: "relative",
   },
@@ -19,7 +19,7 @@ export default StyleSheet.create({
   },
   routeDetailsText: {
     fontSize: 20,
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
   deliveryDetailsContainer: {
     paddingHorizontal: 20,
@@ -111,26 +111,43 @@ export default StyleSheet.create({
     position: "absolute",
     top: 20,
     left: 20,
-    backgroundColor: "blue",
+    backgroundColor: "#FF7276",
     borderRadius: 50,
     padding: 10,
     alignItems: "center",
     justifyContent: "center",
   },
   modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    //position: "absolute",
+    paddingVertical: 48,
+    paddingHorizontal: 0,
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
   },
   modalContent: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "gray",
-    //position: "absolute",
+    padding: 16,
+    flexDirection: "column",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "#e3e3e3",
+  },
+  profileName: {
+    marginTop: 12,
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#090909",
+  },
+  profileEmail: {
+    marginTop: 6,
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#848484",
+  },
+  staffNumber: {
+    marginTop: 6,
+    fontSize: 16,
   },
   closeButton: {
     marginTop: 10,
@@ -143,5 +160,47 @@ export default StyleSheet.create({
     color: "white", // Text color
     fontSize: 16,
     fontWeight: "bold",
+  },
+  driverContainer: {
+    paddingVertical: 5,
+    paddingHorizontal: 50,
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+  },
+  profile: {
+    padding: 12,
+    gap: 0,
+    backgroundColor: "#f6f6f6",
+    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  profileAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 9999,
+    marginRight: 12,
+  },
+  profileName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#292929",
+  },
+  profileHandle: {
+    marginTop: 2,
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#858585",
+  },
+  helperDsc: {
+    marginTop: 20,
+  },
+  callBtn: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
   },
 });

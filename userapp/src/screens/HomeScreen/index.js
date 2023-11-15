@@ -9,6 +9,7 @@ import {
   Linking,
   Pressable,
   Modal,
+  SafeAreaView,
 } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Appbar, Menu } from "react-native-paper";
@@ -29,6 +30,9 @@ import {
   getUser,
 } from "../../graphql/queries";
 import { onUpdateRoute } from "../../graphql/subscriptions";
+import gbIcon from "../../docs/gb-logo.svg";
+import houseIcon from "../../docs/icon-house.png";
+import vanIcon from "../../docs/van.png";
 
 const HomeScreen = () => {
   const { kids, dbUser, currentUserData, userEmail } = useAuthContext();
@@ -329,9 +333,10 @@ const HomeScreen = () => {
           }}
           title={"Gracie Barra Bus"}
           description={currentRouteData?.Van?.name}
+          icon={vanIcon}
         >
           <View style={{ padding: 5 }}>
-            <FontAwesome name="bus" size={30} color="green" />
+            <Image source={vanIcon} style={{ width: 40, height: 40 }} />
           </View>
         </Marker>
         <Marker
@@ -344,7 +349,7 @@ const HomeScreen = () => {
           description={dropOffAddress}
         >
           <View style={{ padding: 5 }}>
-            <FontAwesome5 name="home" size={30} color="red" />
+            <Image source={houseIcon} style={{ width: 40, height: 40 }} />
           </View>
         </Marker>
       </MapView>
@@ -359,16 +364,11 @@ const HomeScreen = () => {
             {" "}
             ETA {timeArrival} - {totalMinutes.toFixed(0)} min
           </Text>
-          <FontAwesome5
-            name="bus"
-            size={30}
-            color="#3fc060"
-            style={{ marginHorizontal: 10 }}
-          />
+          <Image source={vanIcon} style={{ width: 40, height: 40 }} />
           <Text style={styles.routeDetailsText}>{totalKm.toFixed(2)} Km</Text>
         </View>
         <View style={{ padding: 5, marginBottom: 1, flex: 1 }}>
-          <Text style={{ textAlign: "center" }}>
+          <Text style={{ textAlign: "center", fontSize: 15 }}>
             Kids on the Route ({currentRouteData?.Van?.name} -{" "}
             {currentRouteData?.Van?.model})
           </Text>
@@ -394,50 +394,49 @@ const HomeScreen = () => {
               }}
               ListFooterComponent={() => (
                 <View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      marginLeft: 20,
-                      position: "absolute",
-                    }}
-                  >
-                    <Text style={{ marginRight: 20 }}>
-                      Driver: {driver?.name}
-                    </Text>
-                    {helper && <Text>Helper: {helper?.name} </Text>}
-                  </View>
                   <View style={styles.container}>
                     <Pressable
                       onPress={(e) => {
                         setSelectedItem(driver);
                       }}
                     >
-                      <Image
-                        source={{ uri: driver?.photo }}
-                        resizeMethod="scale"
-                        resizeMode="contain"
-                        style={styles.imageDriver}
-                      />
+                      <View style={styles.driverContainer}>
+                        <View style={styles.profile}>
+                          <Image
+                            source={{ uri: driver?.photo }}
+                            resizeMethod="scale"
+                            resizeMode="contain"
+                            style={styles.profileAvatar}
+                          />
+                          <View style={styles.profileBody}>
+                            <Text style={styles.profileName}>
+                              {driver?.name}
+                            </Text>
+
+                            <Text style={styles.profileHandle}>Driver</Text>
+                          </View>
+                        </View>
+                      </View>
+                      {helper && (
+                        <View style={styles.driverContainer}>
+                          <View style={styles.profile}>
+                            <Image
+                              source={{ uri: helper?.photo }}
+                              resizeMethod="scale"
+                              resizeMode="contain"
+                              style={styles.profileAvatar}
+                            />
+                            <View style={styles.profileBody}>
+                              <Text style={styles.profileName}>
+                                {helper?.name}
+                              </Text>
+
+                              <Text style={styles.profileHandle}>Helper</Text>
+                            </View>
+                          </View>
+                        </View>
+                      )}
                     </Pressable>
-                    {helper && (
-                      <Pressable
-                        onPress={(e) => {
-                          setSelectedItem(helper);
-                        }}
-                      >
-                        <Image
-                          //source={{ uri: helper?.photo }}
-                          source={
-                            helper?.photo
-                              ? { uri: helper.photo }
-                              : { uri: "https://i.imgur.com/5gc6290.jpg" }
-                          }
-                          style={styles.imageHelper}
-                          resizeMethod="scale"
-                          resizeMode="contain"
-                        />
-                      </Pressable>
-                    )}
                   </View>
                   <View style={{ alignItems: "center", marginTop: 1 }}>
                     <TouchableOpacity
@@ -456,14 +455,17 @@ const HomeScreen = () => {
                           .catch((error) => console.error(error));
                       }}
                       style={{
-                        backgroundColor: "green",
+                        backgroundColor: "#FF7276",
                         padding: 10,
                         borderRadius: 10,
                       }}
                     >
-                      <Text style={{ color: "white", fontSize: 20 }}>
-                        Call Us
-                      </Text>
+                      <View style={styles.callBtn}>
+                        <Text style={{ color: "white", fontSize: 20 }}>
+                          Call Us{" "}
+                        </Text>
+                        <MaterialIcons name="call" size={24} color="white" />
+                      </View>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -477,26 +479,64 @@ const HomeScreen = () => {
                 setSelectedItem(null);
               }}
             >
-              <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                  {selectedItem && (
-                    <View>
-                      <Text>{selectedItem.name}</Text>
-                      <Text>{selectedItem.phoneNumber}</Text>
-                      <Text>{selectedItem.email}</Text>
-                      <Text>{selectedItem.userType}</Text>
-                      <Pressable
-                        onPress={() => {
-                          setSelectedItem(null); // Close the popup when pressed
-                        }}
-                        style={styles.closeButton}
-                      >
-                        <Text style={styles.closeButtonText}>Close</Text>
-                      </Pressable>
-                    </View>
-                  )}
+              <SafeAreaView style={{ flex: 1, backgroundColor: "#f6f6f6" }}>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    {selectedItem && (
+                      <View>
+                        <Image
+                          source={
+                            driver?.photo
+                              ? { uri: driver.photo }
+                              : { uri: "https://i.imgur.com/5gc6290.jpg" }
+                          }
+                          style={styles.profileAvatar}
+                        />
+                        <Text style={styles.profileName}>
+                          {selectedItem.name}
+                        </Text>
+                        <Text>{selectedItem.userType}</Text>
+                        <Text style={styles.staffNumber}>
+                          {selectedItem.phoneNumber}
+                        </Text>
+                        <Text style={styles.profileEmail}>
+                          {selectedItem.email}
+                        </Text>
+                        {helper && (
+                          <View style={styles.helperDsc}>
+                            <Image
+                              source={
+                                helper?.photo
+                                  ? { uri: helper.photo }
+                                  : { uri: "https://i.imgur.com/5gc6290.jpg" }
+                              }
+                              style={styles.profileAvatar}
+                            />
+                            <Text style={styles.profileName}>
+                              {helper.name}
+                            </Text>
+                            <Text>{helper.userType}</Text>
+                            <Text style={styles.staffNumber}>
+                              {helper.phoneNumber}
+                            </Text>
+                            <Text style={styles.profileEmail}>
+                              {helper.email}
+                            </Text>
+                          </View>
+                        )}
+                        <Pressable
+                          onPress={() => {
+                            setSelectedItem(null); // Close the popup when pressed
+                          }}
+                          style={styles.closeButton}
+                        >
+                          <Text style={styles.closeButtonText}>Close</Text>
+                        </Pressable>
+                      </View>
+                    )}
+                  </View>
                 </View>
-              </View>
+              </SafeAreaView>
             </Modal>
           </View>
         </View>
