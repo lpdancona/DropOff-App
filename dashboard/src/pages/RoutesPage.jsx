@@ -1,104 +1,80 @@
-import "./RoutesPage.css";
+// RoutesPage.js
+
 import React, { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faUserXmark,
-  faArrowUpRightFromSquare,
-} from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
 import { API, graphqlOperation } from "aws-amplify";
-import { getRoute, listRoutes, listVans, getVan } from "../graphql/queries";
+import { listVans, getVan, listKids } from "../graphql/queries";
+
+import "./RoutesPage.css";
 
 function RoutesPages() {
-  const [routesData, setRoutesData] = useState([]);
   const [vans, setVans] = useState([]);
-  const [selectedVanName, setSelectedVanName] = useState("");
-  const [selectedVan, setSelectedVan] = useState(null);
+  const [allKids, setAllKids] = useState([]);
 
   useEffect(() => {
-    // Fetch the list of vans using the GraphQL query
-    const fetchVans = async () => {
+    const fetchData = async () => {
       try {
-        const response = await API.graphql(
+        const vansResponse = await API.graphql(
           graphqlOperation(listVans, { limit: 100 })
         );
-        const vansData = response.data.listVans.items;
+        const vansData = vansResponse.data.listVans.items;
         setVans(vansData);
+
+        const kidsResponse = await API.graphql({
+          query: listKids,
+          variables: {
+            filter: { vanID: { ne: null } },
+          },
+        });
+        const kidsData = kidsResponse.data.listKids.items;
+        setAllKids(kidsData);
       } catch (error) {
-        console.error("Error fetching vans:", error);
+        console.error("Error fetching data:", error);
       }
     };
-    fetchVans();
+
+    fetchData();
   }, []);
 
-  async function getVanById(vanId) {
-    try {
-      const response = await API.graphql({
-        query: getVan,
-        variables: { id: vanId },
-      });
-      const vanData = response.data.getVan;
-
-      return vanData;
-    } catch (error) {
-      console.error("Error fetching van:", error);
-      throw error;
-    }
-  }
-
-  const handleVanModelSelect = async (e) => {
-    const name = e.target.value;
-    setSelectedVanName(name);
-
-    // Find the first van with the selected model
-    const selectedVanData = vans.find((van) => van && van.name === name);
-
-    if (selectedVanData) {
-      const vanDetails = await getVanById(selectedVanData.id);
-      setSelectedVan(vanDetails);
-    } else {
-      setSelectedVan(null);
-    }
-  };
-
   return (
-    <div className="home">
-      <div className="home-container"></div>
-      <div className="vans-container">
-        <div className="vans">
-          <h2>Routes </h2>
-          <label>Select vehicle to change/make route: </label>
-          <select
-            value={selectedVanName}
-            onChange={handleVanModelSelect}
-            className="model-select"
-          >
-            <option value="">Select a vehicle</option>
-            {vans.map((van) => (
-              <option key={van.id} value={van.name}>
-                {van && van.name ? van.name : "Unknown Model"} - {van.model}
-              </option>
+    <div className="routes-container">
+      <div className="kids-list">
+        <h2>Kids to Drop-off</h2>
+        <div className="kids">
+          {allKids
+            .filter((kid) => !kid.vanID)
+            .map((kid) => (
+              <div key={kid.id} className="kid-item">
+                <div className="kid-name">{kid.name}</div>
+                <div className="drop-off-address">{kid.dropOffAddress}</div>
+              </div>
             ))}
-          </select>
+        </div>
+      </div>
 
-          {selectedVan && (
-            <div className="selected-van-info">
-              <div className="share-van">
-                <h3>
-                  Selected Van: {selectedVan.name} - {selectedVan.model}
-                </h3>{" "}
-                <Link
-                  to={`/routes/${selectedVan.id}`}
-                  className="view-details-button"
-                >
-                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-                </Link>
+      <div className="vans-list">
+        <h2>All Vans</h2>
+        <div className="vans">
+          {vans.map((van) => (
+            <div key={van.id} className="van-item">
+              <h3>{van.name}</h3>
+              <div className="kids-in-van">
+                {allKids
+                  .filter((kid) => kid.vanID === van.id)
+                  .map((kid) => (
+                    <div key={kid.id} className="kid-item">
+                      <div className="kid-name">{kid.name}</div>
+                      <div className="drop-off-address">
+                        {kid.dropOffAddress}
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
-          )}
+          ))}
         </div>
       </div>
     </div>
   );
 }
+
 export default RoutesPages;
