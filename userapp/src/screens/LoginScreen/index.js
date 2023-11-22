@@ -15,6 +15,7 @@ import {
   useAuthenticator,
 } from "@aws-amplify/ui-react-native";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const LoginScreen = () => {
   const { user } = useAuthenticator();
@@ -53,33 +54,35 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Email:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setEmail(text)}
-        value={email}
-        placeholder="Enter your email"
-        keyboardType="email-address"
-      />
-      <Text style={styles.label}>Password:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setPassword(text)}
-        value={password}
-        placeholder="Enter your password"
-        secureTextEntry={true}
-      />
-      <View style={styles.rememberMeContainer}>
-        <Checkbox
-          value={rememberMe}
-          onValueChange={() => setRememberMe(!rememberMe)}
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#e8ecf4" }}>
+      <View style={styles.container}>
+        <Text style={styles.label}>Email:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => setEmail(text)}
+          value={email}
+          placeholder="Enter your email"
+          keyboardType="email-address"
         />
-        <Text style={styles.rememberMeLabel}>Remember Me</Text>
+        <Text style={styles.label}>Password:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => setPassword(text)}
+          value={password}
+          placeholder="Enter your password"
+          secureTextEntry={true}
+        />
+        <View style={styles.rememberMeContainer}>
+          <Checkbox
+            value={rememberMe}
+            onValueChange={() => setRememberMe(!rememberMe)}
+          />
+          <Text style={styles.rememberMeLabel}>Remember Me</Text>
+        </View>
+        <Button title="Login" onPress={handleLogin} />
+        <SignOutButton />
       </View>
-      <Button title="Login" onPress={handleLogin} />
-      <SignOutButton />
-    </View>
+    </SafeAreaView>
   );
 };
 

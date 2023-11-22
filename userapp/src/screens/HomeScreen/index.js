@@ -53,7 +53,8 @@ const HomeScreen = () => {
   const [helper, setHelper] = useState(null);
   const [strokeWidth, setStrokeWidth] = useState(1);
   const [strokeColor, setStrokeColor] = useState("rgba(0, 0, 0, 0)");
-
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
 
@@ -164,7 +165,18 @@ const HomeScreen = () => {
       await Auth.signOut();
     } catch (error) {
       console.error("Logout error:", error);
+    } finally {
+      setDropdownVisible(false);
+      setLogoutModalVisible(false);
     }
+  };
+  const toggleDropdown = () => {
+    setDropdownVisible(!isDropdownVisible);
+    setLogoutModalVisible(false);
+  };
+  const toggleLogoutModal = () => {
+    setLogoutModalVisible(!isLogoutModalVisible);
+    setDropdownVisible(false);
   };
 
   const handleGoBack = () => {
@@ -271,21 +283,29 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.mapContainer}>
-      <Menu
-        visible={menuVisible}
-        onDismiss={closeMenu}
-        anchor={
-          <Appbar.Action
-            icon="menu"
-            onPress={openMenu}
-            style={{ marginTop: 30 }}
-          />
-        }
-      >
-        <Menu.Item onPress={handleLogout} title="Logout" />
-        {/* <Menu.Item onPress={handleGoBack} title="Go Back to Login" /> */}
-      </Menu>
+      <View style={styles.containerMenu}>
+        <View style={styles.logoutMenu}>
+          <Pressable onPress={toggleDropdown}>
+            <MaterialIcons name="menu" size={30} color="white" />
+          </Pressable>
+        </View>
 
+        {isDropdownVisible && (
+          <View style={styles.modalContainer}>
+            <Pressable onPress={toggleLogoutModal}>
+              <MaterialIcons name="logout" size={30} color="white" />
+            </Pressable>
+          </View>
+        )}
+
+        {isLogoutModalVisible && (
+          <View style={styles.logoutModalContainer}>
+            <Pressable onPress={handleLogout}>
+              <MaterialIcons name="logout" size={30} color="white" />
+            </Pressable>
+          </View>
+        )}
+      </View>
       <MapView
         ref={mapRef}
         //provider={MapView.PROVIDER_GOOGLE}

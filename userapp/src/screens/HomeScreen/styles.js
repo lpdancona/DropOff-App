@@ -7,9 +7,31 @@ export default StyleSheet.create({
     flex: 1,
     position: "relative",
   },
+  containerMenu: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    backgroundColor: "#FF7276",
+    padding: 20,
+    maxHeight: "25%",
+    gap: "100%",
+  },
+  logoutMenu: {
+    marginLeft: 15,
+    marginTop: 20,
+    marginRight: "50%",
+  },
+  logoutModalContainer: {
+    marginTop: 40,
+  },
+  modalContainer: {
+    marginTop: 40,
+  },
+
   handleIndicator: {
     backgroundColor: "grey",
     width: 100,
+    color: "#FF7276",
   },
   handleIndicatorContainer: {
     flexDirection: "row",
