@@ -2,89 +2,94 @@
 
 import React, { useEffect, useState } from "react";
 import { API, graphqlOperation } from "aws-amplify";
-import { listVans, getVan, listKids } from "../graphql/queries";
+import { listVans, listKids } from "../graphql/queries";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 import "./RoutesPage.css";
 
 function RoutesPages() {
   const [vans, setVans] = useState([]);
-  const [allKids, setAllKids] = useState([]);
+  //const [allKids, setAllKids] = useState([]);
   const [kidsOnVan, setKidsOnVan] = useState([]);
+  const [kidsWithoutVan, setKidsWithoutVan] = useState([]);
 
   function handleOnDragKidBoxEnd(result) {
-    // console.log("drag drops event", result);
-    // console.log("destination", result.destination);
-
     if (!result.destination) return;
-    const newOrder = Array.from(allKids);
+    const newOrder = Array.from(kidsWithoutVan);
     const [draggedItem] = newOrder.splice(result.source.index, 1);
-    console.log(draggedItem);
     newOrder.splice(result.destination.index, 0, draggedItem);
-    setAllKids(newOrder);
+    setKidsWithoutVan(newOrder);
   }
 
   function handleOnDragVanBoxEnd(result) {
-    // console.log("drag drops event", result);
-    // console.log("destination", result.destination);
-
     if (!result.destination) return;
     const newOrder = Array.from(kidsOnVan);
     const [draggedItem] = newOrder.splice(result.source.index, 1);
-    console.log(draggedItem);
     newOrder.splice(result.destination.index, 0, draggedItem);
     setKidsOnVan(newOrder);
   }
 
-  useEffect(() => {
-    const fetchVansData = async () => {
-      try {
-        const vansResponse = await API.graphql(
-          graphqlOperation(listVans, { limit: 100 })
-        );
-        const vansData = vansResponse.data.listVans.items;
-        setVans(vansData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  const fetchVansData = async () => {
+    try {
+      const vansResponse = await API.graphql(
+        graphqlOperation(listVans, { limit: 100 })
+      );
+      const vansData = vansResponse.data.listVans.items;
+      setVans(vansData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
-    const fetchKidsWithoutVan = async () => {
-      try {
-        const variables = {
-          filter: { vanID: { eq: "" } },
-        };
-        const kidsWithoutVan = await API.graphql({
-          query: listKids,
-          variables: variables,
-        });
-        const kidsData = kidsWithoutVan.data.listKids.items;
-        console.log("kidsData without van", kidsData);
-        setAllKids(kidsData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  const fetchKidsWithoutVan = async () => {
+    try {
+      const variables = {
+        filter: { vanID: { attributeExists: false } },
+      };
+      const kidsWithoutVanResponse = await API.graphql({
+        query: listKids,
+        variables: variables,
+      });
+      const kidsWithoutVanData = kidsWithoutVanResponse.data.listKids.items;
+      setKidsWithoutVan(kidsWithoutVanData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
-    const fetchKidsInVan = async () => {
-      try {
+  const fetchKidsInVans = async () => {
+    try {
+      const vansResponse = await API.graphql(
+        graphqlOperation(listVans, { limit: 100 })
+      );
+      const vansData = vansResponse.data.listVans.items;
+
+      for (const van of vansData) {
         const variables = {
-          filter: { vanID: { ne: "" } },
+          filter: { vanID: { eq: van.id } },
         };
+
         const kidsInVan = await API.graphql({
           query: listKids,
           variables: variables,
         });
+
         const kidsData = kidsInVan.data.listKids.items;
-        console.log("kidsData with van", kidsData);
-        setKidsOnVan(kidsData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+        setKidsOnVan((prevKids) => ({ ...prevKids, [van.id]: kidsData }));
       }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchVansAndKids = async () => {
+      await fetchVansData();
+      await fetchKidsWithoutVan();
+      await fetchKidsInVans();
     };
-    fetchVansData();
-    fetchKidsWithoutVan();
-    fetchKidsInVan();
+
+    fetchVansAndKids();
   }, []);
 
   return (
@@ -99,30 +104,29 @@ function RoutesPages() {
                 {...provided.droppableProps}
                 className="kids"
               >
-                {allKids
-                  //.filter((kid) => !kid.vanID)
-                  .map((kid, index) => (
-                    <Draggable
-                      key={kid.id}
-                      draggableId={kid.id.toString()}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          key={kid.id}
-                          className="kid-item"
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          <div className="kid-name">{kid.name}</div>
-                          <div className="drop-off-address">
-                            {kid.dropOffAddress}
-                          </div>
+                {kidsWithoutVan.map((kid, index) => (
+                  <Draggable
+                    key={kid.id}
+                    draggableId={kid.id.toString()}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        key={kid.id}
+                        className="kid-item"
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <div className="kid-name">{kid.name}</div>
+                        <div className="drop-off-address">
+                          {kid.dropOffAddress}
                         </div>
-                      )}
-                    </Draggable>
-                  ))}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
               </div>
             )}
           </Droppable>
@@ -142,16 +146,14 @@ function RoutesPages() {
                   <div key={van.id} className="van-item">
                     <h3>{van.name}</h3>
                     <div className="kids-in-van">
-                      {kidsOnVan
-                        //.filter((kid) => kid.vanID === van.id)
-                        .map((kid) => (
-                          <div key={kid.id} className="kid-item">
-                            <div className="kid-name">{kid.name}</div>
-                            <div className="drop-off-address">
-                              {kid.dropOffAddress}
-                            </div>
+                      {kidsOnVan[van.id]?.map((kid) => (
+                        <div key={kid.id} className="kid-item">
+                          <div className="kid-name">{kid.name}</div>
+                          <div className="drop-off-address">
+                            {kid.dropOffAddress}
                           </div>
-                        ))}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ))}
