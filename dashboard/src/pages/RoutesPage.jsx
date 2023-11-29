@@ -9,24 +9,53 @@ import "./RoutesPage.css";
 
 function RoutesPages() {
   const [vans, setVans] = useState([]);
-  //const [allKids, setAllKids] = useState([]);
-  const [kidsOnVan, setKidsOnVan] = useState([]);
+  const [kidsOnVan, setKidsOnVan] = useState({});
   const [kidsWithoutVan, setKidsWithoutVan] = useState([]);
 
   function handleOnDragKidBoxEnd(result) {
     if (!result.destination) return;
+
     const newOrder = Array.from(kidsWithoutVan);
     const [draggedItem] = newOrder.splice(result.source.index, 1);
     newOrder.splice(result.destination.index, 0, draggedItem);
     setKidsWithoutVan(newOrder);
   }
 
+  function moveKidToVan(kidId, destinationVanId) {
+    // Update the backend or state to set the vanID for the kid to the destination van
+    // You may need to update the API or use a mutation to update the vanID for the kid.
+    // Also, update the state with the new order for the destination van.
+    setKidsOnVan((prevKids) => {
+      const newOrder = Array.from(prevKids[destinationVanId] || []);
+      newOrder.push(kidsWithoutVan.find((kid) => kid.id === kidId));
+      return {
+        ...prevKids,
+        [destinationVanId]: newOrder,
+      };
+    });
+  }
+
   function handleOnDragVanBoxEnd(result) {
     if (!result.destination) return;
-    const newOrder = Array.from(kidsOnVan);
+
+    const sourceVanId = result.source.droppableId.replace("van-", "");
+    const destinationVanId = result.destination.droppableId.replace("van-", "");
+
+    // Check if the kid is moved to a different van
+    if (sourceVanId !== destinationVanId) {
+      const kidId = kidsOnVan[sourceVanId][result.source.index].id;
+      moveKidToVan(kidId, destinationVanId);
+    }
+
+    const newOrder = Array.from(kidsOnVan[sourceVanId]);
     const [draggedItem] = newOrder.splice(result.source.index, 1);
     newOrder.splice(result.destination.index, 0, draggedItem);
-    setKidsOnVan(newOrder);
+
+    // Update the state with the new order
+    setKidsOnVan((prevKids) => ({
+      ...prevKids,
+      [sourceVanId]: newOrder,
+    }));
   }
 
   const fetchVansData = async () => {
@@ -143,19 +172,45 @@ function RoutesPages() {
                 {...provided.droppableProps}
               >
                 {vans.map((van) => (
-                  <div key={van.id} className="van-item">
-                    <h3>{van.name}</h3>
-                    <div className="kids-in-van">
-                      {kidsOnVan[van.id]?.map((kid) => (
-                        <div key={kid.id} className="kid-item">
-                          <div className="kid-name">{kid.name}</div>
-                          <div className="drop-off-address">
-                            {kid.dropOffAddress}
-                          </div>
+                  <Droppable
+                    key={van.id}
+                    droppableId={`van-${van.id}`}
+                    type="kid"
+                  >
+                    {(provided) => (
+                      <div
+                        className="van-item"
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                      >
+                        <h3>{van.name}</h3>
+                        <div className="kids-in-van">
+                          {kidsOnVan[van.id]?.map((kid, index) => (
+                            <Draggable
+                              key={kid?.id}
+                              draggableId={(kid?.id || index).toString()}
+                              index={index}
+                            >
+                              {(provided) => (
+                                <div
+                                  key={kid?.id}
+                                  className="kid-item"
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <div className="kid-name">{kid?.name}</div>
+                                  <div className="drop-off-address">
+                                    {kid?.dropOffAddress}
+                                  </div>
+                                </div>
+                              )}
+                            </Draggable>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                      </div>
+                    )}
+                  </Droppable>
                 ))}
               </div>
             )}

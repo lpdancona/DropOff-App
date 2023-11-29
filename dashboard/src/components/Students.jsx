@@ -61,10 +61,10 @@ function Students() {
   const filteredStudents = students.filter((student) => {
     return (
       (nameFilter === "" ||
-        student.name.toLowerCase().includes(nameFilter.toLowerCase())) &&
+        student.name?.toLowerCase().includes(nameFilter.toLowerCase())) &&
       (addressFilter === "" ||
         student.dropOffAddress
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(addressFilter.toLowerCase()))
     );
   });
