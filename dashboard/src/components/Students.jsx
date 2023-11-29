@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { API } from "aws-amplify";
 import { updateKid, deleteKid } from "../graphql/mutations";
 import { listKids } from "../graphql/queries";
@@ -12,6 +12,7 @@ import {
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "antd";
+import GoogleMapsAutocomplete from "./GoogleMapsAutocomplete";
 
 function Students() {
   const [students, setStudents] = useState([]);
@@ -27,6 +28,10 @@ function Students() {
   const [updatedParent1Email, setUpdatedParent1Email] = useState("");
   const [updatedPhoto, setUpdatedPhoto] = useState("");
   const studentsPerPage = 4;
+  const [updatedDropOffAddress, setUpdatedDropOffAddress] = useState("");
+  const [updatedLat, setUpdatedLat] = useState("");
+  const [updatedLng, setUpdatedLng] = useState("");
+  const updateAutoCompleteRef = useRef();
 
   const fetchKids = async () => {
     try {
@@ -118,6 +123,7 @@ function Students() {
     if (!selectedStudent) {
       return;
     }
+    console.log(selectedStudent);
     const nameUpdated = selectedStudent.name;
     try {
       await API.graphql({
@@ -129,8 +135,8 @@ function Students() {
             parent1Email: updatedParent1Email,
             parent2Email: updatedParent2Email,
             dropOffAddress: updatedAddress,
-            lat: selectedStudent.lat,
-            lng: selectedStudent.lng,
+            lat: updatedLat,
+            lng: updatedLng,
             birthDate: updatedAge,
             photo: updatedPhoto,
             vans: selectedStudent.vans,
@@ -171,6 +177,14 @@ function Students() {
     setSelectedStudent(null);
     setMode("list");
   };
+
+  const handleUpdateAddressSelect = (selectedPlace) => {
+    //console.log("selectd Place", selectedPlace);
+    setUpdatedDropOffAddress(selectedPlace.formatted_address);
+    setUpdatedLat(selectedPlace.geometry.location.lat());
+    setUpdatedLng(selectedPlace.geometry.location.lng());
+  };
+
   return (
     <div className="home-main">
       <div className="home">
@@ -259,11 +273,16 @@ function Students() {
                       onChange={(e) => setUpdatedPhoto(e.target.value)}
                     />
                     <label>Address:</label>
-                    <input
+                    <GoogleMapsAutocomplete
+                      onPlaceSelect={handleUpdateAddressSelect}
+                      ref={updateAutoCompleteRef}
+                      defaultValue={updatedAddress}
+                    />
+                    {/* <input
                       type="text"
                       value={updatedAddress}
                       onChange={(e) => setUpdatedAddress(e.target.value)}
-                    />
+                    /> */}
                     <label>Age:</label>
                     <input
                       type="text"
