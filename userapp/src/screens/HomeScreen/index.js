@@ -318,13 +318,6 @@ const HomeScreen = () => {
             <Pressable onPress={handleLogout}>
               <MaterialIcons name="logout" size={30} color="white" />
             </Pressable>
-
-            <Pressable
-              title="Go to wait"
-              onPress={() => navigation.navigate("Wait")}
-            >
-              <Text>Wait</Text>
-            </Pressable>
           </View>
         )}
       </View>
