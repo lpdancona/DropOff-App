@@ -57,6 +57,15 @@ const HomeScreen = () => {
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(true); // Add a new state variable for loading
+  const [noKidsAvailable, setNoKidsAvailable] = useState(false);
+
+  const LoadingScreen = () => (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator size="large" />
+      <Text>Loading...</Text>
+    </View>
+  );
 
   const getRoutesData = async () => {
     try {
@@ -76,7 +85,7 @@ const HomeScreen = () => {
         alert(
           "Hi there, there is no route in progress now! come back later or contact us for more information!"
         );
-        await handleLogout();
+        await navigation.navigate("Wait");
       }
 
       // Fetch kids data for each route
@@ -140,6 +149,7 @@ const HomeScreen = () => {
       }
       return false;
     }
+    setNoKidsAvailable(true);
     return false;
   };
 
@@ -194,6 +204,7 @@ const HomeScreen = () => {
     if (dbUser && userEmail) {
       const fetchInitialData = async () => {
         await getRoutesData();
+        setIsLoading(false); // Set loading to false after data is fetched
       };
       fetchInitialData();
     }
@@ -203,10 +214,12 @@ const HomeScreen = () => {
     if (routesData) {
       // Check kids in routes after fetching initial data
       if (!checkKidsInRoutes()) {
+        setIsLoading(false);
+        setNoKidsAvailable(true);
         alert(
           `We sorry but, your child ${kids[0].name} is not on any route today!`
         );
-        handleLogout();
+        // handleLogout();
       }
     }
   }, [routesData, kids]);
@@ -280,7 +293,17 @@ const HomeScreen = () => {
   if (!busLocation || !dropOffLatLng) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
-
+  if (isLoading) {
+    // Render the loading screen while data is being fetched
+    return <LoadingScreen />;
+  }
+  if (noKidsAvailable) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>No kids available for today.</Text>
+      </View>
+    );
+  }
   return (
     <View style={styles.mapContainer}>
       <View style={styles.containerMenu}>
@@ -292,16 +315,15 @@ const HomeScreen = () => {
 
         {isDropdownVisible && (
           <View style={styles.modalContainer}>
-            <Pressable onPress={toggleLogoutModal}>
-              <MaterialIcons name="logout" size={30} color="white" />
-            </Pressable>
-          </View>
-        )}
-
-        {isLogoutModalVisible && (
-          <View style={styles.logoutModalContainer}>
             <Pressable onPress={handleLogout}>
               <MaterialIcons name="logout" size={30} color="white" />
+            </Pressable>
+
+            <Pressable
+              title="Go to wait"
+              onPress={() => navigation.navigate("Wait")}
+            >
+              <Text>Wait</Text>
             </Pressable>
           </View>
         )}
@@ -403,7 +425,10 @@ const HomeScreen = () => {
                       padding: 10,
                     }}
                   >
-                    <Text style={{ fontSize: 20 }}> {item.name}</Text>
+                    <Text style={{ fontSize: 20, textAlign: "center" }}>
+                      {" "}
+                      {item.name}
+                    </Text>
                   </View>
                 </View>
               )}

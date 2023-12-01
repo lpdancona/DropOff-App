@@ -9,6 +9,7 @@ import LoginScreen from "../screens/LoginScreen";
 import { useAuthContext } from "../contexts/AuthContext";
 //import { useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
+import WaitingScreen from "../screens/WaitingScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,7 @@ const RootNavigator = () => {
         name='Login' 
         component={LoginScreen}
       /> */}
+      <Stack.Screen name="Wait" component={WaitingScreen} />
     </Stack.Navigator>
   );
 };

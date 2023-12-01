@@ -21,9 +21,6 @@ export default StyleSheet.create({
     marginTop: 20,
     marginRight: "50%",
   },
-  logoutModalContainer: {
-    marginTop: 40,
-  },
   modalContainer: {
     marginTop: 40,
   },
