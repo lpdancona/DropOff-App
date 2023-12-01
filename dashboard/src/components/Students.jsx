@@ -219,8 +219,8 @@ function Students() {
                       </div>
                       <div className="student-details-btn">
                         <button
-                          onClick={() => handleStudentClick(student)}
                           className="btn btn-student-edit"
+                          onClick={() => handleStudentClick(student)}
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>
