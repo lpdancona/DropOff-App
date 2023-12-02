@@ -219,13 +219,13 @@ function Students() {
                       </div>
                       <div className="student-details-btn">
                         <button
-                          className="btn btn-student-edit"
+                          className="btn-student btn-student-edit"
                           onClick={() => handleStudentClick(student)}
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>
                         <button
-                          className="btn btn-student-delete"
+                          className="btn-student btn-student-delete"
                           onClick={() => {
                             handleDeleteClick(student);
                           }}
@@ -240,14 +240,14 @@ function Students() {
                   <button
                     onClick={handlePrevPage}
                     disabled={currentPage === 1}
-                    className="btn"
+                    className="btn-student"
                   >
                     <FontAwesomeIcon icon={faArrowLeft} beat />
                   </button>
                   <button
                     onClick={handleNextPage}
                     disabled={endIndex >= filteredStudents.length}
-                    className="btn"
+                    className="btn-student"
                   >
                     <FontAwesomeIcon icon={faArrowRight} beat />
                   </button>
@@ -301,10 +301,13 @@ function Students() {
                       value={updatedParent2Email || ""}
                       onChange={(e) => setUpdatedParent2Email(e.target.value)}
                     />
-                    <button onClick={handleUpdateStudent} className="btn">
+                    <button
+                      onClick={handleUpdateStudent}
+                      className="btn-student"
+                    >
                       Update Student
                     </button>
-                    <button onClick={handleBackToList} className="btn">
+                    <button onClick={handleBackToList} className="btn-student">
                       Back to List
                     </button>
                   </Card>
@@ -317,10 +320,13 @@ function Students() {
                 <div className="delete-student">
                   <h4>{selectedStudent.name}</h4>
                   <p>Are you sure you want to delete this student?</p>
-                  <button onClick={handleDeleteStudent} className="btn">
+                  <button onClick={handleDeleteStudent} className="btn-student">
                     Yes
                   </button>
-                  <button onClick={() => setMode("list")} className="btn">
+                  <button
+                    onClick={() => setMode("list")}
+                    className="btn-student"
+                  >
                     No
                   </button>
                 </div>

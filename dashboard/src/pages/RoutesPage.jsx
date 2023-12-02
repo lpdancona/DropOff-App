@@ -22,9 +22,7 @@ function RoutesPages() {
   }
 
   function moveKidToVan(kidId, destinationVanId) {
-    // Update the backend or state to set the vanID for the kid to the destination van
-    // You may need to update the API or use a mutation to update the vanID for the kid.
-    // Also, update the state with the new order for the destination van.
+    console.log(kidsOnVan);
     setKidsOnVan((prevKids) => {
       const newOrder = Array.from(prevKids[destinationVanId] || []);
       newOrder.push(kidsWithoutVan.find((kid) => kid.id === kidId));
@@ -44,6 +42,7 @@ function RoutesPages() {
     // Check if the kid is moved to a different van
     if (sourceVanId !== destinationVanId) {
       const kidId = kidsOnVan[sourceVanId][result.source.index].id;
+      //console.log(kidId);
       moveKidToVan(kidId, destinationVanId);
     }
 
@@ -88,9 +87,7 @@ function RoutesPages() {
 
   const fetchKidsInVans = async () => {
     try {
-      const vansResponse = await API.graphql(
-        graphqlOperation(listVans, { limit: 100 })
-      );
+      const vansResponse = await API.graphql(graphqlOperation(listVans));
       const vansData = vansResponse.data.listVans.items;
 
       for (const van of vansData) {
@@ -117,7 +114,7 @@ function RoutesPages() {
       await fetchKidsWithoutVan();
       await fetchKidsInVans();
     };
-
+    console.log("main fetch");
     fetchVansAndKids();
   }, []);
 
@@ -187,21 +184,21 @@ function RoutesPages() {
                         <div className="kids-in-van">
                           {kidsOnVan[van.id]?.map((kid, index) => (
                             <Draggable
-                              key={kid?.id}
-                              draggableId={(kid?.id || index).toString()}
+                              key={kid.id}
+                              draggableId={(kid.id || index).toString()}
                               index={index}
                             >
                               {(provided) => (
                                 <div
-                                  key={kid?.id}
+                                  key={kid.id}
                                   className="kid-item"
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
                                 >
-                                  <div className="kid-name">{kid?.name}</div>
+                                  <div className="kid-name">{kid.name}</div>
                                   <div className="drop-off-address">
-                                    {kid?.dropOffAddress}
+                                    {kid.dropOffAddress}
                                   </div>
                                 </div>
                               )}
