@@ -11,10 +11,33 @@ export default StyleSheet.create({
   },
   centeredTextWrapper: {
     marginHorizontal: 20, // Adjust the margin as needed
-    marginTop: 20,
+    marginTop: 50,
+    marginBottom: -20,
+    position: "relative",
   },
   centeredText: {
     textAlign: "center",
+    zIndex: 1,
+  },
+  parallelogramContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "flex-end",
+  },
+  parallelogram1: {
+    backgroundColor: "rgb(2, 119, 247)",
+    transform: [{ skewY: "7deg" }],
+    width: "100%",
+    height: 100,
+    marginTop: -160,
+  },
+  parallelogram2: {
+    width: "100%",
+    height: 120,
+    marginTop: -145,
   },
   callBtn: {
     display: "flex",

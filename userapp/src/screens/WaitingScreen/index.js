@@ -17,7 +17,7 @@ const WaitingScreen = () => {
   const funTextStyle: TextStyle = {
     fontSize: 14,
     fontWeight: "bold",
-    color: "black",
+    color: "white",
     textTransform: "uppercase",
     letterSpacing: 2,
   };
@@ -30,15 +30,24 @@ const WaitingScreen = () => {
       />
       <Image
         source={require("../../docs/afterlogo.png")}
-        style={{ height: 200, width: 400, marginTop: -30 }}
+        style={{ height: 200, width: 400, marginTop: -20 }}
       />
       <View style={styles.centeredTextWrapper}>
         <Text style={[funTextStyle, styles.centeredText]}>
-          Hello Family, We don't have a route for your little champ yet. please
-          check back in a moment
+          Hello Family, We don't have a route for your little champ yet. You
+          will be notified when we do
         </Text>
+        <View style={styles.parallelogramContainer}>
+          <View style={styles.parallelogram1}></View>
+          <View style={styles.parallelogram2}></View>
+        </View>
       </View>
-      <Text style={[funTextStyle, { marginTop: "90%", marginBottom: 10 }]}>
+      <Text
+        style={[
+          funTextStyle,
+          { marginTop: "90%", marginBottom: 10, color: "black" },
+        ]}
+      >
         Have Questions? Give us a call
       </Text>
       <View style={{ alignItems: "center", marginTop: 1 }}>
