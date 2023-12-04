@@ -1,3 +1,14 @@
+type WeekDayRoutes @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  date: AWSDate
+  weekDay: String
+  vanID: String
+  kidID: String
+  Order: String
+  kidName: String
+  kidDropOffAddress: String
+}
+
 type Configs @model @auth(rules: [{allow: public}]) {
   id: ID!
   defaultVanPhoto: String

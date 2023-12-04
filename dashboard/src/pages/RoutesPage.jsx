@@ -11,6 +11,7 @@ function RoutesPages() {
   const [vans, setVans] = useState([]);
   const [kidsOnVan, setKidsOnVan] = useState({});
   const [kidsWithoutVan, setKidsWithoutVan] = useState([]);
+  const [selectedDay, setSelectedDay] = useState(new Date());
 
   function handleOnDragKidBoxEnd(result) {
     if (!result.destination) return;

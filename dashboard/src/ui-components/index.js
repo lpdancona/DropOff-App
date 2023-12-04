@@ -17,4 +17,6 @@ export { default as UserCreateForm } from "./UserCreateForm";
 export { default as UserUpdateForm } from "./UserUpdateForm";
 export { default as VanCreateForm } from "./VanCreateForm";
 export { default as VanUpdateForm } from "./VanUpdateForm";
+export { default as WeekDayRoutesCreateForm } from "./WeekDayRoutesCreateForm";
+export { default as WeekDayRoutesUpdateForm } from "./WeekDayRoutesUpdateForm";
 export { default as studioTheme } from "./studioTheme";
