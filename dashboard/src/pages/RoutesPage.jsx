@@ -34,24 +34,75 @@ const RoutesPages = () => {
   //   }
   // };
 
-  const handleOnDragKidBoxEnd = (result) => {
-    console.log("result of handle DragKidBoxEnd", result);
-    if (!result.destination) return;
+  // const handleOnDragKids = (result) => {
+  //   console.log("result of handle DragKidBoxEnd", result);
+  //   if (!result.destination) return;
 
-    const newOrder = Array.from(kidsWithoutVan);
-    const [draggedItem] = newOrder.splice(result.source.index, 1);
-    newOrder.splice(result.destination.index, 0, draggedItem);
-    setKidsWithoutVan(newOrder);
-  };
+  //   const newOrder = Array.from(kidsWithoutVan);
+  //   const [draggedItem] = newOrder.splice(result.source.index, 1);
+  //   newOrder.splice(result.destination.index, 0, draggedItem);
+  //   setKidsWithoutVan(newOrder);
+  // };
 
-  const handleOnDragVanBoxEnd = (result) => {
-    console.log("result of handle DragVanBoxEnd", result);
-    if (!result.destination) return;
+  const handleOnDragEnd = (result) => {
+    const moveKidsToVans = (kidId, source, destinationVanId) => {
+      setKidsWithoutVan((prevKidsWithoutVan) => {
+        // Find the index of the kid in the source van
+        const kidIndex = prevKidsWithoutVan.findIndex(
+          (kid) => kid.id === kidId
+        );
+        console.log(kidIndex);
+        if (kidIndex === -1) {
+          // Kid not found in the source van
+          return prevKidsWithoutVan;
+        }
 
-    const sourceVanId = result.source.droppableId.replace("van-", "");
-    const destinationVanId = result.destination.droppableId.replace("van-", "");
+        // Remove the kid from the source van
+        const movedKid = prevKidsWithoutVan[kidIndex];
+        const newSourceOrder = [...prevKidsWithoutVan];
+        newSourceOrder.splice(kidIndex, 1);
 
-    const moveKidToVan = (kidId, sourceVanId, destinationVanId) => {
+        setKidsOnVan((prevKidsOnVan) => {
+          // Check if the kid is moved to a different van
+          if (source !== destinationVanId) {
+            // Add the kid to the destination van
+            const newDestinationOrder = {
+              ...prevKidsOnVan,
+              [destinationVanId]: [
+                ...(prevKidsOnVan[destinationVanId] || []),
+                movedKid,
+              ],
+            };
+
+            // Remove the kid from the source van in kidsOnVan if it exists
+            if (source in newDestinationOrder) {
+              const updatedSourceVan = [...newDestinationOrder[source]];
+              const kidIndexInSourceVan = updatedSourceVan.findIndex(
+                (kid) => kid.id === kidId
+              );
+
+              if (kidIndexInSourceVan !== -1) {
+                updatedSourceVan.splice(kidIndexInSourceVan, 1);
+                newDestinationOrder[source] = updatedSourceVan;
+              }
+            }
+
+            return newDestinationOrder;
+          }
+
+          // Update the state with the new order for the same van
+          return {
+            ...prevKidsOnVan,
+            [source]: [...(prevKidsOnVan[source] || []), movedKid],
+          };
+        });
+
+        // Update the state with the new order for kidsWithoutVan
+        return newSourceOrder;
+      });
+    };
+
+    const moveKidsBetweenVans = (kidId, sourceVanId, destinationVanId) => {
       setKidsOnVan((prevKids) => {
         // Check if the kid is moved to a different van
         if (sourceVanId !== destinationVanId) {
@@ -80,68 +131,53 @@ const RoutesPages = () => {
       });
     };
 
-    // Check if the kid is moved to a different van
-    if (sourceVanId !== destinationVanId) {
-      const kidId = kidsOnVan[sourceVanId][result.source.index].id;
-      moveKidToVan(kidId, sourceVanId, destinationVanId);
-    } else {
-      const newOrder = Array.from(kidsOnVan[sourceVanId]);
-      const [draggedItem] = newOrder.splice(result.source.index, 1);
-      newOrder.splice(result.destination.index, 0, draggedItem);
+    if (!result.destination) return;
 
-      // Update the state with the new order
-      setKidsOnVan((prevKids) => ({
-        ...prevKids,
-        [sourceVanId]: newOrder,
-      }));
-    }
-  };
+    const sourceId = result.source.droppableId;
+    const destinationId = result.destination.droppableId;
 
-  const moveKidBetweenVansAndWithoutVan = (
-    kidId,
-    sourceVanId,
-    destinationVanId
-  ) => {
-    setKidsOnVan((prevKids) => {
-      // Check if the kid is moved to or from 'kidsWithoutVan'
-      if (sourceVanId === "withoutVan") {
-        const newKidsWithoutVan = prevKids[sourceVanId].filter(
-          (kid) => kid.id !== kidId
-        );
+    if (sourceId === destinationId) {
+      // Move within the same list (Kids to Drop-off or within the same van)
+      if (sourceId === "kidsBox") {
+        const newOrder = Array.from(kidsWithoutVan);
+        const [draggedItem] = newOrder.splice(result.source.index, 1);
+        newOrder.splice(result.destination.index, 0, draggedItem);
 
-        return {
+        setKidsWithoutVan(newOrder);
+      } else {
+        // Move within the same van
+        const vanId = sourceId.replace("van-", ""); // Extract van ID from droppableId
+        const vanKids = kidsOnVan[vanId] || []; // Ensure vanKids is defined
+        const newOrder = Array.from(vanKids);
+        const [draggedItem] = newOrder.splice(result.source.index, 1);
+        newOrder.splice(result.destination.index, 0, draggedItem);
+
+        setKidsOnVan((prevKids) => ({
           ...prevKids,
-          withoutVan: newKidsWithoutVan,
-          [destinationVanId]: [
-            ...(prevKids[destinationVanId] || []),
-            { id: kidId /* other kid properties */ },
-          ],
-        };
-      } else if (destinationVanId === "withoutVan") {
-        const newOrder = prevKids[sourceVanId].filter(
-          (kid) => kid.id !== kidId
-        );
-
-        return {
-          ...prevKids,
-          [sourceVanId]: newOrder,
-          withoutVan: [
-            ...(prevKids.withoutVan || []),
-            { id: kidId /* other kid properties */ },
-          ],
-        };
+          [vanId]: newOrder,
+        }));
       }
-
-      // Moving the kid between vans
-      const newSourceOrder = Array.from(prevKids[sourceVanId] || []);
-      const [movedKid] = newSourceOrder.filter((kid) => kid.id === kidId);
-
-      return {
-        ...prevKids,
-        [sourceVanId]: newSourceOrder.filter((kid) => kid.id !== kidId),
-        [destinationVanId]: [...(prevKids[destinationVanId] || []), movedKid],
-      };
-    });
+    } else {
+      if (sourceId === "kidsBox" && destinationId !== "kidsBox") {
+        console.log("kidsWithoutVan", kidsWithoutVan);
+        console.log("kidsOnVan", kidsOnVan);
+        const sourceKidsWithoutVan = result.source.droppableId;
+        const destinationVanId = result.destination.droppableId;
+        const kidId = kidsWithoutVan[result.source.index].id;
+        moveKidsToVans(kidId, sourceKidsWithoutVan, destinationVanId);
+        console.log("kidsWithoutVan", kidsWithoutVan);
+        console.log("kidsOnVan", kidsOnVan);
+      } else {
+        const sourceVanId = result.source.droppableId.replace("van-", "");
+        const destinationVanId = result.destination.droppableId.replace(
+          "van-",
+          ""
+        );
+        const kidId = kidsOnVan[sourceVanId][result.source.index].id;
+        moveKidsBetweenVans(kidId, sourceVanId, destinationVanId);
+      }
+      // Move between lists (Kids to Drop-off to a van)
+    }
   };
 
   const fetchVansData = async () => {
@@ -207,7 +243,7 @@ const RoutesPages = () => {
 
   return (
     <div className="routes-container">
-      <DragDropContext onDragEnd={handleOnDragKidBoxEnd}>
+      <DragDropContext onDragEnd={handleOnDragEnd}>
         <div className="kids-list">
           <h2>Kids to Drop-off</h2>
           <Droppable droppableId="kidsBox" type="kid" direction="vertical">
@@ -244,11 +280,11 @@ const RoutesPages = () => {
             )}
           </Droppable>
         </div>
-      </DragDropContext>
+        {/* </DragDropContext> */}
 
-      <div className="vans-list">
-        <h2>All Vans</h2>
-        <DragDropContext onDragEnd={handleOnDragVanBoxEnd}>
+        <div className="vans-list">
+          <h2>All Vans</h2>
+          {/* <DragDropContext onDragEnd={handleOnDragVanBoxEnd}> */}
           <Droppable droppableId="vansBox" type="group" direction="vertical">
             {(provided) => (
               <div
@@ -300,8 +336,8 @@ const RoutesPages = () => {
               </div>
             )}
           </Droppable>
-        </DragDropContext>
-      </div>
+        </div>
+      </DragDropContext>
     </div>
   );
 };
