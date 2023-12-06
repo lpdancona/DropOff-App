@@ -10,48 +10,49 @@ const RoutesPages = () => {
   const [kidsOnVan, setKidsOnVan] = useState({});
   const [kidsWithoutVan, setKidsWithoutVan] = useState([]);
 
-  // const handleOnDragKidBoxEnd = (result) => {
-  //   console.log("result of handle DragKidBoxEnd", result);
-  //   if (!result.destination) return;
-
-  //   const sourceVanId = result.source.droppableId.replace("van-", "");
-  //   const destinationVanId = result.destination.droppableId.replace("van-", "");
-  //   console.log(sourceVanId);
-  //   console.log(destinationVanId);
-
-  //   if (sourceVanId === "withoutVan" || destinationVanId === "withoutVan") {
-  //     const kidId = kidsWithoutVan[result.source.index].id;
-  //     moveKidBetweenVansAndWithoutVan(kidId, sourceVanId, destinationVanId);
-  //   } else {
-  //     // Handle moving kids within the same van
-  //     const newOrder = Array.from(kidsWithoutVan[sourceVanId]);
-  //     const [draggedItem] = newOrder.splice(result.source.index, 1);
-  //     newOrder.splice(result.destination.index, 0, draggedItem);
-  //     setKidsWithoutVan((prevKids) => ({
-  //       ...prevKids,
-  //       [sourceVanId]: newOrder,
-  //     }));
-  //   }
-  // };
-
-  // const handleOnDragKids = (result) => {
-  //   console.log("result of handle DragKidBoxEnd", result);
-  //   if (!result.destination) return;
-
-  //   const newOrder = Array.from(kidsWithoutVan);
-  //   const [draggedItem] = newOrder.splice(result.source.index, 1);
-  //   newOrder.splice(result.destination.index, 0, draggedItem);
-  //   setKidsWithoutVan(newOrder);
-  // };
-
   const handleOnDragEnd = (result) => {
+    //
+    //move the kids from Vans to back to Kids to Drop-Off
+    const moveKidsBackToNoVan = (kidId, sourceVanId, destinationVanId) => {
+      setKidsOnVan((prevKidsOnVan) => {
+        const kidIndexInSourceVan = (
+          prevKidsOnVan[sourceVanId] || []
+        ).findIndex((kid) => kid.id === kidId);
+
+        if (kidIndexInSourceVan === -1) {
+          // Kid not found in the source van
+          return prevKidsOnVan;
+        }
+
+        // Remove the kid from the source van
+        const movedKid = prevKidsOnVan[sourceVanId][kidIndexInSourceVan];
+        const updatedSourceVan = [...prevKidsOnVan[sourceVanId]];
+        updatedSourceVan.splice(kidIndexInSourceVan, 1);
+
+        // Update the state with the new order for the source van
+        const newKidsOnVan = {
+          ...prevKidsOnVan,
+          [sourceVanId]: updatedSourceVan,
+        };
+
+        // Update the state for kidsWithoutVan by adding the moved kid
+        setKidsWithoutVan((prevKidsWithoutVan) => {
+          const newKidsWithoutVan = [...prevKidsWithoutVan];
+          newKidsWithoutVan.splice(result.destination.index, 0, movedKid);
+          return newKidsWithoutVan;
+        });
+
+        return newKidsOnVan;
+      });
+    };
+
+    //move the kids from Kids to Drop-off to Vans
     const moveKidsToVans = (kidId, source, destinationVanId) => {
       setKidsWithoutVan((prevKidsWithoutVan) => {
         // Find the index of the kid in the source van
         const kidIndex = prevKidsWithoutVan.findIndex(
           (kid) => kid.id === kidId
         );
-        console.log(kidIndex);
         if (kidIndex === -1) {
           // Kid not found in the source van
           return prevKidsWithoutVan;
@@ -66,13 +67,19 @@ const RoutesPages = () => {
           // Check if the kid is moved to a different van
           if (source !== destinationVanId) {
             // Add the kid to the destination van
+
             const newDestinationOrder = {
               ...prevKidsOnVan,
               [destinationVanId]: [
                 ...(prevKidsOnVan[destinationVanId] || []),
-                movedKid,
+                //movedKid,
               ],
             };
+            newDestinationOrder[destinationVanId].splice(
+              result.destination.index,
+              0,
+              movedKid
+            );
 
             // Remove the kid from the source van in kidsOnVan if it exists
             if (source in newDestinationOrder) {
@@ -102,6 +109,7 @@ const RoutesPages = () => {
       });
     };
 
+    //move the kids from one Van to another (BUS 1 TO BUS 4)
     const moveKidsBetweenVans = (kidId, sourceVanId, destinationVanId) => {
       setKidsOnVan((prevKids) => {
         // Check if the kid is moved to a different van
@@ -109,14 +117,20 @@ const RoutesPages = () => {
           const newSourceOrder = Array.from(prevKids[sourceVanId] || []);
           const [movedKid] = newSourceOrder.splice(result.source.index, 1);
 
-          return {
+          const newDestinationOrder = {
             ...prevKids,
             [sourceVanId]: newSourceOrder,
             [destinationVanId]: [
               ...(prevKids[destinationVanId] || []),
-              movedKid,
+              //movedKid,
             ],
           };
+          newDestinationOrder[destinationVanId].splice(
+            result.destination.index,
+            0,
+            movedKid
+          );
+          return newDestinationOrder;
         }
 
         const newOrder = Array.from(prevKids[sourceVanId]);
@@ -159,15 +173,14 @@ const RoutesPages = () => {
       }
     } else {
       if (sourceId === "kidsBox" && destinationId !== "kidsBox") {
-        console.log("kidsWithoutVan", kidsWithoutVan);
-        console.log("kidsOnVan", kidsOnVan);
-        const sourceKidsWithoutVan = result.source.droppableId;
-        const destinationVanId = result.destination.droppableId;
+        const sourceKidsWithoutVan = sourceId; //result.source.droppableId;
+        const destinationVanId = result.destination.droppableId.replace(
+          "van-",
+          ""
+        );
         const kidId = kidsWithoutVan[result.source.index].id;
         moveKidsToVans(kidId, sourceKidsWithoutVan, destinationVanId);
-        console.log("kidsWithoutVan", kidsWithoutVan);
-        console.log("kidsOnVan", kidsOnVan);
-      } else {
+      } else if (destinationId !== "kidsBox") {
         const sourceVanId = result.source.droppableId.replace("van-", "");
         const destinationVanId = result.destination.droppableId.replace(
           "van-",
@@ -175,8 +188,15 @@ const RoutesPages = () => {
         );
         const kidId = kidsOnVan[sourceVanId][result.source.index].id;
         moveKidsBetweenVans(kidId, sourceVanId, destinationVanId);
+      } else if (destinationId === "kidsBox") {
+        const sourceVanId = result.source.droppableId.replace("van-", "");
+        const destinationVanId = result.destination.droppableId.replace(
+          "van-",
+          ""
+        );
+        const kidId = kidsOnVan[sourceVanId][result.source.index].id;
+        moveKidsBackToNoVan(kidId, sourceVanId, destinationVanId);
       }
-      // Move between lists (Kids to Drop-off to a van)
     }
   };
 
@@ -267,7 +287,9 @@ const RoutesPages = () => {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                       >
-                        <div className="kid-name">{kid.name}</div>
+                        <div className="kid-name">{`${index + 1}. ${
+                          kid.name
+                        }`}</div>
                         <div className="drop-off-address">
                           {kid.dropOffAddress}
                         </div>
@@ -320,7 +342,9 @@ const RoutesPages = () => {
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
                                 >
-                                  <div className="kid-name">{kid.name}</div>
+                                  <div className="kid-name">{`${index + 1}. ${
+                                    kid.name
+                                  }`}</div>
                                   <div className="drop-off-address">
                                     {kid.dropOffAddress}
                                   </div>
