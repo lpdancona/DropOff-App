@@ -3,6 +3,7 @@ import { API, graphqlOperation } from "aws-amplify";
 import { listVans, listKids } from "../graphql/queries";
 import { updateVan, updateKid } from "../graphql/mutations";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import GoogleMap from "google-maps-react-markers";
 
 import "./RoutesPage.css";
 
@@ -10,11 +11,20 @@ const RoutesPages = () => {
   const [vans, setVans] = useState([]);
   const [kidsOnVan, setKidsOnVan] = useState({});
   const [kidsWithoutVan, setKidsWithoutVan] = useState([]);
+  const [selectedVan, setSelectedVan] = useState(null);
+  const apikey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+
+  const defaultProps = {
+    // default props for google maps component
+    center: {
+      lat: 49.26355,
+      lng: -123.10083,
+    },
+    zoom: 11,
+  };
 
   const updateKidAssociation = async (kidId, vanId) => {
     vanId = vanId.replace("van-", "");
-    console.log(kidId);
-    console.log(vanId);
     try {
       // Construct the mutation input
       const mutationInput = {
@@ -388,6 +398,32 @@ const RoutesPages = () => {
           </Droppable>
         </div>
       </DragDropContext>
+      <div className="van-dropdown">
+        <select
+          value={selectedVan}
+          onChange={(e) => setSelectedVan(e.target.value)}
+        >
+          <option value={null}>Select Van</option>
+          {vans.map((van) => (
+            <option key={van.id} value={van.id}>
+              {van.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div style={{ height: "100vh", width: "100%" }}>
+        {selectedVan && (
+          <GoogleMap
+            bootstrapURLKeys={{ key: apikey }}
+            defaultCenter={defaultProps.center}
+            defaultZoom={defaultProps.zoom}
+          >
+            {kidsOnVan[selectedVan]?.map((kid) => (
+              <Marker key={kid.id} position={{ lat: kid.lat, lng: kid.lng }} />
+            ))}
+          </GoogleMap>
+        )}
+      </div>
     </div>
   );
 };
