@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { API, graphqlOperation } from "aws-amplify";
 import { listVans, listKids } from "../graphql/queries";
+import { updateVan, updateKid } from "../graphql/mutations";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 import "./RoutesPage.css";
@@ -9,6 +10,28 @@ const RoutesPages = () => {
   const [vans, setVans] = useState([]);
   const [kidsOnVan, setKidsOnVan] = useState({});
   const [kidsWithoutVan, setKidsWithoutVan] = useState([]);
+
+  const updateKidAssociation = async (kidId, vanId) => {
+    vanId = vanId.replace("van-", "");
+    console.log(kidId);
+    console.log(vanId);
+    try {
+      // Construct the mutation input
+      const mutationInput = {
+        id: kidId,
+        // other fields you want to update in the van
+        vanID: vanId,
+        // Include the kid ID in the Kids field to update the association
+        // Kids: {
+        //   connect: [{ id: kidId }],
+        // },
+      };
+
+      await API.graphql(graphqlOperation(updateKid, { input: mutationInput }));
+    } catch (error) {
+      console.error("Error updating kid association:", error);
+    }
+  };
 
   const handleOnDragEnd = (result) => {
     //
@@ -180,6 +203,7 @@ const RoutesPages = () => {
         );
         const kidId = kidsWithoutVan[result.source.index].id;
         moveKidsToVans(kidId, sourceKidsWithoutVan, destinationVanId);
+        updateKidAssociation(kidId, destinationId);
       } else if (destinationId !== "kidsBox") {
         const sourceVanId = result.source.droppableId.replace("van-", "");
         const destinationVanId = result.destination.droppableId.replace(
@@ -188,6 +212,7 @@ const RoutesPages = () => {
         );
         const kidId = kidsOnVan[sourceVanId][result.source.index].id;
         moveKidsBetweenVans(kidId, sourceVanId, destinationVanId);
+        updateKidAssociation(kidId, destinationId);
       } else if (destinationId === "kidsBox") {
         const sourceVanId = result.source.droppableId.replace("van-", "");
         const destinationVanId = result.destination.droppableId.replace(
@@ -196,6 +221,7 @@ const RoutesPages = () => {
         );
         const kidId = kidsOnVan[sourceVanId][result.source.index].id;
         moveKidsBackToNoVan(kidId, sourceVanId, destinationVanId);
+        updateKidAssociation(kidId, destinationId);
       }
     }
   };
