@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { API, graphqlOperation } from "aws-amplify";
 import { listVans, listKids } from "../graphql/queries";
-import { updateVan, updateKid } from "../graphql/mutations";
+import { updateKid } from "../graphql/mutations";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import GoogleMap from "google-maps-react-markers";
+import {
+  GoogleMap,
+  useJsApiLoader,
+  DirectionsService,
+  DirectionsRenderer,
+  Marker,
+} from "@react-google-maps/api";
 
 import "./RoutesPage.css";
 
@@ -14,14 +20,101 @@ const RoutesPages = () => {
   const [selectedVan, setSelectedVan] = useState(null);
   const apikey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
-  const defaultProps = {
-    // default props for google maps component
-    center: {
-      lat: 49.26355,
-      lng: -123.10083,
-    },
-    zoom: 11,
+  const [directions, setDirections] = useState(null);
+  const dropOffStartPoint = { lat: 49.26344, lng: -123.10078 };
+
+  const containerStyle = {
+    width: "1000px",
+    height: "1000px",
   };
+
+  //center on vancouver area
+  const center = {
+    lat: 49.26337,
+    lng: -123.10069,
+    zoom: 8,
+  };
+
+  const zoomMap = 12;
+
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: apikey,
+  });
+  const [map, setMap] = useState(null);
+
+  const onLoad = useCallback(function callback(map) {
+    const bounds = new window.google.maps.LatLngBounds(center);
+    map.fitBounds(bounds);
+    setMap(map);
+  }, []);
+
+  const onUnmount = React.useCallback(function callback(map) {
+    setMap(null);
+  }, []);
+
+  const getDirections = async (waypoints) => {
+    try {
+      const directionService = new window.google.maps.DirectionsService();
+
+      const lastWaypoint = waypoints[waypoints.length - 1];
+
+      const routeRequest = {
+        origin: new window.google.maps.LatLng(
+          dropOffStartPoint.lat,
+          dropOffStartPoint.lng
+        ),
+        destination: new window.google.maps.LatLng(
+          lastWaypoint.lat,
+          lastWaypoint.lng
+        ),
+        waypoints: waypoints.slice(0, -1).map((kid) => ({
+          location: new window.google.maps.LatLng(kid.lat, kid.lng),
+        })),
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      };
+
+      directionService.route(routeRequest, (result, status) => {
+        if (status === window.google.maps.DirectionsStatus.OK) {
+          setDirections(result);
+        } else {
+          console.error("Error fetching directions:", status);
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching directions:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchVanData = async () => {
+      try {
+        // Fetch data for the selected van
+        if (selectedVan && kidsOnVan[selectedVan]) {
+          const waypoints = kidsOnVan[selectedVan];
+          // Reset directions to null when a new van is selected
+          setDirections(null);
+          // Fetch directions for the selected van
+          getDirections(waypoints);
+        }
+      } catch (error) {
+        console.error("Error fetching van data:", error);
+      }
+    };
+
+    // Call the fetchVanData function when the selectedVan changes
+    fetchVanData();
+  }, [selectedVan, kidsOnVan]);
+
+  useEffect(() => {
+    if (selectedVan && kidsOnVan[selectedVan]) {
+      const waypoints = kidsOnVan[selectedVan];
+      // Reset directions to null when a new van is selected
+      setDirections(null);
+      // Fetch directions for the selected van
+      getDirections(waypoints);
+    }
+  }, []);
 
   const updateKidAssociation = async (kidId, vanId) => {
     vanId = vanId.replace("van-", "");
@@ -29,12 +122,7 @@ const RoutesPages = () => {
       // Construct the mutation input
       const mutationInput = {
         id: kidId,
-        // other fields you want to update in the van
         vanID: vanId,
-        // Include the kid ID in the Kids field to update the association
-        // Kids: {
-        //   connect: [{ id: kidId }],
-        // },
       };
 
       await API.graphql(graphqlOperation(updateKid, { input: mutationInput }));
@@ -411,16 +499,29 @@ const RoutesPages = () => {
           ))}
         </select>
       </div>
-      <div style={{ height: "100vh", width: "100%" }}>
-        {selectedVan && (
+      <div>
+        {selectedVan && isLoaded && (
           <GoogleMap
-            bootstrapURLKeys={{ key: apikey }}
-            defaultCenter={defaultProps.center}
-            defaultZoom={defaultProps.zoom}
+            mapContainerStyle={containerStyle}
+            center={center}
+            zoom={zoomMap}
+            onLoad={onLoad}
+            onUnmount={onUnmount}
           >
-            {kidsOnVan[selectedVan]?.map((kid) => (
-              <Marker key={kid.id} position={{ lat: kid.lat, lng: kid.lng }} />
+            {directions && <DirectionsRenderer directions={directions} />}
+
+            {kidsOnVan[selectedVan]?.map((kid, index) => (
+              <Marker
+                key={kid.id}
+                position={{
+                  lat: kid.lat,
+                  lng: kid.lng,
+                }}
+                label={(index + 1).toString()}
+              />
             ))}
+
+            <></>
           </GoogleMap>
         )}
       </div>
