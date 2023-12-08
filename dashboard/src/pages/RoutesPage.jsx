@@ -22,17 +22,68 @@ const RoutesPages = () => {
 
   const [directions, setDirections] = useState(null);
   const dropOffStartPoint = { lat: 49.26344, lng: -123.10078 };
+  const [totalTime, setTotalTime] = useState(null);
+  const [totalDistance, setTotalDistance] = useState(null);
+  const [departureTime, setDepartureTime] = useState(null);
+  const [timeToFinish, setTimeToFinish] = useState(null);
+
+  const calculateTimeToFinish = () => {
+    if (departureTime && totalTime) {
+      const currentTime = new Date();
+      const departureDate = new Date(departureTime);
+
+      // Extract hours, minutes, and seconds from the departureTime
+      const departureHours = departureDate.getHours();
+      const departureMinutes = departureDate.getMinutes();
+      const departureSeconds = departureDate.getSeconds();
+
+      // Calculate total departure time in seconds
+      const totalDepartureTimeInSeconds =
+        departureHours * 3600 + departureMinutes * 60 + departureSeconds;
+
+      // Calculate time to finish
+      const timeToFinishInSeconds =
+        totalTime + (totalDepartureTimeInSeconds - currentTime.getSeconds());
+
+      setTimeToFinish(Math.max(0, timeToFinishInSeconds));
+    }
+  };
+
+  useEffect(() => {
+    calculateTimeToFinish();
+  }, [totalTime, departureTime]);
+
+  const formatTime = (time) => {
+    if (typeof time === "string") {
+      const [hours, minutes] = time.split(":");
+      const date = new Date();
+      date.setHours(parseInt(hours));
+      date.setMinutes(parseInt(minutes));
+
+      return date.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      });
+    }
+
+    // Handle other cases or return an appropriate value
+    return time;
+  };
+
+  const formatDistance = (meters) => {
+    const kilometers = meters / 1000;
+    return `${kilometers} km`;
+  };
 
   const containerStyle = {
-    width: "1000px",
-    height: "1000px",
+    width: "800px",
+    height: "600px",
   };
 
   //center on vancouver area
   const center = {
     lat: 49.26337,
     lng: -123.10069,
-    zoom: 8,
   };
 
   const zoomMap = 12;
@@ -41,6 +92,7 @@ const RoutesPages = () => {
     id: "google-map-script",
     googleMapsApiKey: apikey,
   });
+
   const [map, setMap] = useState(null);
 
   const onLoad = useCallback(function callback(map) {
@@ -76,7 +128,34 @@ const RoutesPages = () => {
 
       directionService.route(routeRequest, (result, status) => {
         if (status === window.google.maps.DirectionsStatus.OK) {
-          setDirections(result);
+          setTotalTime(
+            result.routes[0].legs.reduce(
+              (acc, leg) => acc + leg.duration.value,
+              0
+            )
+          );
+          setTotalDistance(
+            result.routes[0].legs.reduce(
+              (acc, leg) => acc + leg.distance.value,
+              0
+            )
+          );
+
+          setDirections({
+            ...result,
+            options: {
+              suppressMarkers: true, // To suppress default markers
+              markerOptions: {
+                icon: {
+                  path: window.google.maps.SymbolPath.CIRCLE,
+                  scale: 8, // Adjust the scale as needed
+                  fillColor: "#4285F4", // Marker color
+                  fillOpacity: 1,
+                  strokeWeight: 0,
+                },
+              },
+            },
+          });
         } else {
           console.error("Error fetching directions:", status);
         }
@@ -105,16 +184,6 @@ const RoutesPages = () => {
     // Call the fetchVanData function when the selectedVan changes
     fetchVanData();
   }, [selectedVan, kidsOnVan]);
-
-  useEffect(() => {
-    if (selectedVan && kidsOnVan[selectedVan]) {
-      const waypoints = kidsOnVan[selectedVan];
-      // Reset directions to null when a new van is selected
-      setDirections(null);
-      // Fetch directions for the selected van
-      getDirections(waypoints);
-    }
-  }, []);
 
   const updateKidAssociation = async (kidId, vanId) => {
     vanId = vanId.replace("van-", "");
@@ -386,120 +455,131 @@ const RoutesPages = () => {
   }, []);
 
   return (
-    <div className="routes-container">
-      <DragDropContext onDragEnd={handleOnDragEnd}>
-        <div className="kids-list">
-          <h2>Kids to Drop-off</h2>
-          <Droppable droppableId="kidsBox" type="kid" direction="vertical">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="kids"
-              >
-                {kidsWithoutVan.map((kid, index) => (
-                  <Draggable
-                    key={kid.id}
-                    draggableId={kid.id.toString()}
-                    index={index}
+    <div className="main-container">
+      <div className="left-container">
+        <DragDropContext onDragEnd={handleOnDragEnd}>
+          <div className="kids-list">
+            <h2>Kids to Drop-off</h2>
+            <div className="compact-scroll">
+              <Droppable droppableId="kidsBox" type="kid" direction="vertical">
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="kids"
                   >
-                    {(provided) => (
-                      <div
+                    {kidsWithoutVan.map((kid, index) => (
+                      <Draggable
                         key={kid.id}
-                        className="kid-item"
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
+                        draggableId={kid.id.toString()}
+                        index={index}
                       >
-                        <div className="kid-name">{`${index + 1}. ${
-                          kid.name
-                        }`}</div>
-                        <div className="drop-off-address">
-                          {kid.dropOffAddress}
-                        </div>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </div>
-        {/* </DragDropContext> */}
-
-        <div className="vans-list">
-          <h2>All Vans</h2>
-          {/* <DragDropContext onDragEnd={handleOnDragVanBoxEnd}> */}
-          <Droppable droppableId="vansBox" type="group" direction="vertical">
-            {(provided) => (
-              <div
-                className="vans"
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-              >
-                {vans.map((van) => (
-                  <Droppable
-                    key={van.id}
-                    droppableId={`van-${van.id}`}
-                    type="kid"
-                  >
-                    {(provided) => (
-                      <div
-                        className="van-item"
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                      >
-                        <h3>{van.name}</h3>
-                        <div className="kids-in-van">
-                          {kidsOnVan[van.id]?.map((kid, index) => (
-                            <Draggable
-                              key={kid.id}
-                              draggableId={(kid.id || index).toString()}
-                              index={index}
-                            >
-                              {(provided) => (
-                                <div
-                                  key={kid.id}
-                                  className="kid-item"
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                >
-                                  <div className="kid-name">{`${index + 1}. ${
-                                    kid.name
-                                  }`}</div>
-                                  <div className="drop-off-address">
-                                    {kid.dropOffAddress}
+                        {(provided) => (
+                          <div
+                            key={kid.id}
+                            className="kid-item"
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <div className="kid-name">{`${index + 1}. ${
+                              kid.name
+                            }`}</div>
+                            <div className="drop-off-address">
+                              {kid.dropOffAddress}
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </div>
+          </div>
+          <div className="vans-list">
+            <h2>All Vans</h2>
+            <Droppable droppableId="vansBox" type="group" direction="vertical">
+              {(provided) => (
+                <div
+                  className="vans"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {vans.map((van) => (
+                    <Droppable
+                      key={van.id}
+                      droppableId={`van-${van.id}`}
+                      type="kid"
+                    >
+                      {(provided) => (
+                        <div
+                          className="van-item"
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
+                        >
+                          <h3>{van.name}</h3>
+                          <div className="kids-in-van">
+                            {kidsOnVan[van.id]?.map((kid, index) => (
+                              <Draggable
+                                key={kid.id}
+                                draggableId={(kid.id || index).toString()}
+                                index={index}
+                              >
+                                {(provided) => (
+                                  <div
+                                    key={kid.id}
+                                    className="kid-item"
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                  >
+                                    <div className="kid-name">{`${index + 1}. ${
+                                      kid.name
+                                    }`}</div>
+                                    <div className="drop-off-address">
+                                      {kid.dropOffAddress}
+                                    </div>
                                   </div>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
+                                )}
+                              </Draggable>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </Droppable>
-                ))}
-              </div>
-            )}
-          </Droppable>
-        </div>
-      </DragDropContext>
-      <div className="van-dropdown">
-        <select
-          value={selectedVan}
-          onChange={(e) => setSelectedVan(e.target.value)}
-        >
-          <option value={null}>Select Van</option>
-          {vans.map((van) => (
-            <option key={van.id} value={van.id}>
-              {van.name}
-            </option>
-          ))}
-        </select>
+                      )}
+                    </Droppable>
+                  ))}
+                </div>
+              )}
+            </Droppable>
+          </div>
+        </DragDropContext>
       </div>
-      <div>
+
+      <div className="map-container">
+        <div className="departure-time">
+          <label>Departure Time:</label>
+          <input
+            type="time"
+            value={departureTime || ""}
+            onChange={(e) => setDepartureTime(e.target.value)}
+          />
+        </div>
+        <div className="van-dropdown">
+          <select
+            value={selectedVan}
+            onChange={(e) => setSelectedVan(e.target.value)}
+          >
+            <option value={null}>Select Van</option>
+            {vans.map((van) => (
+              <option key={van.id} value={van.id}>
+                {van.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {selectedVan && isLoaded && (
           <GoogleMap
             mapContainerStyle={containerStyle}
@@ -510,7 +590,37 @@ const RoutesPages = () => {
           >
             {directions && <DirectionsRenderer directions={directions} />}
 
-            {kidsOnVan[selectedVan]?.map((kid, index) => (
+            {directions && (
+              <div className="directions-info">
+                <p>Total Time: {formatTime(totalTime)}</p>
+                <p>Total Distance: {formatDistance(totalDistance)}</p>
+                {timeToFinish !== null && (
+                  <div className="time-info">
+                    <p>Time to Depart: {formatTime(departureTime)}</p>
+                    <p>Time to Finish: {formatTime(timeToFinish)}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* {kidsOnVan[selectedVan]?.map((kid, index) => (
+              <Marker
+                key={kid.id}
+                position={{
+                  lat: kid.lat,
+                  lng: kid.lng,
+                }}
+                label={(index + 1).toString()}
+                icon={{
+                  path: window.google.maps.SymbolPath.CIRCLE,
+                  scale: 8, // Adjust the scale as needed
+                  fillColor: "#4285F4", // Marker color
+                  fillOpacity: 1,
+                  strokeWeight: 0,
+                }}
+              />
+            ))} */}
+            {/* {kidsOnVan[selectedVan]?.map((kid, index) => (
               <Marker
                 key={kid.id}
                 position={{
@@ -519,9 +629,7 @@ const RoutesPages = () => {
                 }}
                 label={(index + 1).toString()}
               />
-            ))}
-
-            <></>
+            ))} */}
           </GoogleMap>
         )}
       </div>
