@@ -82,9 +82,9 @@ const HomeScreen = () => {
       });
       const routeData = responseListRoutes.data.listRoutes.items;
       if (routeData.length === 0) {
-        alert(
-          "Hi there, there is no route in progress now! come back later or contact us for more information!"
-        );
+        // alert(
+        //   "Hi there, there is no route in progress now! come back later or contact us for more information!"
+        // );
         await navigation.navigate("Wait");
       }
 
@@ -216,9 +216,10 @@ const HomeScreen = () => {
       if (!checkKidsInRoutes()) {
         setIsLoading(false);
         setNoKidsAvailable(true);
-        alert(
-          `We sorry but, your child ${kids[0].name} is not on any route today!`
-        );
+        // alert(
+        //   `We sorry but, your child ${kids[0].name} is not on any route today!`
+        // );
+        navigation.navigate("Wait");
         // handleLogout();
       }
     }

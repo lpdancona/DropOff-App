@@ -104,7 +104,7 @@ const HomeScreen = () => {
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
-      <Text style={styles.title}>{`Hello, ${currentUserData.name}`}</Text>
+      <Text style={styles.title}>{`Hello, ${currentUserData?.name}`}</Text>
       <Text style={styles.subTitle}>
         You assigned as{" "}
         <Text

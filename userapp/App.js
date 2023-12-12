@@ -17,8 +17,7 @@ import { PaperProvider } from "react-native-paper";
 import CustomHeader from "./src/layout/CustomHeader";
 import CustomFooter from "./src/layout/CustomFooter";
 import getTheme from "./src/layout/CustomTheme";
-import HomeScreen from "./src/screens/HomeScreen";
-import LoginScreen from "./src/screens/LoginScreen";
+
 // Aws Amplify config
 import { Amplify } from "aws-amplify";
 import awsExports from "./src/aws-exports";

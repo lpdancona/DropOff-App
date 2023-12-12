@@ -67,6 +67,7 @@ const RouteContextProvider = ({ children }) => {
         variables: variables,
       });
       const routeData = responseListRoutes.data.listRoutes.items;
+      //console.log(routeData);
 
       // Fetch kids data for each route
       const mergedData = await Promise.all(
