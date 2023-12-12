@@ -101,7 +101,3 @@
   display: flex;
   flex-direction: column;
 }
-
-.valid-drop-area {
-  background-color: #e6f7ff; /* Light blue color */
-}

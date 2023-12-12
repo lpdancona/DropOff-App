@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { API, graphqlOperation } from "aws-amplify";
 import { listVans, listKids } from "../graphql/queries";
-import { updateKid } from "../graphql/mutations";
+import { updateKid, createRoute } from "../graphql/mutations";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import {
   GoogleMap,
@@ -30,20 +30,22 @@ const RoutesPages = () => {
   const calculateTimeToFinish = () => {
     if (departureTime && totalTime) {
       const currentTime = new Date();
-      const departureDate = new Date(departureTime);
+      const departureDate = new Date();
 
-      // Extract hours, minutes, and seconds from the departureTime
-      const departureHours = departureDate.getHours();
-      const departureMinutes = departureDate.getMinutes();
-      const departureSeconds = departureDate.getSeconds();
+      const [hours, minutes] = departureTime.split(":");
+      departureDate.setHours(parseInt(hours));
+      departureDate.setMinutes(parseInt(minutes));
 
       // Calculate total departure time in seconds
       const totalDepartureTimeInSeconds =
-        departureHours * 3600 + departureMinutes * 60 + departureSeconds;
+        departureDate.getHours() * 3600 +
+        departureDate.getMinutes() * 60 +
+        departureDate.getSeconds();
 
       // Calculate time to finish
       const timeToFinishInSeconds =
-        totalTime + (totalDepartureTimeInSeconds - currentTime.getSeconds());
+        totalTime -
+        (currentTime.getTime() / 1000 - totalDepartureTimeInSeconds);
 
       setTimeToFinish(Math.max(0, timeToFinishInSeconds));
     }
@@ -53,21 +55,14 @@ const RoutesPages = () => {
     calculateTimeToFinish();
   }, [totalTime, departureTime]);
 
-  const formatTime = (time) => {
-    if (typeof time === "string") {
-      const [hours, minutes] = time.split(":");
-      const date = new Date();
-      date.setHours(parseInt(hours));
-      date.setMinutes(parseInt(minutes));
+  const formatTime = (timeInSeconds) => {
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+    const seconds = timeInSeconds % 60;
 
-      return date.toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-      });
-    }
-
-    // Handle other cases or return an appropriate value
-    return time;
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   const formatDistance = (meters) => {
@@ -128,6 +123,7 @@ const RoutesPages = () => {
 
       directionService.route(routeRequest, (result, status) => {
         if (status === window.google.maps.DirectionsStatus.OK) {
+          //console.log(result);
           setTotalTime(
             result.routes[0].legs.reduce(
               (acc, leg) => acc + leg.duration.value,
@@ -205,7 +201,7 @@ const RoutesPages = () => {
   };
 
   const handleOnDragEnd = (result) => {
-    console.log(result);
+    //console.log(result);
     //
     //move the kids from Vans to back to Kids to Drop-Off
     const moveKidsBackToNoVan = (kidId, sourceVanId, destinationVanId) => {
@@ -459,6 +455,32 @@ const RoutesPages = () => {
     fetchVansAndKids();
   }, []);
 
+  const handleSaveRoute = async () => {
+    const currentDate = new Date();
+    const currentVan = vans[1];
+    const currentKids = kidsOnVan[selectedVan];
+    console.log(currentVan);
+    console.log(currentKids);
+    try {
+      const routeDetails = {
+        date: currentDate.toISOString(),
+        departTime: departureTime,
+        lat: dropOffStartPoint.lat,
+        lng: dropOffStartPoint.lng,
+        Van: { currentVan },
+        Kids: { currentKids },
+        status: "WAITING_TO_START",
+      };
+
+      const newRoute = await API.graphql({
+        query: createRoute,
+        variables: { input: routeDetails },
+      });
+    } catch (error) {
+      console.error("Error creating route", error);
+    }
+  };
+
   return (
     <div className="main-container">
       <div className="left-container">
@@ -493,6 +515,7 @@ const RoutesPages = () => {
                             <div className="drop-off-address">
                               {kid.dropOffAddress}
                             </div>
+                            {provided.placeholder}
                           </div>
                         )}
                       </Draggable>
@@ -584,7 +607,11 @@ const RoutesPages = () => {
             ))}
           </select>
         </div>
-
+        {selectedVan && isLoaded && (
+          <div>
+            <button onClick={handleSaveRoute}>Save Route</button>
+          </div>
+        )}
         {selectedVan && isLoaded && (
           <GoogleMap
             mapContainerStyle={containerStyle}
@@ -601,8 +628,18 @@ const RoutesPages = () => {
                 <p>Total Distance: {formatDistance(totalDistance)}</p>
                 {timeToFinish !== null && (
                   <div className="time-info">
-                    <p>Time to Depart: {formatTime(departureTime)}</p>
-                    <p>Time to Finish: {formatTime(timeToFinish)}</p>
+                    <p>
+                      Time to Depart:{" "}
+                      {departureTime
+                        ? formatTime(departureTime)
+                        : "Invalid Time"}
+                    </p>
+                    <p>
+                      Time to Finish:{" "}
+                      {timeToFinish !== null
+                        ? formatTime(timeToFinish)
+                        : "Calculating..."}
+                    </p>
                   </div>
                 )}
               </div>
