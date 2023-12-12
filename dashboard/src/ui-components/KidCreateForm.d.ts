@@ -32,6 +32,7 @@ export declare type KidCreateFormInputValues = {
     photo?: string;
     Parent1ID?: string;
     Parent2ID?: string;
+    vanID?: string;
 };
 export declare type KidCreateFormValidationValues = {
     name?: ValidationFunction<string>;
@@ -44,6 +45,7 @@ export declare type KidCreateFormValidationValues = {
     photo?: ValidationFunction<string>;
     Parent1ID?: ValidationFunction<string>;
     Parent2ID?: ValidationFunction<string>;
+    vanID?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type KidCreateFormOverridesProps = {
@@ -58,6 +60,7 @@ export declare type KidCreateFormOverridesProps = {
     photo?: PrimitiveOverrideProps<TextFieldProps>;
     Parent1ID?: PrimitiveOverrideProps<TextFieldProps>;
     Parent2ID?: PrimitiveOverrideProps<TextFieldProps>;
+    vanID?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type KidCreateFormProps = React.PropsWithChildren<{
     overrides?: KidCreateFormOverridesProps | undefined | null;

@@ -1,6 +1,48 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getWeekDayRoutes = /* GraphQL */ `
+  query GetWeekDayRoutes($id: ID!) {
+    getWeekDayRoutes(id: $id) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listWeekDayRoutes = /* GraphQL */ `
+  query ListWeekDayRoutes(
+    $filter: ModelWeekDayRoutesFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listWeekDayRoutes(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        date
+        weekDay
+        vanID
+        kidID
+        Order
+        kidName
+        kidDropOffAddress
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getConfigs = /* GraphQL */ `
   query GetConfigs($id: ID!) {
     getConfigs(id: $id) {
@@ -133,10 +175,6 @@ export const getVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -297,44 +335,6 @@ export const kidsByRouteID = /* GraphQL */ `
   ) {
     kidsByRouteID(
       routeID: $routeID
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        name
-        parent1Email
-        parent2Email
-        dropOffAddress
-        lat
-        lng
-        birthDate
-        photo
-        routeID
-        Parent1ID
-        Parent2ID
-        vanID
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const kidsByVanID = /* GraphQL */ `
-  query KidsByVanID(
-    $vanID: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelKidFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    kidsByVanID(
-      vanID: $vanID
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit

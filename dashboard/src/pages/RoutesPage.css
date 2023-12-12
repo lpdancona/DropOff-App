@@ -35,6 +35,9 @@
 .vans-list {
   width: 50%;
   padding: 10px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin: 10px 0;
 }
 
 .directions-info {
@@ -97,4 +100,8 @@
 .kids-in-van {
   display: flex;
   flex-direction: column;
+}
+
+.valid-drop-area {
+  background-color: #e6f7ff; /* Light blue color */
 }

@@ -1,6 +1,66 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createWeekDayRoutes = /* GraphQL */ `
+  mutation CreateWeekDayRoutes(
+    $input: CreateWeekDayRoutesInput!
+    $condition: ModelWeekDayRoutesConditionInput
+  ) {
+    createWeekDayRoutes(input: $input, condition: $condition) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateWeekDayRoutes = /* GraphQL */ `
+  mutation UpdateWeekDayRoutes(
+    $input: UpdateWeekDayRoutesInput!
+    $condition: ModelWeekDayRoutesConditionInput
+  ) {
+    updateWeekDayRoutes(input: $input, condition: $condition) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteWeekDayRoutes = /* GraphQL */ `
+  mutation DeleteWeekDayRoutes(
+    $input: DeleteWeekDayRoutesInput!
+    $condition: ModelWeekDayRoutesConditionInput
+  ) {
+    deleteWeekDayRoutes(input: $input, condition: $condition) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createConfigs = /* GraphQL */ `
   mutation CreateConfigs(
     $input: CreateConfigsInput!
@@ -171,10 +231,6 @@ export const createVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -195,10 +251,6 @@ export const updateVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -219,10 +271,6 @@ export const deleteVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename

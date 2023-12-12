@@ -186,7 +186,11 @@ const RoutesPages = () => {
   }, [selectedVan, kidsOnVan]);
 
   const updateKidAssociation = async (kidId, vanId) => {
-    vanId = vanId.replace("van-", "");
+    if (vanId !== "kidsBox") {
+      vanId = vanId.replace("van-", "");
+    } else {
+      vanId = null;
+    }
     try {
       // Construct the mutation input
       const mutationInput = {
@@ -201,6 +205,7 @@ const RoutesPages = () => {
   };
 
   const handleOnDragEnd = (result) => {
+    console.log(result);
     //
     //move the kids from Vans to back to Kids to Drop-Off
     const moveKidsBackToNoVan = (kidId, sourceVanId, destinationVanId) => {
@@ -395,9 +400,9 @@ const RoutesPages = () => {
 
   const fetchVansData = async () => {
     try {
-      const vansResponse = await API.graphql(
-        graphqlOperation(listVans, { limit: 100 })
-      );
+      const vansResponse = await API.graphql({
+        query: listVans,
+      });
       const vansData = vansResponse.data.listVans.items;
       setVans(vansData);
     } catch (error) {

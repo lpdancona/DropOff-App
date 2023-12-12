@@ -32,6 +32,7 @@ export declare type KidUpdateFormInputValues = {
     photo?: string;
     Parent1ID?: string;
     Parent2ID?: string;
+    vanID?: string;
 };
 export declare type KidUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
@@ -44,6 +45,7 @@ export declare type KidUpdateFormValidationValues = {
     photo?: ValidationFunction<string>;
     Parent1ID?: ValidationFunction<string>;
     Parent2ID?: ValidationFunction<string>;
+    vanID?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type KidUpdateFormOverridesProps = {
@@ -58,6 +60,7 @@ export declare type KidUpdateFormOverridesProps = {
     photo?: PrimitiveOverrideProps<TextFieldProps>;
     Parent1ID?: PrimitiveOverrideProps<TextFieldProps>;
     Parent2ID?: PrimitiveOverrideProps<TextFieldProps>;
+    vanID?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type KidUpdateFormProps = React.PropsWithChildren<{
     overrides?: KidUpdateFormOverridesProps | undefined | null;

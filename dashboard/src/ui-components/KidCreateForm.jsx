@@ -32,6 +32,7 @@ export default function KidCreateForm(props) {
     photo: "",
     Parent1ID: "",
     Parent2ID: "",
+    vanID: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [parent1Email, setParent1Email] = React.useState(
@@ -49,6 +50,7 @@ export default function KidCreateForm(props) {
   const [photo, setPhoto] = React.useState(initialValues.photo);
   const [Parent1ID, setParent1ID] = React.useState(initialValues.Parent1ID);
   const [Parent2ID, setParent2ID] = React.useState(initialValues.Parent2ID);
+  const [vanID, setVanID] = React.useState(initialValues.vanID);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
@@ -61,6 +63,7 @@ export default function KidCreateForm(props) {
     setPhoto(initialValues.photo);
     setParent1ID(initialValues.Parent1ID);
     setParent2ID(initialValues.Parent2ID);
+    setVanID(initialValues.vanID);
     setErrors({});
   };
   const validations = {
@@ -74,6 +77,7 @@ export default function KidCreateForm(props) {
     photo: [],
     Parent1ID: [],
     Parent2ID: [],
+    vanID: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -111,6 +115,7 @@ export default function KidCreateForm(props) {
           photo,
           Parent1ID,
           Parent2ID,
+          vanID,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -183,6 +188,7 @@ export default function KidCreateForm(props) {
               photo,
               Parent1ID,
               Parent2ID,
+              vanID,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -216,6 +222,7 @@ export default function KidCreateForm(props) {
               photo,
               Parent1ID,
               Parent2ID,
+              vanID,
             };
             const result = onChange(modelFields);
             value = result?.parent1Email ?? value;
@@ -249,6 +256,7 @@ export default function KidCreateForm(props) {
               photo,
               Parent1ID,
               Parent2ID,
+              vanID,
             };
             const result = onChange(modelFields);
             value = result?.parent2Email ?? value;
@@ -282,6 +290,7 @@ export default function KidCreateForm(props) {
               photo,
               Parent1ID,
               Parent2ID,
+              vanID,
             };
             const result = onChange(modelFields);
             value = result?.dropOffAddress ?? value;
@@ -319,6 +328,7 @@ export default function KidCreateForm(props) {
               photo,
               Parent1ID,
               Parent2ID,
+              vanID,
             };
             const result = onChange(modelFields);
             value = result?.lat ?? value;
@@ -356,6 +366,7 @@ export default function KidCreateForm(props) {
               photo,
               Parent1ID,
               Parent2ID,
+              vanID,
             };
             const result = onChange(modelFields);
             value = result?.lng ?? value;
@@ -390,6 +401,7 @@ export default function KidCreateForm(props) {
               photo,
               Parent1ID,
               Parent2ID,
+              vanID,
             };
             const result = onChange(modelFields);
             value = result?.birthDate ?? value;
@@ -423,6 +435,7 @@ export default function KidCreateForm(props) {
               photo: value,
               Parent1ID,
               Parent2ID,
+              vanID,
             };
             const result = onChange(modelFields);
             value = result?.photo ?? value;
@@ -456,6 +469,7 @@ export default function KidCreateForm(props) {
               photo,
               Parent1ID: value,
               Parent2ID,
+              vanID,
             };
             const result = onChange(modelFields);
             value = result?.Parent1ID ?? value;
@@ -489,6 +503,7 @@ export default function KidCreateForm(props) {
               photo,
               Parent1ID,
               Parent2ID: value,
+              vanID,
             };
             const result = onChange(modelFields);
             value = result?.Parent2ID ?? value;
@@ -502,6 +517,40 @@ export default function KidCreateForm(props) {
         errorMessage={errors.Parent2ID?.errorMessage}
         hasError={errors.Parent2ID?.hasError}
         {...getOverrideProps(overrides, "Parent2ID")}
+      ></TextField>
+      <TextField
+        label="Van id"
+        isRequired={false}
+        isReadOnly={false}
+        value={vanID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              parent1Email,
+              parent2Email,
+              dropOffAddress,
+              lat,
+              lng,
+              birthDate,
+              photo,
+              Parent1ID,
+              Parent2ID,
+              vanID: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.vanID ?? value;
+          }
+          if (errors.vanID?.hasError) {
+            runValidationTasks("vanID", value);
+          }
+          setVanID(value);
+        }}
+        onBlur={() => runValidationTasks("vanID", vanID)}
+        errorMessage={errors.vanID?.errorMessage}
+        hasError={errors.vanID?.hasError}
+        {...getOverrideProps(overrides, "vanID")}
       ></TextField>
       <Flex
         justifyContent="space-between"

@@ -1,6 +1,63 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateWeekDayRoutes = /* GraphQL */ `
+  subscription OnCreateWeekDayRoutes(
+    $filter: ModelSubscriptionWeekDayRoutesFilterInput
+  ) {
+    onCreateWeekDayRoutes(filter: $filter) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateWeekDayRoutes = /* GraphQL */ `
+  subscription OnUpdateWeekDayRoutes(
+    $filter: ModelSubscriptionWeekDayRoutesFilterInput
+  ) {
+    onUpdateWeekDayRoutes(filter: $filter) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteWeekDayRoutes = /* GraphQL */ `
+  subscription OnDeleteWeekDayRoutes(
+    $filter: ModelSubscriptionWeekDayRoutesFilterInput
+  ) {
+    onDeleteWeekDayRoutes(filter: $filter) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateConfigs = /* GraphQL */ `
   subscription OnCreateConfigs($filter: ModelSubscriptionConfigsFilterInput) {
     onCreateConfigs(filter: $filter) {
@@ -156,10 +213,6 @@ export const onCreateVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -177,10 +230,6 @@ export const onUpdateVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -198,10 +247,6 @@ export const onDeleteVan = /* GraphQL */ `
       year
       seats
       bosterSeats
-      Kids {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
