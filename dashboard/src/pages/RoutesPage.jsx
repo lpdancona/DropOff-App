@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { API, graphqlOperation } from "aws-amplify";
 import { listVans, listKids } from "../graphql/queries";
-import { updateKid, createRoute } from "../graphql/mutations";
+import {
+  updateKid,
+  createRoute,
+  createAddressList,
+} from "../graphql/mutations";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import {
   GoogleMap,
@@ -457,27 +461,63 @@ const RoutesPages = () => {
 
   const handleSaveRoute = async () => {
     const currentDate = new Date();
-    const currentVan = vans[1];
     const currentKids = kidsOnVan[selectedVan];
-    console.log(currentVan);
-    console.log(currentKids);
+
     try {
-      const routeDetails = {
+      // Create a new route
+      const newRouteDetails = {
         date: currentDate.toISOString(),
         departTime: departureTime,
         lat: dropOffStartPoint.lat,
         lng: dropOffStartPoint.lng,
-        Van: { currentVan },
-        Kids: { currentKids },
+        routeVanId: selectedVan,
         status: "WAITING_TO_START",
       };
 
-      const newRoute = await API.graphql({
+      const {
+        data: { createRoute: newRoute },
+      } = await API.graphql({
         query: createRoute,
-        variables: { input: routeDetails },
+        variables: { input: newRouteDetails },
       });
+
+      // Update routeID for each kid
+      const updateKidsPromises = currentKids.map(async (kid, index) => {
+        const kidDetails = {
+          id: kid.id,
+          routeID: newRoute.id,
+        };
+
+        // Update kid details with new routeID
+        await API.graphql({
+          query: updateKid,
+          variables: { input: kidDetails },
+        });
+
+        // Create addressList for the kid
+        const newAddressListDetails = {
+          order: index + 1, // Assuming order starts from 1
+          latitude: kid.lat,
+          longitude: kid.lng,
+          routeID: newRoute.id,
+          addressListKidId: kid.id,
+        };
+
+        // Save the new addressList for the kid
+        return await API.graphql({
+          query: createAddressList,
+          variables: { input: newAddressListDetails },
+        });
+      });
+
+      // Wait for all kid updates and addressList creations to complete
+      const updateResults = await Promise.all(updateKidsPromises);
+      console.log(updateResults);
+
+      alert("Route saved with success!");
     } catch (error) {
-      console.error("Error creating route", error);
+      console.error("Error updating route on kids", error);
+      alert("Failed to save route. Please check the console for details.");
     }
   };
 

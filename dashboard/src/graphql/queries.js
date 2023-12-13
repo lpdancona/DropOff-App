@@ -95,10 +95,10 @@ export const getAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
         vanID
+        routeID
         createdAt
         updatedAt
         __typename
@@ -231,11 +231,11 @@ export const getRoute = /* GraphQL */ `
         __typename
       }
       status
-      Kids {
+      AddressLists {
         nextToken
         __typename
       }
-      AddressLists {
+      Kids {
         nextToken
         __typename
       }
@@ -285,10 +285,10 @@ export const getKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      routeID
       Parent1ID
       Parent2ID
       vanID
+      routeID
       createdAt
       updatedAt
       __typename
@@ -312,10 +312,10 @@ export const listKids = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
         vanID
+        routeID
         createdAt
         updatedAt
         __typename
@@ -350,10 +350,10 @@ export const kidsByRouteID = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
         vanID
+        routeID
         createdAt
         updatedAt
         __typename

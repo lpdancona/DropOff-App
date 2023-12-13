@@ -130,10 +130,10 @@ export const createAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
         vanID
+        routeID
         createdAt
         updatedAt
         __typename
@@ -166,10 +166,10 @@ export const updateAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
         vanID
+        routeID
         createdAt
         updatedAt
         __typename
@@ -202,10 +202,10 @@ export const deleteAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
         vanID
+        routeID
         createdAt
         updatedAt
         __typename
@@ -305,11 +305,11 @@ export const createRoute = /* GraphQL */ `
         __typename
       }
       status
-      Kids {
+      AddressLists {
         nextToken
         __typename
       }
-      AddressLists {
+      Kids {
         nextToken
         __typename
       }
@@ -348,11 +348,11 @@ export const updateRoute = /* GraphQL */ `
         __typename
       }
       status
-      Kids {
+      AddressLists {
         nextToken
         __typename
       }
-      AddressLists {
+      Kids {
         nextToken
         __typename
       }
@@ -391,11 +391,11 @@ export const deleteRoute = /* GraphQL */ `
         __typename
       }
       status
-      Kids {
+      AddressLists {
         nextToken
         __typename
       }
-      AddressLists {
+      Kids {
         nextToken
         __typename
       }
@@ -421,10 +421,10 @@ export const createKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      routeID
       Parent1ID
       Parent2ID
       vanID
+      routeID
       createdAt
       updatedAt
       __typename
@@ -446,10 +446,10 @@ export const updateKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      routeID
       Parent1ID
       Parent2ID
       vanID
+      routeID
       createdAt
       updatedAt
       __typename
@@ -471,10 +471,10 @@ export const deleteKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      routeID
       Parent1ID
       Parent2ID
       vanID
+      routeID
       createdAt
       updatedAt
       __typename

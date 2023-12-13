@@ -54,8 +54,8 @@ type Route @model @auth(rules: [{allow: public}]) {
   route: AWSJSON
   Van: Van @hasOne
   status: RouteStatus
-  Kids: [Kid] @hasMany(indexName: "byRoute", fields: ["id"])
   AddressLists: [AddressList] @hasMany(indexName: "byRoute", fields: ["id"])
+  Kids: [Kid] @hasMany(indexName: "byRoute", fields: ["id"])
 }
 
 type Kid @model @auth(rules: [{allow: public}]) {
@@ -68,10 +68,10 @@ type Kid @model @auth(rules: [{allow: public}]) {
   lng: Float
   birthDate: AWSDate
   photo: String
-  routeID: ID @index(name: "byRoute")
   Parent1ID: ID
   Parent2ID: ID
   vanID: ID
+  routeID: ID @index(name: "byRoute")
 }
 
 enum UserTypes {

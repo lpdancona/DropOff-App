@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Employees.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { API } from "aws-amplify";
 import {
   faPenToSquare,
   faTrash,
@@ -8,6 +9,8 @@ import {
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import EmployeeForm from "./EmployeeForm";
+import { getUsers } from "../graphql/queries";
+
 function Employees() {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -19,9 +22,13 @@ function Employees() {
   const [updatedPhoto, setUpdatedPhoto] = useState("");
   const employeesPerPage = 4;
 
+
   useEffect(() => {
     const fetchEmployees = async () => {
-      const response = await fetch(
+      const variables: {
+        filter 
+      }
+      const response = await API({query: getUsers}
         "https://drop-off-app-dere.onrender.com/api/employes"
       );
       const json = await response.json();
