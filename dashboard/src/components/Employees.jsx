@@ -9,7 +9,7 @@ import {
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import EmployeeForm from "./EmployeeForm";
-import { getUsers } from "../graphql/queries";
+import { listUsers } from "../graphql/queries";
 
 function Employees() {
   const [employees, setEmployees] = useState([]);
@@ -22,20 +22,35 @@ function Employees() {
   const [updatedPhoto, setUpdatedPhoto] = useState("");
   const employeesPerPage = 4;
 
+  // const fetchKidsWithoutVan = async () => {
+  //   try {
+  //     const variables = {
+  //       filter: { vanID: { attributeExists: false } },
+  //     };
+  //     const kidsWithoutVanResponse = await API.graphql({
+  //       query: listKids,
+  //       variables: variables,
+  //     });
+  //     const kidsWithoutVanData = kidsWithoutVanResponse.data.listKids.items;
+  //     setKidsWithoutVan(kidsWithoutVanData);
+  //   } catch (error) {
+  //     console.error("Error fetching kids without van data:", error);
+  //   }
+  // };
 
   useEffect(() => {
     const fetchEmployees = async () => {
-      const variables: {
-        filter 
-      }
-      const response = await API({query: getUsers}
-        "https://drop-off-app-dere.onrender.com/api/employes"
-      );
-      const json = await response.json();
-
-      if (response.ok) {
-        setEmployees(json.employes);
-      }
+      const variables = {
+        filter: {
+          or: [{ userType: { eq: "STAFF" } }, { userType: { eq: "DRIVER" } }],
+        },
+      };
+      const employeesResponse = await API.graphql({
+        query: listUsers,
+        variables: variables,
+      });
+      const staff = employeesResponse.data.listUsers.items;
+      setEmployees(staff);
     };
     fetchEmployees();
   }, []);
