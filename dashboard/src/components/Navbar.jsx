@@ -27,6 +27,9 @@ export default function Navbar() {
           <Link to="/students">
             <h2>Kids</h2>
           </Link>
+          <Link to="/parents">
+            <h2>Parents</h2>
+          </Link>
           <Link to="/vans">
             <h2>Vans</h2>
           </Link>
