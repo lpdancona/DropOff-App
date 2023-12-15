@@ -12,67 +12,53 @@ import {
   SafeAreaView,
 } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-// import { Appbar, Menu } from "react-native-paper";
-// import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
+import { Appbar, Menu } from "react-native-paper";
+import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import styles from "./styles";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
-//import { useAuthContext } from "../../contexts/AuthContext";
-import { useRouteContext } from "../../contexts/RouteContext";
+import { useAuthContext } from "../../contexts/AuthContext";
 import { Auth } from "aws-amplify";
-// import { API, graphqlOperation } from "aws-amplify";
-// import {
-//   listRoutes,
-//   kidsByRouteID,
-//   getVan,
-//   getUser,
-// } from "../../graphql/queries";
-// import { onUpdateRoute } from "../../graphql/subscriptions";
-//import gbIcon from "../../docs/gb-logo.svg";
+import { API, graphqlOperation } from "aws-amplify";
+import {
+  listRoutes,
+  kidsByRouteID,
+  getVan,
+  getUser,
+} from "../../graphql/queries";
+import { onUpdateRoute } from "../../graphql/subscriptions";
+import gbIcon from "../../docs/gb-logo.svg";
 import houseIcon from "../../docs/icon-house.png";
 import vanIcon from "../../docs/van.png";
 
 const HomeScreen = () => {
-  //const { kids, dbUser, currentUserData, userEmail } = useAuthContext();
-  const {
-    driver,
-    helper,
-    currentRouteData,
-    dropOffLatLng,
-    dropOffAddress,
-    matchingKids,
-    busLocation,
-    isLoading,
-    isRouteInProgress,
-    noKidsAvailable,
-  } = useRouteContext();
-
+  const { kids, dbUser, currentUserData, userEmail } = useAuthContext();
   const [selectedItem, setSelectedItem] = useState(null);
-  // const [dropOffLatLng, setDropLatLng] = useState(null);
-  // const [dropOffAddress, setDropOffAddress] = useState(null);
-  //const [menuVisible, setMenuVisible] = useState(false);
+  const [dropOffLatLng, setDropLatLng] = useState(null);
+  const [dropOffAddress, setDropOffAddress] = useState(null);
+  const [menuVisible, setMenuVisible] = useState(false);
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
   const { width, height } = useWindowDimensions();
-  //const [busLocation, setBusLocation] = useState(null);
-  //const [routesData, setRoutesData] = useState(null);
-  //const [currentRouteData, setCurrentRouteData] = useState(null);
+  const [busLocation, setBusLocation] = useState(null);
+  const [routesData, setRoutesData] = useState(null);
+  const [currentRouteData, setCurrentRouteData] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
-  //const [matchingKids, setMatchingKids] = useState(null);
-  //const [driver, setDriver] = useState(null);
-  //const [helper, setHelper] = useState(null);
+  const [matchingKids, setMatchingKids] = useState(null);
+  const [driver, setDriver] = useState(null);
+  const [helper, setHelper] = useState(null);
   const [strokeWidth, setStrokeWidth] = useState(1);
   const [strokeColor, setStrokeColor] = useState("rgba(0, 0, 0, 0)");
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
-  //const [isLoading, setIsLoading] = useState(true);
-  //const [noKidsAvailable, setNoKidsAvailable] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Add a new state variable for loading
+  const [noKidsAvailable, setNoKidsAvailable] = useState(false);
 
   const LoadingScreen = () => (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -80,6 +66,92 @@ const HomeScreen = () => {
       <Text>Loading...</Text>
     </View>
   );
+
+  const getRoutesData = async () => {
+    try {
+      const variables = {
+        filter: {
+          status: { eq: "IN_PROGRESS" },
+        },
+      };
+
+      // Fetch route data
+      const responseListRoutes = await API.graphql({
+        query: listRoutes,
+        variables: variables,
+      });
+      const routeData = responseListRoutes.data.listRoutes.items;
+      if (routeData.length === 0) {
+        // alert(
+        //   "Hi there, there is no route in progress now! come back later or contact us for more information!"
+        // );
+        await navigation.navigate("Wait");
+      }
+
+      // Fetch kids data for each route
+      const mergedData = await Promise.all(
+        routeData.map(async (route) => {
+          const responseKidsByRouteID = await API.graphql({
+            query: kidsByRouteID,
+            variables: { routeID: route.id },
+          });
+          const kidsData = responseKidsByRouteID.data.kidsByRouteID.items;
+          // fetch the van
+          const responseGetVan = await API.graphql({
+            query: getVan,
+            variables: { id: route.routeVanId },
+          });
+          const vansData = responseGetVan.data.getVan;
+
+          return { ...route, Kid: kidsData, Van: vansData };
+        })
+      );
+
+      setRoutesData(mergedData);
+    } catch (error) {
+      console.error("Error fetching data getROutesData: ", error);
+    }
+  };
+
+  const checkKidsInRoutes = () => {
+    if (kids && routesData) {
+      // Find the first route that has at least one kid from the context
+      const routeWithMatchingKids = routesData.find((item) => {
+        if (item.Kid && Array.isArray(item.Kid)) {
+          return item.Kid.some((routeKid) =>
+            kids.some((contextKid) => routeKid.id === contextKid.id)
+          );
+        }
+        return false;
+      });
+
+      if (routeWithMatchingKids) {
+        // Update the state variable with the route that has matching kids
+        setCurrentRouteData(routeWithMatchingKids);
+        //
+        const matchingKidsArray = kids.filter((contextKid) =>
+          routeWithMatchingKids.Kid.some(
+            (routeKid) => routeKid.id === contextKid.id
+          )
+        );
+        if (matchingKidsArray.length > 0) {
+          // Update the state variable with matching kids
+          setMatchingKids(matchingKidsArray);
+
+          // Loop through matching kids and extract dropOffAddress and dropOffLatLng
+          matchingKidsArray.forEach((matchingKid) => {
+            const { dropOffAddress, lat, lng } = matchingKid;
+            setDropLatLng({ latitude: lat, longitude: lng });
+            setDropOffAddress(dropOffAddress);
+          });
+        }
+        return true;
+      }
+      return false;
+    }
+    setNoKidsAvailable(true);
+    return false;
+  };
 
   const currentDateTime = new Date(); // Get the current date and time
   currentDateTime.setMinutes(currentDateTime.getMinutes() + totalMinutes); // Add the totalMinutes to the current time
@@ -97,7 +169,6 @@ const HomeScreen = () => {
       longitudeDelta: 0.0007,
     });
   };
-
   const handleLogout = async () => {
     try {
       // Sign out the user using Amplify Auth
@@ -118,111 +189,107 @@ const HomeScreen = () => {
     setDropdownVisible(false);
   };
 
+  const handleGoBack = () => {
+    // Navigate back to the login screen
+    navigation.goBack();
+  };
+
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
   ///
   /// Start UseEffect
   ///
+  useEffect(() => {
+    // Fetch initial data when the component mounts
+    if (dbUser && userEmail) {
+      const fetchInitialData = async () => {
+        await getRoutesData();
+        setIsLoading(false); // Set loading to false after data is fetched
+      };
+      fetchInitialData();
+    }
+  }, [kids]);
 
   useEffect(() => {
-    if (!isRouteInProgress) {
-      navigation.navigate("Wait");
+    if (routesData) {
+      // Check kids in routes after fetching initial data
+      if (!checkKidsInRoutes()) {
+        setIsLoading(false);
+        setNoKidsAvailable(true);
+        // alert(
+        //   `We sorry but, your child ${kids[0].name} is not on any route today!`
+        // );
+        navigation.navigate("Wait");
+        // handleLogout();
+      }
     }
-  }, [isRouteInProgress]);
+  }, [routesData, kids]);
 
-  // useEffect(() => {
-  //   // Fetch initial data when the component mounts
-  //   if (routesData) {
-  //     setIsLoading(false); // Set loading to false after data is fetched
-  //   }
-  // }, [routesData]);
+  const getStaffData = async () => {
+    if (currentRouteData.driver) {
+      const responseGetDriver = await API.graphql({
+        query: getUser,
+        variables: { id: currentRouteData.driver },
+      });
+      const driverData = responseGetDriver.data.getUser;
+      setDriver(driverData);
+    }
+    if (currentRouteData.helper) {
+      //
+      const responseGetHelper = await API.graphql({
+        query: getUser,
+        variables: { id: currentRouteData.helper },
+      });
+      const helperData = responseGetHelper.data.getUser;
+      setHelper(helperData);
+    }
+  };
 
-  // useEffect(() => {
-  //   if (routesData) {
-  //     // Check kids in routes after fetching initial data
-  //     if (!checkKidsInRoutes()) {
-  //       setIsLoading(false);
-  //       setNoKidsAvailable(true);
-  //       // alert(
-  //       //   `We sorry but, your child ${kids[0].name} is not on any route today!`
-  //       // );
-  //       navigation.navigate("Wait");
-  //       // handleLogout();
-  //     }
-  //   }
-  // }, [routesData, kids]);
+  useEffect(() => {
+    if (!currentRouteData) {
+      return;
+    }
+    getStaffData();
+  }, [currentRouteData]);
 
-  // const getStaffData = async () => {
-  //   if (currentRouteData.driver) {
-  //     const responseGetDriver = await API.graphql({
-  //       query: getUser,
-  //       variables: { id: currentRouteData.driver },
-  //     });
-  //     const driverData = responseGetDriver.data.getUser;
-  //     setDriver(driverData);
-  //   }
-  //   if (currentRouteData.helper) {
-  //     //
-  //     const responseGetHelper = await API.graphql({
-  //       query: getUser,
-  //       variables: { id: currentRouteData.helper },
-  //     });
-  //     const helperData = responseGetHelper.data.getUser;
-  //     setHelper(helperData);
-  //   }
-  // };
+  useEffect(() => {
+    // Update the bus location state when currentRouteData changes
+    if (currentRouteData) {
+      const initialBusLocation = {
+        latitude: currentRouteData.lat,
+        longitude: currentRouteData.lng,
+      };
+      setBusLocation(initialBusLocation);
+    }
+  }, [currentRouteData]);
 
-  // useEffect(() => {
-  //   if (!currentRouteData) {
-  //     return;
-  //   }
-  //   console.log(currentRouteData);
-  //   if (currentRouteData.status === "IN_PROGRESS") {
-  //     navigation.navigate("Home");
-  //   } else {
-  //     navigation.navigate("Wait");
-  //   }
-  // }, [currentRouteData?.status]);
+  useEffect(() => {
+    if (!busLocation) {
+      return;
+    }
+    const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
+      next: ({ value }) => {
+        const newBusLocation = {
+          latitude: value.data.onUpdateRoute.lat,
+          longitude: value.data.onUpdateRoute.lng,
+        };
+        if (
+          newBusLocation.latitude !== busLocation.lat ||
+          newBusLocation.longitude !== busLocation.lng
+        ) {
+          setBusLocation(newBusLocation);
+        }
+      },
+      error: (error) => {
+        console.error("Subscription Error:", error);
+      },
+    });
 
-  // useEffect(() => {
-  //   // Update the bus location state when currentRouteData changes
-  //   if (currentRouteData) {
-  //     const initialBusLocation = {
-  //       latitude: currentRouteData.lat,
-  //       longitude: currentRouteData.lng,
-  //     };
-  //     setBusLocation(initialBusLocation);
-  //   }
-  // }, [currentRouteData]);
-
-  // useEffect(() => {
-  //   if (!busLocation) {
-  //     return;
-  //   }
-  //   const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
-  //     next: ({ value }) => {
-  //       if (value.status !== "IN_PROGRESS") {
-  //         navigation.navigate("Wait");
-  //       }
-  //       const newBusLocation = {
-  //         latitude: value.data.onUpdateRoute.lat,
-  //         longitude: value.data.onUpdateRoute.lng,
-  //       };
-  //       if (
-  //         newBusLocation.latitude !== busLocation.lat ||
-  //         newBusLocation.longitude !== busLocation.lng
-  //       ) {
-  //         setBusLocation(newBusLocation);
-  //       }
-  //     },
-  //     error: (error) => {
-  //       console.error("Subscription Error:", error);
-  //     },
-  //   });
-
-  //   return () => {
-  //     // Cleanup subscription on component unmount
-  //     sub.unsubscribe();
-  //   };
-  // }, [busLocation]);
+    return () => {
+      // Cleanup subscription on component unmount
+      sub.unsubscribe();
+    };
+  }, [busLocation]);
 
   if (!busLocation || !dropOffLatLng) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;

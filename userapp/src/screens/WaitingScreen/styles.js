@@ -10,9 +10,9 @@ export default StyleSheet.create({
     position: "absolute",
   },
   centeredTextWrapper: {
-    marginHorizontal: 20, // Adjust the margin as needed
-    marginTop: 50,
-    marginBottom: -20,
+    marginHorizontal: 20,
+    marginTop: 20,
+    marginBottom: -40,
     position: "relative",
   },
   centeredText: {
@@ -44,6 +44,48 @@ export default StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: "rgb(2 119 247)",
+    backgroundColor: "rgb(2, 119, 247)",
+  },
+  logoutButton: {
+    backgroundColor: "red",
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 20,
+    alignSelf: "center",
+  },
+  modalView: {
+    margin: 60,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    top: 250,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 1,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 10,
+    padding: 10,
+    marginHorizontal: 10,
+    width: 100,
+    alignItems: "center",
+  },
+  buttonClose: {
+    backgroundColor: "green",
+  },
+  buttonConfirm: {
+    backgroundColor: "red",
+  },
+  confirmLogoutText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    letterSpacing: 2,
   },
 });

@@ -17,6 +17,7 @@ import { PaperProvider } from "react-native-paper";
 import CustomHeader from "./src/layout/CustomHeader";
 import CustomFooter from "./src/layout/CustomFooter";
 import getTheme from "./src/layout/CustomTheme";
+import RouteContextProvider from "./src/contexts/RouteContext";
 
 // Aws Amplify config
 import { Amplify } from "aws-amplify";
@@ -40,12 +41,14 @@ function App() {
           <NavigationContainer>
             <PushNotificationsContextProvider>
               <AuthContextProvider>
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                  <PaperProvider>
-                    <RootNavigator />
-                  </PaperProvider>
-                </GestureHandlerRootView>
-                <StatusBar style="light" />
+                <RouteContextProvider>
+                  <GestureHandlerRootView style={{ flex: 1 }}>
+                    <PaperProvider>
+                      <RootNavigator />
+                    </PaperProvider>
+                  </GestureHandlerRootView>
+                  <StatusBar style="light" />
+                </RouteContextProvider>
               </AuthContextProvider>
             </PushNotificationsContextProvider>
           </NavigationContainer>

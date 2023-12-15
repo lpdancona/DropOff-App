@@ -1,18 +1,32 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
+  SafeAreaView,
   Text,
   useWindowDimensions,
   Image,
   TextStyle,
   TouchableOpacity,
   Linking,
+  Modal,
+  Pressable,
 } from "react-native";
+import { Auth } from "aws-amplify";
 import styles from "./styles";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
+import { useNavigation } from "@react-navigation/native";
+
+// import { API, graphqlOperation } from "aws-amplify";
+// import { onUpdateRoute } from "../../graphql/subscriptions";
+
 const WaitingScreen = () => {
   const windowWidth = useWindowDimensions().width;
+  const [confirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
+  //const [isWaiting, setIsWaiting] = useState(true);
+  //const { isRouteInProgress } = useRouteContext();
+  const navigation = useNavigation();
 
   const funTextStyle: TextStyle = {
     fontSize: 14,
@@ -22,8 +36,46 @@ const WaitingScreen = () => {
     letterSpacing: 2,
   };
 
+  const handleLogout = async () => {
+    try {
+      // Sign out the user using Amplify Auth
+      await Auth.signOut();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setConfirmationModalVisible(false);
+    }
+  };
+
+  // useEffect(() => {
+  //   console.log("is Route in Progress (wainting)", isRouteInProgress);
+  //   if (isRouteInProgress) {
+  //     navigation.navigate("Home");
+  //   } else {
+  //     navigation.navigate("Wait");
+  //   }
+  // }, [isRouteInProgress]);
+
+  // useEffect(() => {
+  //   const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
+  //     next: ({ value }) => {
+  //       if (value.status === "IN_PROGRESS") {
+  //         navigation.navigate("Home");
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error("Subscription Error:", error);
+  //     },
+  //   });
+
+  //   return () => {
+  //     // Cleanup subscription on component unmount
+  //     sub.unsubscribe();
+  //   };
+  // }, [isWaiting]);
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Image
         source={require("../../docs/ondacima.png")}
         style={[styles.waveImage, { top: 0, height: 115, width: 480 }]}
@@ -45,7 +97,7 @@ const WaitingScreen = () => {
       <Text
         style={[
           funTextStyle,
-          { marginTop: "90%", marginBottom: 10, color: "black" },
+          { marginTop: "40%", marginBottom: 10, color: "black" },
         ]}
       >
         Have Questions? Give us a call
@@ -78,11 +130,49 @@ const WaitingScreen = () => {
           </View>
         </TouchableOpacity>
       </View>
+      {/* Logout Button */}
+      <TouchableOpacity
+        onPress={() => setConfirmationModalVisible(true)}
+        style={styles.logoutButton}
+      >
+        <Text style={{ color: "white", fontSize: 20 }}>Logout</Text>
+      </TouchableOpacity>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={confirmationModalVisible}
+        onRequestClose={() => setConfirmationModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.confirmLogoutText}>
+              Are you sure you want to logout?
+            </Text>
+            <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setConfirmationModalVisible(false)}
+              >
+                <Text style={funTextStyle}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.buttonConfirm]}
+                onPress={handleLogout}
+              >
+                <Text style={funTextStyle}>Logout</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <Image
         source={require("../../docs/ondabaixo.png")}
         style={[styles.waveImage, { bottom: 0, height: 102, width: 500 }]}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
