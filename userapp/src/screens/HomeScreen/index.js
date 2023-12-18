@@ -48,6 +48,7 @@ const HomeScreen = () => {
     isLoading,
     isRouteInProgress,
     noKidsAvailable,
+    addressList,
   } = useRouteContext();
 
   const [selectedItem, setSelectedItem] = useState(null);
@@ -89,6 +90,7 @@ const HomeScreen = () => {
     minute: "2-digit",
     hour12: true,
   });
+
   const zoomInOnDriver = () => {
     mapRef.current.animateToRegion({
       latitude: busLocation.latitude,
@@ -118,9 +120,54 @@ const HomeScreen = () => {
     setDropdownVisible(false);
   };
 
+  const calculateBearing = (startLat, startLng, endLat, endLng) => {
+    const startLatRad = degreesToRadians(startLat);
+    const startLngRad = degreesToRadians(startLng);
+    const endLatRad = degreesToRadians(endLat);
+    const endLngRad = degreesToRadians(endLng);
+
+    const dLng = endLngRad - startLngRad;
+
+    const x = Math.sin(dLng) * Math.cos(endLatRad);
+    const y =
+      Math.cos(startLatRad) * Math.sin(endLatRad) -
+      Math.sin(startLatRad) * Math.cos(endLatRad) * Math.cos(dLng);
+
+    const bearing = Math.atan2(x, y);
+    const bearingDegrees = radiansToDegrees(bearing);
+
+    return bearingDegrees;
+  };
+
+  const degreesToRadians = (degrees) => (degrees * Math.PI) / 180;
+  const radiansToDegrees = (radians) => (radians * 180) / Math.PI;
+
   ///
   /// Start UseEffect
   ///
+  useEffect(() => {
+    if (busLocation) {
+      // Calculate the bearing angle between the current and next locations
+      const bearing = calculateBearing(
+        busLocation.latitude,
+        busLocation.longitude,
+        dropOffLatLng.latitude,
+        dropOffLatLng.longitude
+      );
+
+      // Animate the map to the next location and rotate it based on the bearing
+      mapRef.current.animateCamera({
+        center: {
+          latitude: busLocation.latitude,
+          longitude: busLocation.longitude,
+        },
+        heading: bearing,
+        pitch: 0,
+        altitude: 1000, // You can adjust the altitude as needed
+        zoom: 15, // You can adjust the zoom level as needed
+      });
+    }
+  }, [busLocation, dropOffLatLng]);
 
   useEffect(() => {
     if (!isRouteInProgress) {
@@ -128,103 +175,7 @@ const HomeScreen = () => {
     }
   }, [isRouteInProgress]);
 
-  // useEffect(() => {
-  //   // Fetch initial data when the component mounts
-  //   if (routesData) {
-  //     setIsLoading(false); // Set loading to false after data is fetched
-  //   }
-  // }, [routesData]);
-
-  // useEffect(() => {
-  //   if (routesData) {
-  //     // Check kids in routes after fetching initial data
-  //     if (!checkKidsInRoutes()) {
-  //       setIsLoading(false);
-  //       setNoKidsAvailable(true);
-  //       // alert(
-  //       //   `We sorry but, your child ${kids[0].name} is not on any route today!`
-  //       // );
-  //       navigation.navigate("Wait");
-  //       // handleLogout();
-  //     }
-  //   }
-  // }, [routesData, kids]);
-
-  // const getStaffData = async () => {
-  //   if (currentRouteData.driver) {
-  //     const responseGetDriver = await API.graphql({
-  //       query: getUser,
-  //       variables: { id: currentRouteData.driver },
-  //     });
-  //     const driverData = responseGetDriver.data.getUser;
-  //     setDriver(driverData);
-  //   }
-  //   if (currentRouteData.helper) {
-  //     //
-  //     const responseGetHelper = await API.graphql({
-  //       query: getUser,
-  //       variables: { id: currentRouteData.helper },
-  //     });
-  //     const helperData = responseGetHelper.data.getUser;
-  //     setHelper(helperData);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (!currentRouteData) {
-  //     return;
-  //   }
-  //   console.log(currentRouteData);
-  //   if (currentRouteData.status === "IN_PROGRESS") {
-  //     navigation.navigate("Home");
-  //   } else {
-  //     navigation.navigate("Wait");
-  //   }
-  // }, [currentRouteData?.status]);
-
-  // useEffect(() => {
-  //   // Update the bus location state when currentRouteData changes
-  //   if (currentRouteData) {
-  //     const initialBusLocation = {
-  //       latitude: currentRouteData.lat,
-  //       longitude: currentRouteData.lng,
-  //     };
-  //     setBusLocation(initialBusLocation);
-  //   }
-  // }, [currentRouteData]);
-
-  // useEffect(() => {
-  //   if (!busLocation) {
-  //     return;
-  //   }
-  //   const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
-  //     next: ({ value }) => {
-  //       if (value.status !== "IN_PROGRESS") {
-  //         navigation.navigate("Wait");
-  //       }
-  //       const newBusLocation = {
-  //         latitude: value.data.onUpdateRoute.lat,
-  //         longitude: value.data.onUpdateRoute.lng,
-  //       };
-  //       if (
-  //         newBusLocation.latitude !== busLocation.lat ||
-  //         newBusLocation.longitude !== busLocation.lng
-  //       ) {
-  //         setBusLocation(newBusLocation);
-  //       }
-  //     },
-  //     error: (error) => {
-  //       console.error("Subscription Error:", error);
-  //     },
-  //   });
-
-  //   return () => {
-  //     // Cleanup subscription on component unmount
-  //     sub.unsubscribe();
-  //   };
-  // }, [busLocation]);
-
-  if (!busLocation || !dropOffLatLng) {
+  if (!busLocation || !dropOffLatLng || !addressList) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
   if (isLoading) {
@@ -238,6 +189,31 @@ const HomeScreen = () => {
       </View>
     );
   }
+  console.log(addressList);
+  //onsole.log(matchingKids);
+
+  const waypoints = addressList.map((address) => ({
+    latitude: address.latitude,
+    longitude: address.longitude,
+  }));
+
+  const dropOffIndex = waypoints.findIndex(
+    (waypoint) =>
+      waypoint.latitude === dropOffLatLng.latitude &&
+      waypoint.longitude === dropOffLatLng.longitude
+  );
+
+  const filteredWaypoints =
+    dropOffIndex !== -1 ? waypoints.slice(0, dropOffIndex + 1) : null;
+
+  const finalWaypoints =
+    filteredWaypoints && filteredWaypoints.length === 1
+      ? null
+      : filteredWaypoints;
+
+  // console.log("addressList", addressList);
+  // console.log("waypoints", waypoints);
+  // console.log("filteredWaypoints", filteredWaypoints);
 
   return (
     <View style={styles.mapContainer}>
@@ -274,8 +250,9 @@ const HomeScreen = () => {
         </TouchableOpacity>
         <MapViewDirections
           apikey={GOOGLE_MAPS_APIKEY}
-          origin={busLocation} // Start from the first waypoint
-          destination={dropOffLatLng} //{van.waypoints[van.waypoints.length - 1]} // End at the last waypoint
+          origin={busLocation}
+          destination={dropOffLatLng}
+          waypoints={finalWaypoints ? finalWaypoints : []}
           mode={"DRIVING"}
           precision="high"
           timePrecision="now"
@@ -292,6 +269,11 @@ const HomeScreen = () => {
             }
             // Handle the route information here
             //setIsDriverClose(result.distance <= 0.1);
+            // console.log(
+            //   `Parent ${index + 1}: ETA ${result.duration.toFixed(
+            //     0
+            //   )} min, Distance ${result.distance.toFixed(2)} Km`
+            // );
             setTotalMinutes(result.duration);
             setTotalKm(result.distance);
           }}

@@ -28,6 +28,12 @@ function SignOutButton() {
 LogBox.ignoreLogs(["NSLocation*UsageDescription"]);
 
 function App() {
+  useEffect(() => {
+    return () => {
+      console.log("STOPPING ALL REGISTERED TASKS");
+      TaskManager.unregisterAllTasksAsync();
+    };
+  }, []);
   return (
     <NavigationContainer>
       <PushNotificationsContextProvider>

@@ -270,6 +270,11 @@ const RouteScreen = () => {
       latitude: busLocation.latitude,
       longitude: busLocation.longitude,
     });
+    const newDestination = {
+      latitude: addressList[currentWaypointIndex].latitude,
+      longitude: addressList[currentWaypointIndex].longitude,
+    };
+    setDestination(newDestination);
     // remove past waypoints from addresslist
     setAddressList((prevAddressList) => {
       return prevAddressList.slice(currentWaypointIndex);
@@ -544,7 +549,7 @@ const RouteScreen = () => {
         //provider={PROVIDER_GOOGLE}
         style={{ width, height }}
         showsUserLocation={true}
-        followsUserLocation={true}
+        //followsUserLocation={true}
         initialRegion={{
           latitude: busLocation.latitude,
           longitude: busLocation.longitude,
@@ -567,6 +572,7 @@ const RouteScreen = () => {
             strokeColor="blue"
             timePrecision="now"
             onReady={(result) => {
+              //console.log(addressList[currentWaypointIndex].Kid[0].name);
               const isClose = result.duration <= 5;
               if (isClose && !notificationSent && driverAction === "Drive") {
                 setNotificationSent(true);
@@ -577,8 +583,15 @@ const RouteScreen = () => {
 
               if (result.distance <= 0.1) {
                 //console.log("distance", result.distance);
+
+                sendPushNotification(
+                  expoPushToken?.data,
+                  "Arrived!",
+                  `Driver you arrived at ${addressList[currentWaypointIndex].Kid[0].name} house! `
+                );
                 setHandlingNextWaypoint(true);
                 setIsVanArrived(true);
+
                 //handleNextWaypoint();
               }
             }}
@@ -761,7 +774,7 @@ const RouteScreen = () => {
             )}
           {handlingNextWaypoint && (
             <>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => {
                   // Handle the "Cancel" action
                 }}
@@ -785,7 +798,7 @@ const RouteScreen = () => {
                 }}
               >
                 <Text style={{ color: "black", fontSize: 20 }}>Pause</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               {isVanArrived && (
                 <TouchableOpacity
                   onPress={() => {

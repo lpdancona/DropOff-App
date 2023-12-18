@@ -6,10 +6,10 @@ import {
   kidsByRouteID,
   getVan,
   getUser,
+  listAddressLists,
+  getKid,
 } from "../../src/graphql/queries";
-import { useNavigation } from "@react-navigation/native";
 import { onUpdateRoute } from "../graphql/subscriptions";
-import { USES_DEFAULT_IMPLEMENTATION } from "react-native-maps/lib/decorateMapComponent";
 
 const RouteContext = createContext({});
 
@@ -27,6 +27,69 @@ const RouteContextProvider = ({ children }) => {
   const [helper, setHelper] = useState(null);
   const [busLocation, setBusLocation] = useState(null);
   const [isRouteInProgress, setIsRouteInProgress] = useState(false);
+  const [addressList, setAddressList] = useState(null);
+
+  const getOrderAddress = async () => {
+    try {
+      const variables = {
+        filter: {
+          routeID: { eq: currentRouteData.id },
+        },
+      };
+      const responseListAddress = await API.graphql({
+        query: listAddressLists,
+        variables: variables,
+      });
+      const AddressListsData = responseListAddress.data.listAddressLists.items;
+      const sortedAddressList = AddressListsData.sort(
+        (a, b) => a.order - b.order
+      );
+
+      const addressListWithKids = await Promise.all(
+        sortedAddressList.map(async (addressListItem) => {
+          try {
+            const responseGetKid = await API.graphql({
+              query: getKid,
+              variables: { id: addressListItem.addressListKidId },
+            });
+            const kidData = responseGetKid.data.getKid;
+            return {
+              ...addressListItem,
+              Kid: kidData,
+            };
+          } catch (kidError) {
+            console.error("Error fetching Kid data", kidError);
+            return addressListItem;
+          }
+        })
+      );
+      const groupedAddressList = new Map();
+
+      addressListWithKids.forEach((address) => {
+        const { latitude, longitude } = address;
+        const locationKey = `${latitude}_${longitude}`;
+
+        if (!groupedAddressList.has(locationKey)) {
+          groupedAddressList.set(locationKey, {
+            ...address,
+            Kid: [],
+            latitude,
+            longitude,
+          });
+        }
+
+        const groupedAddress = groupedAddressList.get(locationKey);
+        // groupedAddress.AddressList.push(address);
+        groupedAddress.Kid.push(address.Kid);
+      });
+
+      const uniqueAddressList = Array.from(groupedAddressList.values());
+
+      setAddressList(uniqueAddressList);
+    } catch (error) {
+      console.error("Error fetching getOrderAddress: ", error);
+    }
+  };
 
   const getRoutesData = async () => {
     try {
@@ -45,8 +108,10 @@ const RouteContextProvider = ({ children }) => {
         query: listRoutes,
         variables: variables,
       });
+
       const routeData = responseListRoutes.data.listRoutes.items;
       if (routeData.length === 0) {
+        console.log("routesData not found any route", routeData);
         // alert(
         //   "Hi there, there is no route in progress now! come back later or contact us for more information!"
         // );
@@ -77,6 +142,7 @@ const RouteContextProvider = ({ children }) => {
       console.error("Error fetching data getROutesData: ", error);
     }
   };
+
   const checkKidsInRoutes = () => {
     if (kids && routesData) {
       //console.log("routesData", routesData);
@@ -118,17 +184,6 @@ const RouteContextProvider = ({ children }) => {
     return false;
   };
 
-  useEffect(() => {
-    // Fetch initial data when the component mounts
-    if (dbUser && userEmail) {
-      const fetchInitialData = async () => {
-        await getRoutesData();
-        setIsLoading(false); // Set loading to false after data is fetched
-      };
-      fetchInitialData();
-    }
-  }, [kids]);
-
   const getStaffData = async () => {
     if (currentRouteData.driver) {
       const responseGetDriver = await API.graphql({
@@ -148,6 +203,26 @@ const RouteContextProvider = ({ children }) => {
       setHelper(helperData);
     }
   };
+  //
+  //Start useEffect
+  //
+
+  useEffect(() => {
+    if (currentRouteData) {
+      getOrderAddress();
+    }
+  }, [currentRouteData]);
+
+  useEffect(() => {
+    // Fetch initial data when the component mounts
+    if (dbUser && userEmail) {
+      const fetchInitialData = async () => {
+        await getRoutesData();
+        setIsLoading(false); // Set loading to false after data is fetched
+      };
+      fetchInitialData();
+    }
+  }, [dbUser]);
 
   useEffect(() => {
     if (!currentRouteData) {
@@ -182,7 +257,6 @@ const RouteContextProvider = ({ children }) => {
   useEffect(() => {
     // Update the bus location state when currentRouteData changes
     if (currentRouteData) {
-      console.log(currentRouteData);
       const initialBusLocation = {
         latitude: currentRouteData.lat,
         longitude: currentRouteData.lng,
@@ -202,11 +276,6 @@ const RouteContextProvider = ({ children }) => {
     }
     const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
       next: ({ value }) => {
-        if (value.status !== "IN_PROGRESS") {
-          setIsRouteInProgress(false);
-        } else if (value.status === "IN_PROGRESS") {
-          setIsRouteInProgress(true);
-        }
         const newBusLocation = {
           latitude: value.data.onUpdateRoute.lat,
           longitude: value.data.onUpdateRoute.lng,
@@ -229,6 +298,30 @@ const RouteContextProvider = ({ children }) => {
     };
   }, [busLocation]);
 
+  useEffect(() => {
+    const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
+      next: ({ value }) => {
+        if (value && value.data && value.data.onUpdateRoute) {
+          const routeStatus = value.data.onUpdateRoute.status;
+
+          if (routeStatus === "IN_PROGRESS") {
+            setIsRouteInProgress(true);
+          } else {
+            setIsRouteInProgress(false);
+          }
+        }
+      },
+      error: (error) => {
+        console.error("Subscription Error:", error);
+      },
+    });
+
+    return () => {
+      // Cleanup subscription on component unmount
+      sub.unsubscribe();
+    };
+  }, []);
+
   return (
     <RouteContext.Provider
       value={{
@@ -244,6 +337,7 @@ const RouteContextProvider = ({ children }) => {
         busLocation,
         isLoading,
         isRouteInProgress,
+        addressList,
       }}
     >
       {children}

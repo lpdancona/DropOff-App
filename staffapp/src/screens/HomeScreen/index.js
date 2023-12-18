@@ -166,19 +166,12 @@ const HomeScreen = () => {
                   </View>
                 </View>
                 <Text style={styles.itemTitle}>
-                  {item.status === "WAITING_TO_START" ? (
+                  {item.status === "WAITING_TO_START" && (
                     <Text style={{ color: "green" }}>Waiting to start</Text>
-                  ) : item.status === "IN_PROGRESS" ? (
-                    <Text
-                      style={{
-                        color: "blue",
-                      }}
-                    >
+                  )}
+                  {item.status === "IN_PROGRESS" && (
+                    <Text style={{ color: "blue" }}>
                       In progress - Departed Time {routesData[index].departTime}
-                    </Text>
-                  ) : (
-                    <Text style={{ color: "red" }}>
-                      PAUSED (waiting to resume)
                     </Text>
                   )}
                 </Text>

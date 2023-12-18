@@ -18,7 +18,6 @@ const Stack = createNativeStackNavigator();
 const RootNavigator = () => {
   const { dbUser, loading } = useAuthContext();
   const { isRouteInProgress } = useRouteContext();
-  console.log("isRoute in Progress (navigation)", isRouteInProgress);
 
   if (loading) {
     return <ActivityIndicator size="large" color="gray" />;
@@ -35,12 +34,6 @@ const RootNavigator = () => {
       ) : (
         <Stack.Screen name="ParentLogin" component={ProfileScreen} />
       )}
-      {/* <Stack.Screen name="ParentLogin" component={ProfileScreen} />
-      <Stack.Screen name="Home" component={HomeScreen} /> */}
-      {/* <Stack.Screen 
-        name='Login' 
-        component={LoginScreen}
-      /> */}
     </Stack.Navigator>
   );
 };
