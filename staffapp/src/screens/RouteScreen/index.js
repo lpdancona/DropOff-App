@@ -67,6 +67,7 @@ const RouteScreen = () => {
   );
   const [showDriveButton, setShowDriveButton] = useState(true);
   const [isVanArrived, setIsVanArrived] = useState(false);
+  const [etaDistance, setEtaDistance] = useState({});
 
   // data from contexts
   const { schedulePushNotification, sendPushNotification, expoPushToken } =
@@ -182,20 +183,62 @@ const RouteScreen = () => {
     }
   };
 
+  // const renderKidsItem = ({ item, index }) => {
+  //   if (!addressList) {
+  //     return <ActivityIndicator size="large" color="gray" />;
+  //   }
+
+  //   return (
+  //     <View>
+  //       {/* <Text>{`Order: ${item.order}`}</Text> */}
+  //       {item.Kid.map((kid) => (
+  //         <Pressable
+  //           key={kid.id}
+  //           onPress={(e) => {
+  //             setSelectedItem(kid);
+  //           }}
+  //         >
+  //           <View style={styles.itemContainer}>
+  //             <Text style={styles.itemText}>
+  //               {item.order} - {kid.name}
+  //             </Text>
+  //             <Text style={styles.etaDistanceText}>
+  //               ETA: {item.eta}, Distance: {item.distance}
+  //             </Text>
+  //           </View>
+  //         </Pressable>
+  //       ))}
+  //     </View>
+  //   );
+  // };
+
   const renderKidsItem = ({ item, index }) => {
-    if (!currentRouteData) {
+    if (!addressList) {
       return <ActivityIndicator size="large" color="gray" />;
     }
+
     return (
-      <Pressable
-        onPress={(e) => {
-          setSelectedItem(item);
-        }}
-      >
-        <View style={styles.itemContainer}>
-          <Text style={styles.itemText}>{item.name}</Text>
-        </View>
-      </Pressable>
+      <View>
+        {item.Kid.map((kid) => {
+          const { eta, formattedDistance } = etaDistance[index] || {};
+
+          return (
+            <Pressable
+              key={kid.id}
+              onPress={(e) => {
+                setSelectedItem(kid);
+              }}
+            >
+              <View style={styles.itemContainer}>
+                <Text style={styles.itemText}>
+                  {item.order} - {kid.name} - ETA: {eta}, Distance:{" "}
+                  {formattedDistance}
+                </Text>
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
     );
   };
 
@@ -223,6 +266,7 @@ const RouteScreen = () => {
               variables: { id: addressListItem.addressListKidId },
             });
             const kidData = responseGetKid.data.getKid;
+
             return {
               ...addressListItem,
               Kid: kidData,
@@ -233,6 +277,7 @@ const RouteScreen = () => {
           }
         })
       );
+
       const groupedAddressList = new Map();
 
       addressListWithKids.forEach((address) => {
@@ -283,28 +328,36 @@ const RouteScreen = () => {
 
   const getParentsInfo = async () => {
     if (currentRouteData?.Kid) {
-      // Loop through each kid in currentRouteData
       for (const kid of currentRouteData.Kid) {
-        if (kid.Parent1ID !== null) {
-          const parent1Data = await API.graphql({
-            query: getUser,
-            variables: { id: kid.Parent1ID },
-          });
-
-          // Store the parent1Data in the kid object
-          kid.Parent1 = parent1Data.data.getUser;
-        }
-
-        if (kid.Parent2ID !== null) {
-          const parent2Data = await API.graphql({
-            query: getUser,
-            variables: { id: kid.Parent2ID },
-          });
-
-          // Store the parent2Data in the kid object
-          kid.Parent2 = parent2Data.data.getUser;
+        await fetchParentsInfoForKid(kid);
+      }
+    }
+    if (addressList) {
+      for (const kid of addressList) {
+        if (kid.Kid) {
+          for (const nestedKid of kid.Kid) {
+            await fetchParentsInfoForKid(nestedKid);
+          }
         }
       }
+    }
+  };
+
+  const fetchParentsInfoForKid = async (kid) => {
+    if (kid.Parent1ID !== null) {
+      const parent1Data = await API.graphql({
+        query: getUser,
+        variables: { id: kid.Parent1ID },
+      });
+      kid.Parent1 = parent1Data.data.getUser;
+    }
+
+    if (kid.Parent2ID !== null) {
+      const parent2Data = await API.graphql({
+        query: getUser,
+        variables: { id: kid.Parent2ID },
+      });
+      kid.Parent2 = parent2Data.data.getUser;
     }
   };
 
@@ -444,7 +497,7 @@ const RouteScreen = () => {
     if (currentRouteData) {
       getParentsInfo();
     }
-  }, [currentRouteData]);
+  }, [currentRouteData, addressList]);
 
   const updateRouteStatus = async (status) => {
     try {
@@ -536,6 +589,7 @@ const RouteScreen = () => {
   function generateMarkerDescription(kids) {
     return kids.map((kid) => kid.dropOffAddress).join("\n");
   }
+  //console.log(addressList);
   /// jsx return
 
   return (
@@ -572,7 +626,16 @@ const RouteScreen = () => {
             strokeColor="blue"
             timePrecision="now"
             onReady={(result) => {
+              const { duration, distance } = result;
+              const eta = `${duration.toFixed(0)} min`;
+              const formattedDistance = `${distance.toFixed(2)} Km`;
+
               //console.log(addressList[currentWaypointIndex].Kid[0].name);
+              setEtaDistance({
+                ...etaDistance,
+                [currentWaypointIndex]: { eta, formattedDistance },
+              });
+
               const isClose = result.duration <= 5;
               if (isClose && !notificationSent && driverAction === "Drive") {
                 setNotificationSent(true);
@@ -670,11 +733,10 @@ const RouteScreen = () => {
           }}
         >
           <BottomSheetFlatList
-            data={currentRouteData.Kid} //data={van.kidsInRoute}
+            data={addressList}
             renderItem={renderKidsItem}
-            keyExtractor={(item) => item.name.toString()}
+            keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={{ backgroundColor: "white" }}
-            //ListFooterComponent={() => <View></View>}
           />
 
           <Modal
@@ -692,17 +754,17 @@ const RouteScreen = () => {
                 {selectedItem && (
                   <View>
                     <Text>
-                      <Text style={{ fontWeight: "bold" }}>Name:</Text>{" "}
+                      <Text style={{ fontWeight: "bold" }}>Kid Name:</Text>{" "}
                       {selectedItem.name}
                     </Text>
                     <Text>
                       <Text style={{ fontWeight: "bold" }}>Parent name:</Text>{" "}
                       {selectedItem.Parent1?.name}
                     </Text>
-                    <Text>
+                    {/* <Text>
                       <Text style={{ fontWeight: "bold" }}>Unit Number:</Text>{" "}
                       {selectedItem.Parent1?.unitNumber}
-                    </Text>
+                    </Text> */}
                     <Text>
                       <Text style={{ fontWeight: "bold" }}>
                         Street Address:
