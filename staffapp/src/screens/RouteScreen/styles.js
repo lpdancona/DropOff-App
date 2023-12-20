@@ -128,6 +128,16 @@ export default StyleSheet.create({
     justifyContent: "space-between",
     padding: 16,
   },
+  continueButton: {
+    marginTop: 10,
+    alignItems: "center",
+    backgroundColor: "green",
+    padding: 10,
+    borderRadius: 30, // Adjust the border radius as needed
+  },
+  continueButtonText: {
+    color: "white",
+  },
   image: {
     width: 180,
     height: 200,

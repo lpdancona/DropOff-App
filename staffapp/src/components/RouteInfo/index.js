@@ -1,17 +1,51 @@
 import React from "react";
-import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 //import { Auth } from "aws-amplify";
 import styles from "./styles";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-const RouteInfoComponent = ({ currentRoute, addressList, driver, helper }) => {
+const RouteInfoComponent = ({
+  currentRoute,
+  addressList,
+  driver,
+  helper,
+  driverAction,
+  currentWaypoint,
+}) => {
   const navigation = useNavigation();
 
   const goBackToHome = () => {
-    navigation.goBack();
+    if (driverAction !== "Drive") {
+      navigation.goBack();
+    } else {
+      // Display a confirmation prompt
+      Alert.alert(
+        "Confirm Go Back",
+        "You are in the middle of the route. Are you sure you want to go back?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Confirm",
+            onPress: () => {
+              // User confirmed, navigate back
+              navigation.goBack();
+            },
+          },
+        ]
+      );
+    }
   };
-
+  console.log(addressList);
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.goBackButton} onPress={goBackToHome}>
@@ -53,6 +87,15 @@ const RouteInfoComponent = ({ currentRoute, addressList, driver, helper }) => {
                 ? `In progress  Time started: ${currentRoute.departTime}`
                 : "Waiting to start"}
             </Text> */}
+          </View>
+          <View style={styles.waypointInfo}>
+            <Text style={styles.waypointLabel}>Driving to home of:</Text>
+            <Text style={styles.waypointName}>
+              {addressList[currentWaypoint].Kid[0].name}
+            </Text>
+            <Text style={styles.waypointAddress}>
+              {addressList[currentWaypoint].Kid[0].dropOffAddress}
+            </Text>
           </View>
           <View style={styles.vehicleInfo}>
             <Text style={styles.vehicleLabel}>Vehicle:</Text>

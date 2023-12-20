@@ -42,11 +42,11 @@ const RouteScreen = () => {
 
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const snapPoints = useMemo(() => ["12%", "95%"], []);
   const { width, height } = useWindowDimensions();
+  const [selectedItem, setSelectedItem] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
-  const snapPoints = useMemo(() => ["12%", "95%"], []);
   const [helper, setHelper] = useState([]);
   const [driver, setDriver] = useState([]);
   const [busLocation, setBusLocation] = useState(null);
@@ -68,6 +68,7 @@ const RouteScreen = () => {
   const [showDriveButton, setShowDriveButton] = useState(true);
   const [isVanArrived, setIsVanArrived] = useState(false);
   const [etaDistance, setEtaDistance] = useState({});
+  const [routeStatus, setRouteStatus] = useState(null);
 
   // data from contexts
   const { schedulePushNotification, sendPushNotification, expoPushToken } =
@@ -76,7 +77,8 @@ const RouteScreen = () => {
   const { routesData } = useRouteContext();
   const { locationEmitter } = useBackgroundTaskContext();
   const { currentUserData } = useAuthContext();
-  //const { registerBackgroundFetchAsync } = useBackgroundTaskContext();
+  const [showArrivedModal, setShowArrivedModal] = useState(false);
+  const [arrivedAddress, setArrivedAddress] = useState(null);
 
   const requestLocationPermissions = async () => {
     const { status: foregroundStatus } =
@@ -183,35 +185,6 @@ const RouteScreen = () => {
     }
   };
 
-  // const renderKidsItem = ({ item, index }) => {
-  //   if (!addressList) {
-  //     return <ActivityIndicator size="large" color="gray" />;
-  //   }
-
-  //   return (
-  //     <View>
-  //       {/* <Text>{`Order: ${item.order}`}</Text> */}
-  //       {item.Kid.map((kid) => (
-  //         <Pressable
-  //           key={kid.id}
-  //           onPress={(e) => {
-  //             setSelectedItem(kid);
-  //           }}
-  //         >
-  //           <View style={styles.itemContainer}>
-  //             <Text style={styles.itemText}>
-  //               {item.order} - {kid.name}
-  //             </Text>
-  //             <Text style={styles.etaDistanceText}>
-  //               ETA: {item.eta}, Distance: {item.distance}
-  //             </Text>
-  //           </View>
-  //         </Pressable>
-  //       ))}
-  //     </View>
-  //   );
-  // };
-
   const renderKidsItem = ({ item, index }) => {
     if (!addressList) {
       return <ActivityIndicator size="large" color="gray" />;
@@ -231,9 +204,9 @@ const RouteScreen = () => {
             >
               <View style={styles.itemContainer}>
                 <Text style={styles.itemText}>
-                  {item.order} - {kid.name} - ETA: {eta}, Distance:{" "}
-                  {formattedDistance}
+                  {item.order} - {kid.name}
                 </Text>
+                <Text style={styles.itemText}>{kid.dropOffAddress}</Text>
               </View>
             </Pressable>
           );
@@ -306,8 +279,9 @@ const RouteScreen = () => {
     }
   };
 
-  const handleNextWaypoint = () => {
-    setCurrentWaypointIndex((prevIndex) => prevIndex + 1);
+  const handleNextWaypoint = async () => {
+    const nextWaypointIndex = currentWaypointIndex + 1;
+    setCurrentWaypointIndex(nextWaypointIndex);
     setIsVanArrived(false);
     setNotificationSent(false);
     //update the origin to the new bus location
@@ -316,10 +290,13 @@ const RouteScreen = () => {
       longitude: busLocation.longitude,
     });
     const newDestination = {
-      latitude: addressList[currentWaypointIndex].latitude,
-      longitude: addressList[currentWaypointIndex].longitude,
+      latitude: addressList[nextWaypointIndex].latitude,
+      longitude: addressList[nextWaypointIndex].longitude,
     };
     setDestination(newDestination);
+    // update the route (currentDestination)
+    await updateRouteNextDestination(addressList[nextWaypointIndex].id);
+
     // remove past waypoints from addresslist
     setAddressList((prevAddressList) => {
       return prevAddressList.slice(currentWaypointIndex);
@@ -362,7 +339,7 @@ const RouteScreen = () => {
   };
 
   const getStaffInfo = async () => {
-    if (currentRouteData.driver && currentRouteData.helper) {
+    if (currentRouteData.driver) {
       const driverData = await API.graphql({
         query: getUser,
         variables: { id: currentRouteData.driver },
@@ -382,34 +359,82 @@ const RouteScreen = () => {
     setShowDriveConfirmation(true);
   };
 
+  const updateRouteStatus = async (status) => {
+    try {
+      const currentTime = new Date();
+      const hours = currentTime.getHours();
+      const minutes = currentTime.getMinutes();
+      const ampm = hours >= 12 ? "pm" : "am";
+      const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+      const formattedTime = `${formattedHours}:${formattedMinutes} ${ampm}`;
+      let input = { id: currentRouteData.id, status: status };
+      if (status === "IN_PROGRESS") {
+        input.departTime = formattedTime;
+      }
+      const response = await API.graphql({
+        query: updateRoute,
+        variables: { input },
+      });
+    } catch (error) {
+      console.error("Error updating route", error);
+    }
+  };
+
+  const updateRouteNextDestination = async (nextWaypoint) => {
+    try {
+      //
+      let input = { id: currentRouteData.id, currentDestination: nextWaypoint };
+      if (nextWaypoint) {
+        input.currentDestination = nextWaypoint;
+      }
+      const response = await API.graphql({
+        query: updateRoute,
+        variables: { input },
+      });
+    } catch (error) {
+      console.error("Error updating route", error);
+    }
+  };
+
+  const zoomInOnDriver = () => {
+    mapRef.current.animateToRegion({
+      latitude: busLocation.latitude,
+      longitude: busLocation.longitude,
+      latitudeDelta: 0.001,
+      longitudeDelta: 0.001,
+    });
+  };
+
   const handleDriveConfirmationResponse = async (response) => {
     setDriveConfirmationResponse(response);
     setShowDriveConfirmation(false);
 
     // Handle the user's response
     if (response === "Confirm") {
-      //setDriverAction("Drive");
+      setDriverAction("Drive");
 
       //if (driverAction === "Drive") {
       // send push notification to user app
-      // bottomSheetRef.current?.collapse();
-      // sendNotificationToAllParents();
-      // setNotificationSent(false);
+      bottomSheetRef.current?.collapse();
+      sendNotificationToAllParents();
+      setNotificationSent(false);
+      setShowDriveButton(false); // Hide the Drive button
 
-      // // update the route status
-      // await updateRouteStatus("IN_PROGRESS");
-      // await updateRouteNextDestination(waypoints[currentWaypointIndex]);
-      // await fetchCurrentRouteData();
-      // setHandlingNextWaypoint(true);
-      // zoomInOnDriver();
+      // update the route status
+      await updateRouteStatus("IN_PROGRESS");
+      //await fetchCurrentRouteData();
+      setHandlingNextWaypoint(true);
+      zoomInOnDriver();
+      const currentDestination = addressList[currentWaypointIndex].id;
+
+      await updateRouteNextDestination(currentDestination);
 
       // Create an array of waypoint coordinates
       const waypoints = addressList.map((address) => {
         return `${address.latitude},${address.longitude}`;
       });
-      console.log("waypoints", waypoints);
-
-      // setShowDriveButton(false); // Hide the Drive button
+      //
 
       // // Separate the first address as the origin
       // const origin = `${busLocation.latitude},${busLocation.longitude}`;
@@ -425,7 +450,7 @@ const RouteScreen = () => {
 
       // // Open Google Maps with the origin and waypoints pre-set
       // Linking.openURL(googleMapsUrl);
-      // //}
+      //}
     }
   };
 
@@ -442,7 +467,48 @@ const RouteScreen = () => {
     const routeWithId = routesData.find((route) => route.id === id);
     setCurrentRouteData(routeWithId);
   };
-  //const timeArrival = `${etaHours}:${etaMinutes}`;
+
+  const handleContinue = () => {
+    setShowArrivedModal(false);
+    // Implement any additional logic for continuing to the next destination
+    handleNextWaypoint();
+  };
+
+  const getRouteStatus = async () => {
+    const routeStatus = currentRouteData.status;
+
+    if (routeStatus === "IN_PROGRESS") {
+      const currentDestinationId = currentRouteData.currentDestination;
+
+      const currentWaypoint = addressList.find(
+        (destination) => destination.id === currentDestinationId
+      );
+
+      if (currentWaypoint) {
+        setDestination({
+          latitude: currentWaypoint.latitude,
+          longitude: currentWaypoint.longitude,
+        });
+      } else {
+        console.error(
+          "Unable to find matching waypoint for current destination ID"
+        );
+      }
+    }
+
+    setRouteStatus(routeStatus);
+  };
+
+  const handleResumeRoute = async () => {
+    setDriverAction("Drive");
+
+    //if (driverAction === "Drive") {
+    // send push notification to user app
+    bottomSheetRef.current?.collapse();
+
+    setHandlingNextWaypoint(true);
+    zoomInOnDriver();
+  };
 
   /////
   /////   starting the useEffects ///
@@ -505,55 +571,6 @@ const RouteScreen = () => {
     }
   }, [currentRouteData, addressList]);
 
-  const updateRouteStatus = async (status) => {
-    try {
-      const currentTime = new Date();
-      const hours = currentTime.getHours();
-      const minutes = currentTime.getMinutes();
-      const ampm = hours >= 12 ? "pm" : "am";
-      const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
-      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-      const formattedTime = `${formattedHours}:${formattedMinutes} ${ampm}`;
-      //
-      let input = { id: currentRouteData.id, status: status };
-      if (status === "IN_PROGRESS") {
-        input.departTime = formattedTime;
-      }
-      const response = await API.graphql({
-        query: updateRoute,
-        variables: { input },
-      });
-    } catch (error) {
-      console.error("Error updating route", error);
-    }
-  };
-
-  const updateRouteNextDestination = async (nextWaypoint) => {
-    console.log(nextWaypoint);
-    // try {
-    //   //
-    //   let input = { id: currentRouteData.id, currentDestination: nextWaypoint };
-    //   if (nextWaypoint) {
-    //     input.currentDestination = formattedTime;
-    //   }
-    //   const response = await API.graphql({
-    //     query: updateRoute,
-    //     variables: { input },
-    //   });
-    // } catch (error) {
-    //   console.error("Error updating route", error);
-    // }
-  };
-
-  const zoomInOnDriver = () => {
-    mapRef.current.animateToRegion({
-      latitude: busLocation.latitude,
-      longitude: busLocation.longitude,
-      latitudeDelta: 0.001,
-      longitudeDelta: 0.001,
-    });
-  };
-
   useEffect(() => {
     if (
       !busLocation ||
@@ -597,6 +614,24 @@ const RouteScreen = () => {
     setNextWaypoints(nextWaypoints);
   }, [addressList, currentWaypointIndex, busLocation]);
 
+  useEffect(() => {
+    if (isVanArrived && driverAction === "Drive") {
+      setIsVanArrived(false);
+      setShowArrivedModal(true);
+      setArrivedAddress(addressList[currentWaypointIndex]);
+    }
+  }, [isVanArrived]);
+
+  useEffect(() => {
+    if (currentRouteData && addressList) {
+      getRouteStatus();
+    }
+  }, [currentRouteData, addressList]);
+
+  ///
+  /// finish the use effects
+  //
+
   if (!busLocation || !currentRouteData) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
@@ -612,7 +647,6 @@ const RouteScreen = () => {
   function generateMarkerDescription(kids) {
     return kids.map((kid) => kid.dropOffAddress).join("\n");
   }
-  //console.log(addressList);
   /// jsx return
 
   return (
@@ -725,6 +759,8 @@ const RouteScreen = () => {
         addressList={addressList}
         driver={driver}
         helper={helper}
+        driverAction={driverAction}
+        currentWaypoint={currentWaypointIndex}
       />
 
       <BottomSheet
@@ -761,6 +797,33 @@ const RouteScreen = () => {
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={{ backgroundColor: "white" }}
           />
+
+          <Modal
+            visible={showArrivedModal}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => {
+              setShowArrivedModal(false);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text>{`You arrived at ${arrivedAddress?.Kid[0]?.name} house's, Click Continue to next destination.`}</Text>
+                <Pressable
+                  onPress={handleContinue}
+                  style={styles.continueButton}
+                >
+                  <Text style={styles.continueButtonText}>Continue</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setShowArrivedModal(false)}
+                  style={styles.closeButton}
+                >
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
 
           <Modal
             visible={selectedItem !== null}
@@ -840,7 +903,8 @@ const RouteScreen = () => {
         </View>
         <View style={styles.buttonDriveContainer}>
           {currentUserData.id === currentRouteData.driver &&
-            showDriveButton && (
+            showDriveButton &&
+            routeStatus !== "IN_PROGRESS" && (
               <TouchableOpacity
                 onPress={async () => {
                   showDriveConfirmationMessage();
@@ -857,48 +921,43 @@ const RouteScreen = () => {
             )}
           {handlingNextWaypoint && (
             <>
-              {/* <TouchableOpacity
-                onPress={() => {
-                  // Handle the "Cancel" action
-                }}
-                style={{
-                  backgroundColor: "red",
-                  padding: 10,
-                  borderRadius: 10,
-                  marginRight: 10,
-                }}
-              >
-                <Text style={{ color: "white", fontSize: 20 }}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  // Handle the "Pause" action
-                }}
-                style={{
-                  backgroundColor: "yellow",
-                  padding: 10,
-                  borderRadius: 10,
-                }}
-              >
-                <Text style={{ color: "black", fontSize: 20 }}>Pause</Text>
-              </TouchableOpacity> */}
               {isVanArrived && (
-                <TouchableOpacity
-                  onPress={() => {
-                    // Handle the "Continue" action and update the waypoint index
-                    handleNextWaypoint();
-                  }}
-                  style={{
-                    backgroundColor: "blue",
-                    padding: 10,
-                    borderRadius: 10,
-                  }}
-                >
-                  <Text style={{ color: "white", fontSize: 20 }}>Continue</Text>
-                </TouchableOpacity>
+                <>
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleContinue();
+                    }}
+                    style={{
+                      backgroundColor: "blue",
+                      padding: 10,
+                      borderRadius: 10,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: 20 }}>
+                      Continue
+                    </Text>
+                  </TouchableOpacity>
+                </>
               )}
             </>
           )}
+          {routeStatus === "IN_PROGRESS" && driverAction !== "Drive" && (
+            <TouchableOpacity
+              onPress={() => {
+                // Handle the "Resume Route" action
+                handleResumeRoute();
+              }}
+              style={{
+                backgroundColor: "green",
+                padding: 10,
+                borderRadius: 10,
+              }}
+            >
+              <Text style={{ color: "white", fontSize: 20 }}>Resume Route</Text>
+            </TouchableOpacity>
+          )}
+
           <ShowMessage
             visible={showDriveConfirmation}
             message={confirmationMessage}
