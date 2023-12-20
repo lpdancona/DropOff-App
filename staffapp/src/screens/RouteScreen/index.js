@@ -388,38 +388,44 @@ const RouteScreen = () => {
 
     // Handle the user's response
     if (response === "Confirm") {
-      if (driverAction === "Drive") {
-        // send push notification to user app
-        bottomSheetRef.current?.collapse();
-        sendNotificationToAllParents();
-        setNotificationSent(false);
+      //setDriverAction("Drive");
 
-        // update the route status
-        await updateRouteStatus("IN_PROGRESS");
-        await fetchCurrentRouteData();
-        setHandlingNextWaypoint(true);
-        zoomInOnDriver();
+      //if (driverAction === "Drive") {
+      // send push notification to user app
+      // bottomSheetRef.current?.collapse();
+      // sendNotificationToAllParents();
+      // setNotificationSent(false);
 
-        // Create an array of waypoint coordinates
-        const waypoints = addressList.map((address) => {
-          return `${address.latitude},${address.longitude}`;
-        });
+      // // update the route status
+      // await updateRouteStatus("IN_PROGRESS");
+      // await updateRouteNextDestination(waypoints[currentWaypointIndex]);
+      // await fetchCurrentRouteData();
+      // setHandlingNextWaypoint(true);
+      // zoomInOnDriver();
 
-        // Separate the first address as the origin
-        const origin = `${busLocation.latitude},${busLocation.longitude}`;
+      // Create an array of waypoint coordinates
+      const waypoints = addressList.map((address) => {
+        return `${address.latitude},${address.longitude}`;
+      });
+      console.log("waypoints", waypoints);
 
-        // Separate the last address as the destination
-        const destination = waypoints.pop();
+      // setShowDriveButton(false); // Hide the Drive button
 
-        // Join the remaining waypoints into a single string separated by "|"
-        const waypointsString = waypoints.join("|");
+      // // Separate the first address as the origin
+      // const origin = `${busLocation.latitude},${busLocation.longitude}`;
 
-        // Construct the Google Maps URL with the origin and waypoints
-        const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
+      // // Separate the last address as the destination
+      // const destination = waypoints.pop();
 
-        // Open Google Maps with the origin and waypoints pre-set
-        Linking.openURL(googleMapsUrl);
-      }
+      // // Join the remaining waypoints into a single string separated by "|"
+      // const waypointsString = waypoints.join("|");
+
+      // // Construct the Google Maps URL with the origin and waypoints
+      // const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
+
+      // // Open Google Maps with the origin and waypoints pre-set
+      // Linking.openURL(googleMapsUrl);
+      // //}
     }
   };
 
@@ -520,6 +526,23 @@ const RouteScreen = () => {
     } catch (error) {
       console.error("Error updating route", error);
     }
+  };
+
+  const updateRouteNextDestination = async (nextWaypoint) => {
+    console.log(nextWaypoint);
+    // try {
+    //   //
+    //   let input = { id: currentRouteData.id, currentDestination: nextWaypoint };
+    //   if (nextWaypoint) {
+    //     input.currentDestination = formattedTime;
+    //   }
+    //   const response = await API.graphql({
+    //     query: updateRoute,
+    //     variables: { input },
+    //   });
+    // } catch (error) {
+    //   console.error("Error updating route", error);
+    // }
   };
 
   const zoomInOnDriver = () => {
@@ -820,9 +843,7 @@ const RouteScreen = () => {
             showDriveButton && (
               <TouchableOpacity
                 onPress={async () => {
-                  setDriverAction("Drive");
                   showDriveConfirmationMessage();
-                  setShowDriveButton(false); // Hide the Drive button
                 }}
                 style={{
                   backgroundColor: "green",
