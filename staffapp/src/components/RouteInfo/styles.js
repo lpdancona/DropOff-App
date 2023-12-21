@@ -8,14 +8,14 @@ export default StyleSheet.create({
     right: 10,
     backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 10,
-    padding: 10,
+    padding: 8,
     elevation: 5,
   },
   goBackButton: {
-    backgroundColor: "#f2f2f2",
-    width: 50, // Adjust the width and height as needed for your circle
-    height: 50,
-    borderRadius: 25, // Make the borderRadius half of the width/height to make it circular
+    backgroundColor: "red", //"#f2f2f2",
+    width: 30, // Adjust the width and height as needed for your circle
+    height: 30,
+    borderRadius: 15, // Make the borderRadius half of the width/height to make it circular
     alignItems: "center",
     justifyContent: "center",
   },
@@ -27,7 +27,7 @@ export default StyleSheet.create({
   heading: {
     fontSize: 19,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 5,
     textAlign: "center",
   },
   infoColumn: {
@@ -54,11 +54,11 @@ export default StyleSheet.create({
     fontSize: 12,
   },
   vehicleName: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "bold",
   },
   vehicleLabel: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     marginRight: 5,
   },
@@ -115,5 +115,14 @@ export default StyleSheet.create({
     //backgroundColor: "red",
     //borderRadius: 10,
     //zIndex: 2,
+  },
+  waypointInfo: {
+    flexDirection: "row",
+
+    padding: 5,
+  },
+  waypointName: { fontWeight: "bold" },
+  waypointAddress: {
+    fontSize: 13,
   },
 });

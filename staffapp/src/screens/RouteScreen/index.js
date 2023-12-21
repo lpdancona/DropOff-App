@@ -9,6 +9,7 @@ import {
   Pressable,
   Modal,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
@@ -36,7 +37,7 @@ import { useAuthContext } from "../../contexts/AuthContext";
 //
 
 const RouteScreen = () => {
-  const navigation = useNavigation();
+  //const navigation = useNavigation();
   const route = useRoute();
   const id = route.params?.id;
 
@@ -56,6 +57,7 @@ const RouteScreen = () => {
   const [destination, setDestination] = useState(null);
   const [nextWaypoints, setNextWaypoints] = useState(null);
   const [notificationSent, setNotificationSent] = useState(false);
+  const [notificationToDriver, setNotificationToDriver] = useState(false);
   const [currentRouteData, setCurrentRouteData] = useState(null);
   const [showDriveConfirmation, setShowDriveConfirmation] = useState(false);
   const [driveConfirmationResponse, setDriveConfirmationResponse] =
@@ -66,14 +68,13 @@ const RouteScreen = () => {
     "Do you want to start the route?"
   );
   const [showDriveButton, setShowDriveButton] = useState(true);
+  const [showResumeButton, setResumeButton] = useState(false);
   const [isVanArrived, setIsVanArrived] = useState(false);
-  const [etaDistance, setEtaDistance] = useState({});
   const [routeStatus, setRouteStatus] = useState(null);
 
   // data from contexts
   const { schedulePushNotification, sendPushNotification, expoPushToken } =
     usePushNotificationsContext();
-  //const { routesData, currentRouteData } = useRouteContext();
   const { routesData } = useRouteContext();
   const { locationEmitter } = useBackgroundTaskContext();
   const { currentUserData } = useAuthContext();
@@ -193,8 +194,6 @@ const RouteScreen = () => {
     return (
       <View>
         {item.Kid.map((kid) => {
-          const { eta, formattedDistance } = etaDistance[index] || {};
-
           return (
             <Pressable
               key={kid.id}
@@ -284,6 +283,7 @@ const RouteScreen = () => {
     setCurrentWaypointIndex(nextWaypointIndex);
     setIsVanArrived(false);
     setNotificationSent(false);
+    setNotificationToDriver(false);
     //update the origin to the new bus location
     setOrigin({
       latitude: busLocation.latitude,
@@ -436,21 +436,21 @@ const RouteScreen = () => {
       });
       //
 
-      // // Separate the first address as the origin
-      // const origin = `${busLocation.latitude},${busLocation.longitude}`;
+      // Separate the first address as the origin
+      const origin = `${busLocation.latitude},${busLocation.longitude}`;
 
-      // // Separate the last address as the destination
-      // const destination = waypoints.pop();
+      // Separate the last address as the destination
+      const destination = waypoints.pop();
 
-      // // Join the remaining waypoints into a single string separated by "|"
-      // const waypointsString = waypoints.join("|");
+      // Join the remaining waypoints into a single string separated by "|"
+      const waypointsString = waypoints.join("|");
 
-      // // Construct the Google Maps URL with the origin and waypoints
-      // const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
+      // Construct the Google Maps URL with the origin and waypoints
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
 
-      // // Open Google Maps with the origin and waypoints pre-set
-      // Linking.openURL(googleMapsUrl);
-      //}
+      // Open Google Maps with the origin and waypoints pre-set
+      Linking.openURL(googleMapsUrl);
+      }
     }
   };
 
@@ -485,10 +485,14 @@ const RouteScreen = () => {
       );
 
       if (currentWaypoint) {
+        const currentOrder = currentWaypoint.order - 1;
+        console.log(currentOrder);
         setDestination({
           latitude: currentWaypoint.latitude,
           longitude: currentWaypoint.longitude,
         });
+        setCurrentWaypointIndex(currentWaypointIndex + currentOrder);
+        setResumeButton(true);
       } else {
         console.error(
           "Unable to find matching waypoint for current destination ID"
@@ -547,30 +551,35 @@ const RouteScreen = () => {
     return () => foregroundSubscription;
   }, []);
 
+  //get the current route (by id)
   useEffect(() => {
     if (routesData) {
       fetchCurrentRouteData();
     }
   }, [routesData, id]);
 
+  //get the driver and helper info
   useEffect(() => {
     if (currentRouteData) {
       getStaffInfo();
     }
   }, [currentRouteData]);
 
+  // get the Addresslist
   useEffect(() => {
     if (currentRouteData) {
       getOrderAddress();
     }
   }, [currentRouteData]);
 
+  //get parents of kids on route info
   useEffect(() => {
     if (currentRouteData) {
       getParentsInfo();
     }
   }, [currentRouteData, addressList]);
 
+  //set the origin and destination
   useEffect(() => {
     if (
       !busLocation ||
@@ -580,13 +589,14 @@ const RouteScreen = () => {
       return;
     }
 
-    const origin =
-      currentWaypointIndex === 0
-        ? busLocation
-        : {
-            latitude: addressList[currentWaypointIndex - 1].latitude,
-            longitude: addressList[currentWaypointIndex - 1].longitude,
-          };
+    // const origin =
+    //   currentWaypointIndex === 0
+    //     ? busLocation
+    //     : {
+    //         latitude: addressList[currentWaypointIndex - 1].latitude,
+    //         longitude: addressList[currentWaypointIndex - 1].longitude,
+    //       };
+    const origin = busLocation;
     setOrigin(origin);
 
     const destination = {
@@ -614,6 +624,7 @@ const RouteScreen = () => {
     setNextWaypoints(nextWaypoints);
   }, [addressList, currentWaypointIndex, busLocation]);
 
+  // show the arrivedmodal if the driver is in the waypoint
   useEffect(() => {
     if (isVanArrived && driverAction === "Drive") {
       setIsVanArrived(false);
@@ -622,6 +633,7 @@ const RouteScreen = () => {
     }
   }, [isVanArrived]);
 
+  //get route status
   useEffect(() => {
     if (currentRouteData && addressList) {
       getRouteStatus();
@@ -683,16 +695,6 @@ const RouteScreen = () => {
             strokeColor="blue"
             timePrecision="now"
             onReady={(result) => {
-              const { duration, distance } = result;
-              const eta = `${duration.toFixed(0)} min`;
-              const formattedDistance = `${distance.toFixed(2)} Km`;
-
-              //console.log(addressList[currentWaypointIndex].Kid[0].name);
-              setEtaDistance({
-                ...etaDistance,
-                [currentWaypointIndex]: { eta, formattedDistance },
-              });
-
               const isClose = result.duration <= 5;
               if (isClose && !notificationSent && driverAction === "Drive") {
                 setNotificationSent(true);
@@ -703,12 +705,15 @@ const RouteScreen = () => {
 
               if (result.distance <= 0.1) {
                 //console.log("distance", result.distance);
+                if (!notificationToDriver) {
+                  setNotificationToDriver(true);
+                  sendPushNotification(
+                    expoPushToken?.data,
+                    "Arrived!",
+                    `Driver you arrived at ${addressList[currentWaypointIndex].Kid[0].name} house! `
+                  );
+                }
 
-                sendPushNotification(
-                  expoPushToken?.data,
-                  "Arrived!",
-                  `Driver you arrived at ${addressList[currentWaypointIndex].Kid[0].name} house! `
-                );
                 setHandlingNextWaypoint(true);
                 setIsVanArrived(true);
 
@@ -913,7 +918,7 @@ const RouteScreen = () => {
                   backgroundColor: "green",
                   padding: 10,
                   borderRadius: 10,
-                  marginBottom: 30,
+                  marginBottom: 40,
                 }}
               >
                 <Text style={{ color: "white", fontSize: 20 }}>Drive</Text>
@@ -931,7 +936,7 @@ const RouteScreen = () => {
                       backgroundColor: "blue",
                       padding: 10,
                       borderRadius: 10,
-                      marginBottom: 10,
+                      marginBottom: 20,
                     }}
                   >
                     <Text style={{ color: "white", fontSize: 20 }}>
@@ -942,21 +947,26 @@ const RouteScreen = () => {
               )}
             </>
           )}
-          {routeStatus === "IN_PROGRESS" && driverAction !== "Drive" && (
-            <TouchableOpacity
-              onPress={() => {
-                // Handle the "Resume Route" action
-                handleResumeRoute();
-              }}
-              style={{
-                backgroundColor: "green",
-                padding: 10,
-                borderRadius: 10,
-              }}
-            >
-              <Text style={{ color: "white", fontSize: 20 }}>Resume Route</Text>
-            </TouchableOpacity>
-          )}
+          {routeStatus === "IN_PROGRESS" &&
+            driverAction !== "Drive" &&
+            showResumeButton && (
+              <TouchableOpacity
+                onPress={() => {
+                  // Handle the "Resume Route" action
+                  handleResumeRoute();
+                }}
+                style={{
+                  backgroundColor: "green",
+                  padding: 10,
+                  borderRadius: 10,
+                  marginBottom: 40,
+                }}
+              >
+                <Text style={{ color: "white", fontSize: 20 }}>
+                  Resume Route
+                </Text>
+              </TouchableOpacity>
+            )}
 
           <ShowMessage
             visible={showDriveConfirmation}

@@ -45,11 +45,10 @@ const RouteInfoComponent = ({
       );
     }
   };
-  console.log(addressList);
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.goBackButton} onPress={goBackToHome}>
-        <AntDesign name="arrowleft" size={30} color="black" />
+        <AntDesign name="arrowleft" size={30} color="white" />
       </TouchableOpacity>
       <View>
         <Text style={styles.heading}>Route Information</Text>
@@ -65,7 +64,8 @@ const RouteInfoComponent = ({
           </View>
         </View>
         <View style={styles.infoColumn}>
-          <View>
+          <View style={{ flexDirection: "row" }}>
+            <Text> Route Status: </Text>
             {currentRoute.status === "WAITING_TO_START" ? (
               <Text style={{ color: "green", fontSize: 15 }}>
                 Waiting to start
@@ -89,19 +89,21 @@ const RouteInfoComponent = ({
             </Text> */}
           </View>
           <View style={styles.waypointInfo}>
-            <Text style={styles.waypointLabel}>Driving to home of:</Text>
+            <Text style={styles.waypointLabel}>Driving to home of: </Text>
             <Text style={styles.waypointName}>
               {addressList[currentWaypoint].Kid[0].name}
             </Text>
+          </View>
+          <View>
             <Text style={styles.waypointAddress}>
               {addressList[currentWaypoint].Kid[0].dropOffAddress}
             </Text>
-          </View>
-          <View style={styles.vehicleInfo}>
-            <Text style={styles.vehicleLabel}>Vehicle:</Text>
-            <Text style={styles.vehicleName}>
-              {currentRoute.Van.name} - {currentRoute.Van.model}{" "}
-            </Text>
+            <View style={styles.vehicleInfo}>
+              <Text style={styles.vehicleLabel}>Vehicle:</Text>
+              <Text style={styles.vehicleName}>
+                {currentRoute.Van.name} - {currentRoute.Van.model}{" "}
+              </Text>
+            </View>
           </View>
         </View>
       </View>
