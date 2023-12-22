@@ -89,10 +89,11 @@ const RouteInfoComponent = ({
             </Text> */}
           </View>
           <View style={styles.waypointInfo}>
-            <Text style={styles.waypointLabel}>Driving to home of: </Text>
+            <Text style={styles.waypointLabel}>Driving to </Text>
             <Text style={styles.waypointName}>
               {addressList[currentWaypoint].Kid[0].name}
             </Text>
+            <Text style={styles.waypointLabel}> home</Text>
           </View>
           <View>
             <Text style={styles.waypointAddress}>

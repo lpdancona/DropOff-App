@@ -450,7 +450,6 @@ const RouteScreen = () => {
 
       // Open Google Maps with the origin and waypoints pre-set
       Linking.openURL(googleMapsUrl);
-      }
     }
   };
 
