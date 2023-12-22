@@ -15,10 +15,10 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import styles from "./styles";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import RouteInfoComponent from "../../components/RouteInfo";
 import { API } from "aws-amplify";
 import { getUser, listAddressLists, getKid } from "../../graphql/queries";
@@ -31,6 +31,7 @@ import LocationTrackingComponent from "../../components/LocationTrackingComponen
 import { useBackgroundTaskContext } from "../../contexts/BackgroundTaskContext";
 import ShowMessage from "../../components/ShowMessage";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { useNavigation } from "@react-navigation/native";
 
 //const BACKGROUND_FETCH_TASK = "background-location-task";
 
@@ -40,6 +41,7 @@ const RouteScreen = () => {
   //const navigation = useNavigation();
   const route = useRoute();
   const id = route.params?.id;
+  const navigation = useNavigation();
 
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
@@ -361,21 +363,62 @@ const RouteScreen = () => {
 
   const updateRouteStatus = async (status) => {
     try {
-      const currentTime = new Date();
-      const hours = currentTime.getHours();
-      const minutes = currentTime.getMinutes();
-      const ampm = hours >= 12 ? "pm" : "am";
-      const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
-      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-      const formattedTime = `${formattedHours}:${formattedMinutes} ${ampm}`;
-      let input = { id: currentRouteData.id, status: status };
       if (status === "IN_PROGRESS") {
+        const currentTime = new Date();
+        const hours = currentTime.getHours();
+        const minutes = currentTime.getMinutes();
+        const ampm = hours >= 12 ? "pm" : "am";
+        const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+        const formattedTime = `${formattedHours}:${formattedMinutes} ${ampm}`;
+        let input = { id: currentRouteData.id, status: status };
         input.departTime = formattedTime;
+        setCurrentRouteData((prevData) => ({
+          ...prevData,
+          status: status,
+          departTime: formattedTime,
+        }));
+        const response = await API.graphql({
+          query: updateRoute,
+          variables: { input },
+        });
       }
-      const response = await API.graphql({
-        query: updateRoute,
-        variables: { input },
-      });
+      if (status === "FINISHED") {
+        const currentTime = new Date();
+        const hours = currentTime.getHours();
+        const minutes = currentTime.getMinutes();
+        const ampm = hours >= 12 ? "pm" : "am";
+        const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+        const formattedTime = `${formattedHours}:${formattedMinutes} ${ampm}`;
+
+        let input = { id: currentRouteData.id, status: status };
+        input.finishedTime = formattedTime;
+        setCurrentRouteData((prevData) => ({
+          ...prevData,
+          status: status,
+          finishedTime: formattedTime,
+        }));
+        const response = await API.graphql({
+          query: updateRoute,
+          variables: { input },
+        });
+
+        // Display a message to the driver
+        Alert.alert(
+          "Route Finished",
+          "You have successfully completed the route!",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                // Navigate back to the home screen
+                navigation.navigate("Home");
+              },
+            },
+          ]
+        );
+      }
     } catch (error) {
       console.error("Error updating route", error);
     }
@@ -413,41 +456,30 @@ const RouteScreen = () => {
     // Handle the user's response
     if (response === "Confirm") {
       setDriverAction("Drive");
-
-      //if (driverAction === "Drive") {
       // send push notification to user app
       bottomSheetRef.current?.collapse();
       sendNotificationToAllParents();
       setNotificationSent(false);
       setShowDriveButton(false); // Hide the Drive button
-
       // update the route status
       await updateRouteStatus("IN_PROGRESS");
-      //await fetchCurrentRouteData();
       setHandlingNextWaypoint(true);
       zoomInOnDriver();
       const currentDestination = addressList[currentWaypointIndex].id;
-
       await updateRouteNextDestination(currentDestination);
-
       // Create an array of waypoint coordinates
       const waypoints = addressList.map((address) => {
         return `${address.latitude},${address.longitude}`;
       });
       //
-
       // Separate the first address as the origin
       const origin = `${busLocation.latitude},${busLocation.longitude}`;
-
       // Separate the last address as the destination
       const destination = waypoints.pop();
-
       // Join the remaining waypoints into a single string separated by "|"
       const waypointsString = waypoints.join("|");
-
       // Construct the Google Maps URL with the origin and waypoints
       const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
-
       // Open Google Maps with the origin and waypoints pre-set
       Linking.openURL(googleMapsUrl);
     }
@@ -473,6 +505,11 @@ const RouteScreen = () => {
     handleNextWaypoint();
   };
 
+  const handleFinish = async () => {
+    setShowArrivedModal(false);
+    await updateRouteStatus("FINISHED");
+  };
+
   const getRouteStatus = async () => {
     const routeStatus = currentRouteData.status;
 
@@ -485,7 +522,6 @@ const RouteScreen = () => {
 
       if (currentWaypoint) {
         const currentOrder = currentWaypoint.order - 1;
-        console.log(currentOrder);
         setDestination({
           latitude: currentWaypoint.latitude,
           longitude: currentWaypoint.longitude,
@@ -764,6 +800,7 @@ const RouteScreen = () => {
         driver={driver}
         helper={helper}
         driverAction={driverAction}
+        setDriverAction={setDriverAction}
         currentWaypoint={currentWaypointIndex}
       />
 
@@ -813,12 +850,18 @@ const RouteScreen = () => {
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
                 <Text>{`You arrived at ${arrivedAddress?.Kid[0]?.name} house's, Click Continue to next destination.`}</Text>
-                <Pressable
-                  onPress={handleContinue}
-                  style={styles.continueButton}
-                >
-                  <Text style={styles.continueButtonText}>Continue</Text>
-                </Pressable>
+                {currentWaypointIndex === addressList.length - 1 ? (
+                  <Pressable onPress={handleFinish} style={styles.finishButton}>
+                    <Text style={styles.finishButtonText}>Finish</Text>
+                  </Pressable>
+                ) : (
+                  <Pressable
+                    onPress={handleContinue}
+                    style={styles.continueButton}
+                  >
+                    <Text style={styles.continueButtonText}>Continue</Text>
+                  </Pressable>
+                )}
                 <Pressable
                   onPress={() => setShowArrivedModal(false)}
                   style={styles.closeButton}
@@ -923,29 +966,42 @@ const RouteScreen = () => {
                 <Text style={{ color: "white", fontSize: 20 }}>Drive</Text>
               </TouchableOpacity>
             )}
-          {handlingNextWaypoint && (
+          {handlingNextWaypoint && isVanArrived && (
             <>
-              {isVanArrived && (
-                <>
-                  <TouchableOpacity
-                    onPress={() => {
-                      handleContinue();
-                    }}
-                    style={{
-                      backgroundColor: "blue",
-                      padding: 10,
-                      borderRadius: 10,
-                      marginBottom: 20,
-                    }}
-                  >
-                    <Text style={{ color: "white", fontSize: 20 }}>
-                      Continue
-                    </Text>
-                  </TouchableOpacity>
-                </>
+              {currentWaypointIndex === addressList.length - 1 ? (
+                // If the current waypoint is the last one, render "Finish" button
+                <TouchableOpacity
+                  onPress={() => {
+                    handleFinish();
+                  }}
+                  style={{
+                    backgroundColor: "green",
+                    padding: 10,
+                    borderRadius: 10,
+                    marginBottom: 20,
+                  }}
+                >
+                  <Text style={{ color: "white", fontSize: 20 }}>Finish</Text>
+                </TouchableOpacity>
+              ) : (
+                // Otherwise, render "Continue" button
+                <TouchableOpacity
+                  onPress={() => {
+                    handleContinue();
+                  }}
+                  style={{
+                    backgroundColor: "blue",
+                    padding: 10,
+                    borderRadius: 10,
+                    marginBottom: 20,
+                  }}
+                >
+                  <Text style={{ color: "white", fontSize: 20 }}>Continue</Text>
+                </TouchableOpacity>
               )}
             </>
           )}
+
           {routeStatus === "IN_PROGRESS" &&
             driverAction !== "Drive" &&
             showResumeButton && (

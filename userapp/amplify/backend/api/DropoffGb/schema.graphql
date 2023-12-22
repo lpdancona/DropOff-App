@@ -57,6 +57,7 @@ type Route @model @auth(rules: [{allow: public}]) {
   AddressLists: [AddressList] @hasMany(indexName: "byRoute", fields: ["id"])
   Kids: [Kid] @hasMany(indexName: "byRoute", fields: ["id"])
   currentDestination: String
+  finishedTime: String
 }
 
 type Kid @model @auth(rules: [{allow: public}]) {

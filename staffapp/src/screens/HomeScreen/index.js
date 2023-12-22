@@ -13,14 +13,15 @@ import {
 import styles from "./styles";
 import { useRouteContext } from "../../../src/contexts/RouteContext";
 import { useAuthContext } from "../../../src/contexts/AuthContext";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Auth } from "aws-amplify";
 
 const HomeScreen = () => {
-  const navigation = useNavigation();
   const { routesData, updateRoutesData } = useRouteContext();
-  const { dbUser, currentUserData } = useAuthContext();
+  const { currentUserData } = useAuthContext();
+
   const [images, setImages] = useState({});
+  const navigation = useNavigation();
   const defaultImageUrl = "https://i.imgur.com/R2PRpbV.jpg";
   const [assignedRoute, setAssignedRoute] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -42,9 +43,16 @@ const HomeScreen = () => {
       console.error("Logout error:", error);
     }
   };
-  // const fetchData = () => {
-  //   setRefreshing(false);
-  // };
+
+  const fetchData = async () => {
+    setRefreshing(true);
+    await updateRoutesData();
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (routesData) {
@@ -90,6 +98,12 @@ const HomeScreen = () => {
       }
     }
   }, [currentUserData, routesData]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
   if (!routesData) {
     return <ActivityIndicator size="large" color="gray" />;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ const RouteInfoComponent = ({
   driver,
   helper,
   driverAction,
+  setDriverAction,
   currentWaypoint,
 }) => {
   const navigation = useNavigation();
@@ -38,6 +39,7 @@ const RouteInfoComponent = ({
             text: "Confirm",
             onPress: () => {
               // User confirmed, navigate back
+              setDriverAction("Waiting");
               navigation.goBack();
             },
           },
@@ -45,6 +47,12 @@ const RouteInfoComponent = ({
       );
     }
   };
+
+  useEffect(() => {
+    if (driverAction === "Drive") {
+    }
+  }, [driverAction]);
+
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.goBackButton} onPress={goBackToHome}>
@@ -65,7 +73,7 @@ const RouteInfoComponent = ({
         </View>
         <View style={styles.infoColumn}>
           <View style={{ flexDirection: "row" }}>
-            <Text> Route Status: </Text>
+            <Text> Route status: </Text>
             {currentRoute.status === "WAITING_TO_START" ? (
               <Text style={{ color: "green", fontSize: 15 }}>
                 Waiting to start
