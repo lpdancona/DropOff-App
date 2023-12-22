@@ -26,7 +26,6 @@ export default {
       backgroundColor: "#ffffff",
     },
     package: "com.geodarth.DropoffUser",
-    versionCode: 1,
   },
   web: {
     favicon: "./assets/favicon.png",
