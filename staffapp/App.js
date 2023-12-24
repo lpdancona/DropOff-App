@@ -1,13 +1,9 @@
 //import 'core-js/full/symbol/async-iterator';
-import { StatusBar } from "expo-status-bar";
+import * as TaskManager from "expo-task-manager";
 import React, { useEffect } from "react";
-import { Button, LogBox } from "react-native";
+import { LogBox, AppState } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import {
-  Authenticator,
-  useAuthenticator,
-  withAuthenticator,
-} from "@aws-amplify/ui-react-native";
+import { withAuthenticator } from "@aws-amplify/ui-react-native";
 import AuthContextProvider from "./src/contexts/AuthContext";
 import RouteContextProvider from "./src/contexts/RouteContext";
 import RootNavigator from "./src/navigation";
@@ -20,20 +16,37 @@ import { Amplify } from "aws-amplify";
 import awsExports from "./src/aws-exports";
 Amplify.configure(awsExports);
 
-function SignOutButton() {
-  const { signOut } = useAuthenticator();
-  return <Button title="Sign Out" onPress={signOut} />;
-}
+// function SignOutButton() {
+//   const { signOut } = useAuthenticator();
+//   return <Button title="Sign Out" onPress={signOut} />;
+// }
 
 LogBox.ignoreLogs(["NSLocation*UsageDescription"]);
 
 function App() {
+  // useEffect(() => {
+  //   const handleAppStateChange = (nextAppState) => {
+  //     if (nextAppState === "background") {
+  //       console.log("App is in the background. Perform cleanup.");
+  //       console.log("STOPPING ALL REGISTERED TASKS");
+  //       TaskManager.unregisterAllTasksAsync();
+  //     }
+  //   };
+
+  //   AppState.addEventListener("change", handleAppStateChange);
+
+  //   return () => {
+  //     AppState.removeEventListener("change", handleAppStateChange);
+  //     console.log("Component will unmount");
+  //   };
+  // }, []);
+
   useEffect(() => {
     return () => {
-      console.log("STOPPING ALL REGISTERED TASKS");
       TaskManager.unregisterAllTasksAsync();
     };
   }, []);
+
   return (
     <NavigationContainer>
       <PushNotificationsContextProvider>

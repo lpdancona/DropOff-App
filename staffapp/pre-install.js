@@ -2,7 +2,7 @@ const fs = require("fs");
 
 const buildProfile = process.env.EAS_BUILD_PROFILE;
 const configProd = process.env.AWS_EXPORTS;
-const configDevelop = process.env.AWS_EXPORTS_DEVELOP;
+const configDevelop = process.env.AWS_EXPORTS;
 
 const config = buildProfile === "production" ? configProd : configDevelop;
 

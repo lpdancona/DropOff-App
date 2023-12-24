@@ -2,18 +2,25 @@ import React, { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import * as Location from "expo-location";
 import { useBackgroundTaskContext } from "../../contexts/BackgroundTaskContext";
-//import { useRouteContext } from "../../contexts/RouteContext";
 import { View, Text, ActivityIndicator } from "react-native";
 import { updateLocation } from "../../components/LocationUtils";
-import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
+//import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
 
 //const locationEmitter = new EventEmitter();
 const LOCATION_UPDATE = "LOCATION_UPDATE";
 
 const LocationTrackingComponent = ({ locationEmitter, routeID }) => {
-  const { registerBackgroundFetchAsync, unregisterBackgroundFetchAsync } =
-    useBackgroundTaskContext();
+  const {
+    registerBackgroundFetchAsync,
+    unregisterBackgroundFetchAsync,
+    unregisterAllTasks,
+  } = useBackgroundTaskContext();
   const [isTracking, setIsTracking] = useState(false);
+
+  useEffect(() => {
+    console.log("stop all register tasks (enter on screen)");
+    unregisterAllTasks();
+  }, []);
 
   useEffect(() => {
     const startForegroundLocationTracking = async () => {
@@ -84,15 +91,20 @@ const LocationTrackingComponent = ({ locationEmitter, routeID }) => {
         }
       });
     };
+
     startForegroundLocationTracking();
     startBackgroundLocationTracking();
     registerBackgroundFetchAsync();
 
     // Clean up Logic
     return () => {
+      console.log("calling unregister background fetch");
       unregisterBackgroundFetchAsync();
+      unregisterAllTasks();
+      Location.stopLocationUpdatesAsync("background-location-task");
+      locationEmitter.removeAllListeners();
     };
-  }, [registerBackgroundFetchAsync, unregisterBackgroundFetchAsync]);
+  }, [routeID, registerBackgroundFetchAsync, unregisterBackgroundFetchAsync]);
 
   return (
     <View>
