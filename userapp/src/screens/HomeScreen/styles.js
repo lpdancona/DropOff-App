@@ -127,9 +127,10 @@ export default StyleSheet.create({
     marginTop: 13,
   },
   zoomButton: {
+    marginTop: 2,
     position: "absolute",
-    top: 20,
-    left: 20,
+    //top: 20,
+    //left: 20,
     backgroundColor: "#FF7276",
     borderRadius: 50,
     padding: 10,

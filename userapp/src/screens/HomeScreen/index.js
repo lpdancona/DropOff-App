@@ -156,18 +156,20 @@ const HomeScreen = () => {
       );
 
       // Animate the map to the next location and rotate it based on the bearing
-      mapRef.current.animateCamera({
-        center: {
-          latitude: busLocation.latitude,
-          longitude: busLocation.longitude,
-        },
-        heading: bearing,
-        pitch: 0,
-        altitude: 1000, // You can adjust the altitude as needed
-        zoom: 15, // You can adjust the zoom level as needed
-      });
+      if (mapRef.current) {
+        mapRef.current.animateCamera({
+          center: {
+            latitude: busLocation.latitude,
+            longitude: busLocation.longitude,
+          },
+          heading: bearing,
+          pitch: 0,
+          altitude: 1000, // You can adjust the altitude as needed
+          zoom: 15, // You can adjust the zoom level as needed
+        });
+      }
     }
-  }, [busLocation, dropOffLatLng]);
+  }, [busLocation, dropOffLatLng, mapRef.current]);
 
   useEffect(() => {
     if (!isRouteInProgress) {
@@ -189,7 +191,7 @@ const HomeScreen = () => {
       </View>
     );
   }
-  console.log(addressList);
+  //console.log(addressList);
   //onsole.log(matchingKids);
 
   const waypoints = addressList.map((address) => ({
