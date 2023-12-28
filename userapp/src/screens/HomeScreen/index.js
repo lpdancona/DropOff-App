@@ -140,9 +140,9 @@ const HomeScreen = () => {
             longitude: busLocation.longitude,
           },
           heading: bearing,
-          pitch: 0,
-          altitude: 1000, // You can adjust the altitude as needed
-          zoom: 15, // You can adjust the zoom level as needed
+          // pitch: 0,
+          // altitude: 1000, // You can adjust the altitude as needed
+          // zoom: 15, // You can adjust the zoom level as needed
         });
       }
     }
@@ -264,7 +264,7 @@ const HomeScreen = () => {
           }}
           title={"Gracie Barra Bus"}
           description={currentRouteData?.Van?.name}
-          icon={vanIcon}
+          // icon={vanIcon}
           rotation={calculateBearing(
             busLocation.latitude,
             busLocation.longitude,

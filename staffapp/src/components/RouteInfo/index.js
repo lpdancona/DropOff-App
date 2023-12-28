@@ -66,6 +66,9 @@ const RouteInfoComponent = ({
           <View style={styles.driverInfo}>
             <Text style={styles.driverLabel}>Driver:</Text>
             <Text style={styles.driverName}>{driver?.name}</Text>
+            <Text style={styles.driverAction}>
+              {driverAction === "Drive" ? "(Driving)" : "(Waiting)"}
+            </Text>
           </View>
 
           <View style={styles.helperInfo}>

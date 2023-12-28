@@ -103,6 +103,7 @@ export const getAddressList = /* GraphQL */ `
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -123,6 +124,7 @@ export const listAddressLists = /* GraphQL */ `
         latitude
         longitude
         routeID
+        status
         createdAt
         updatedAt
         addressListKidId
@@ -154,6 +156,7 @@ export const addressListsByRouteID = /* GraphQL */ `
         latitude
         longitude
         routeID
+        status
         createdAt
         updatedAt
         addressListKidId
@@ -240,6 +243,7 @@ export const getRoute = /* GraphQL */ `
         __typename
       }
       currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId
@@ -265,6 +269,7 @@ export const listRoutes = /* GraphQL */ `
         route
         status
         currentDestination
+        finishedTime
         createdAt
         updatedAt
         routeVanId

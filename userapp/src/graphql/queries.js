@@ -1,6 +1,82 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getWeekDayRoutes = /* GraphQL */ `
+  query GetWeekDayRoutes($id: ID!) {
+    getWeekDayRoutes(id: $id) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listWeekDayRoutes = /* GraphQL */ `
+  query ListWeekDayRoutes(
+    $filter: ModelWeekDayRoutesFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listWeekDayRoutes(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        date
+        weekDay
+        vanID
+        kidID
+        Order
+        kidName
+        kidDropOffAddress
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getConfigs = /* GraphQL */ `
+  query GetConfigs($id: ID!) {
+    getConfigs(id: $id) {
+      id
+      defaultVanPhoto
+      defaultUserPhoto
+      phoneNumberManager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listConfigs = /* GraphQL */ `
+  query ListConfigs(
+    $filter: ModelConfigsFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listConfigs(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        defaultVanPhoto
+        defaultUserPhoto
+        phoneNumberManager
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getAddressList = /* GraphQL */ `
   query GetAddressList($id: ID!) {
     getAddressList(id: $id) {
@@ -19,13 +95,15 @@ export const getAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
+        vanID
+        routeID
         createdAt
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -46,6 +124,7 @@ export const listAddressLists = /* GraphQL */ `
         latitude
         longitude
         routeID
+        status
         createdAt
         updatedAt
         addressListKidId
@@ -77,6 +156,7 @@ export const addressListsByRouteID = /* GraphQL */ `
         latitude
         longitude
         routeID
+        status
         createdAt
         updatedAt
         addressListKidId
@@ -154,14 +234,16 @@ export const getRoute = /* GraphQL */ `
         __typename
       }
       status
-      Kids {
-        nextToken
-        __typename
-      }
       AddressLists {
         nextToken
         __typename
       }
+      Kids {
+        nextToken
+        __typename
+      }
+      currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId
@@ -186,6 +268,8 @@ export const listRoutes = /* GraphQL */ `
         helper
         route
         status
+        currentDestination
+        finishedTime
         createdAt
         updatedAt
         routeVanId
@@ -208,9 +292,10 @@ export const getKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      routeID
       Parent1ID
       Parent2ID
+      vanID
+      routeID
       createdAt
       updatedAt
       __typename
@@ -234,9 +319,10 @@ export const listKids = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
+        vanID
+        routeID
         createdAt
         updatedAt
         __typename
@@ -271,9 +357,10 @@ export const kidsByRouteID = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
+        vanID
+        routeID
         createdAt
         updatedAt
         __typename

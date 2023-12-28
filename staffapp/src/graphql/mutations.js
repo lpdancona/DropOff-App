@@ -138,6 +138,7 @@ export const createAddressList = /* GraphQL */ `
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -174,6 +175,7 @@ export const updateAddressList = /* GraphQL */ `
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -210,6 +212,7 @@ export const deleteAddressList = /* GraphQL */ `
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -314,6 +317,7 @@ export const createRoute = /* GraphQL */ `
         __typename
       }
       currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId
@@ -358,6 +362,7 @@ export const updateRoute = /* GraphQL */ `
         __typename
       }
       currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId
@@ -402,6 +407,7 @@ export const deleteRoute = /* GraphQL */ `
         __typename
       }
       currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId

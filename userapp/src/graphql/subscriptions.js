@@ -1,6 +1,102 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateWeekDayRoutes = /* GraphQL */ `
+  subscription OnCreateWeekDayRoutes(
+    $filter: ModelSubscriptionWeekDayRoutesFilterInput
+  ) {
+    onCreateWeekDayRoutes(filter: $filter) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateWeekDayRoutes = /* GraphQL */ `
+  subscription OnUpdateWeekDayRoutes(
+    $filter: ModelSubscriptionWeekDayRoutesFilterInput
+  ) {
+    onUpdateWeekDayRoutes(filter: $filter) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteWeekDayRoutes = /* GraphQL */ `
+  subscription OnDeleteWeekDayRoutes(
+    $filter: ModelSubscriptionWeekDayRoutesFilterInput
+  ) {
+    onDeleteWeekDayRoutes(filter: $filter) {
+      id
+      date
+      weekDay
+      vanID
+      kidID
+      Order
+      kidName
+      kidDropOffAddress
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateConfigs = /* GraphQL */ `
+  subscription OnCreateConfigs($filter: ModelSubscriptionConfigsFilterInput) {
+    onCreateConfigs(filter: $filter) {
+      id
+      defaultVanPhoto
+      defaultUserPhoto
+      phoneNumberManager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateConfigs = /* GraphQL */ `
+  subscription OnUpdateConfigs($filter: ModelSubscriptionConfigsFilterInput) {
+    onUpdateConfigs(filter: $filter) {
+      id
+      defaultVanPhoto
+      defaultUserPhoto
+      phoneNumberManager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteConfigs = /* GraphQL */ `
+  subscription OnDeleteConfigs($filter: ModelSubscriptionConfigsFilterInput) {
+    onDeleteConfigs(filter: $filter) {
+      id
+      defaultVanPhoto
+      defaultUserPhoto
+      phoneNumberManager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateAddressList = /* GraphQL */ `
   subscription OnCreateAddressList(
     $filter: ModelSubscriptionAddressListFilterInput
@@ -21,13 +117,15 @@ export const onCreateAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
+        vanID
+        routeID
         createdAt
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -55,13 +153,15 @@ export const onUpdateAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
+        vanID
+        routeID
         createdAt
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -89,13 +189,15 @@ export const onDeleteAddressList = /* GraphQL */ `
         lng
         birthDate
         photo
-        routeID
         Parent1ID
         Parent2ID
+        vanID
+        routeID
         createdAt
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -179,14 +281,16 @@ export const onCreateRoute = /* GraphQL */ `
         __typename
       }
       status
-      Kids {
-        nextToken
-        __typename
-      }
       AddressLists {
         nextToken
         __typename
       }
+      Kids {
+        nextToken
+        __typename
+      }
+      currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId
@@ -219,14 +323,16 @@ export const onUpdateRoute = /* GraphQL */ `
         __typename
       }
       status
-      Kids {
-        nextToken
-        __typename
-      }
       AddressLists {
         nextToken
         __typename
       }
+      Kids {
+        nextToken
+        __typename
+      }
+      currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId
@@ -259,14 +365,16 @@ export const onDeleteRoute = /* GraphQL */ `
         __typename
       }
       status
-      Kids {
-        nextToken
-        __typename
-      }
       AddressLists {
         nextToken
         __typename
       }
+      Kids {
+        nextToken
+        __typename
+      }
+      currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId
@@ -286,9 +394,10 @@ export const onCreateKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      routeID
       Parent1ID
       Parent2ID
+      vanID
+      routeID
       createdAt
       updatedAt
       __typename
@@ -307,9 +416,10 @@ export const onUpdateKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      routeID
       Parent1ID
       Parent2ID
+      vanID
+      routeID
       createdAt
       updatedAt
       __typename
@@ -328,9 +438,10 @@ export const onDeleteKid = /* GraphQL */ `
       lng
       birthDate
       photo
-      routeID
       Parent1ID
       Parent2ID
+      vanID
+      routeID
       createdAt
       updatedAt
       __typename

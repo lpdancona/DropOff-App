@@ -9,7 +9,7 @@ import {
   listAddressLists,
   getKid,
 } from "../../src/graphql/queries";
-import { onUpdateRoute } from "../graphql/subscriptions";
+import { onUpdateRoute, onUpdateAddressList } from "../graphql/subscriptions";
 
 const RouteContext = createContext({});
 
@@ -308,6 +308,32 @@ const RouteContextProvider = ({ children }) => {
             setIsRouteInProgress(true);
           } else {
             setIsRouteInProgress(false);
+          }
+        }
+      },
+      error: (error) => {
+        console.error("Subscription Error:", error);
+      },
+    });
+
+    return () => {
+      // Cleanup subscription on component unmount
+      sub.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const sub = API.graphql(graphqlOperation(onUpdateAddressList)).subscribe({
+      next: ({ value }) => {
+        if (value && value.data && value.data.onUpdateAddressList) {
+          const addressListStatus = value.data.onUpdateAddressList;
+
+          if (addressListStatus.addressListKidId === matchingKids[0].id) {
+            if (addressListStatus.status === "FINISHED") {
+              setIsRouteInProgress(false);
+            } else {
+              setIsRouteInProgress(true);
+            }
           }
         }
       },
