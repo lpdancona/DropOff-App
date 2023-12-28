@@ -265,6 +265,12 @@ const HomeScreen = () => {
           title={"Gracie Barra Bus"}
           description={currentRouteData?.Van?.name}
           icon={vanIcon}
+          rotation={calculateBearing(
+            busLocation.latitude,
+            busLocation.longitude,
+            dropOffLatLng.latitude,
+            dropOffLatLng.longitude
+          )}
         >
           <View style={{ padding: 5 }}>
             <Image source={vanIcon} style={{ width: 40, height: 40 }} />

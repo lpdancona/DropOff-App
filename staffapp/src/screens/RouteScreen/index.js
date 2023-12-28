@@ -557,94 +557,34 @@ const RouteScreen = () => {
     requestLocationPermissions();
   }, []);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     let { status } = await Location.requestForegroundPermissionsAsync();
-  //     if (!status === "granted") {
-  //       setErrorMsg("Permission to access location was denied");
-  //       return;
-  //     }
-  //     let location = await Location.getCurrentPositionAsync({ accuracy: 5 });
-  //     setBusLocation({
-  //       latitude: location.coords.latitude,
-  //       longitude: location.coords.longitude,
-  //     });
-  //   })();
-
-  //   const foregroundSubscription = Location.watchPositionAsync(
-  //     {
-  //       accuracy: Location.Accuracy.BestForNavigation,
-  //       distanceInterval: 5,
-  //     },
-  //     (updatedLocation) => {
-  //       setBusLocation({
-  //         latitude: updatedLocation.coords.latitude,
-  //         longitude: updatedLocation.coords.longitude,
-  //       });
-  //     }
-  //   );
-  //   return () => foregroundSubscription;
-  // }, []);
-
   useEffect(() => {
-    const initializeLocation = async () => {
+    (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
+      if (!status === "granted") {
         setErrorMsg("Permission to access location was denied");
         return;
       }
-
       let location = await Location.getCurrentPositionAsync({ accuracy: 5 });
       setBusLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
-    };
+    })();
 
-    // Initialize location once on component mount
-    initializeLocation();
-
-    //...
+    const foregroundSubscription = Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.BestForNavigation,
+        distanceInterval: 5,
+      },
+      (updatedLocation) => {
+        setBusLocation({
+          latitude: updatedLocation.coords.latitude,
+          longitude: updatedLocation.coords.longitude,
+        });
+      }
+    );
+    return () => foregroundSubscription;
   }, []);
-
-  useEffect(() => {
-    console.log(driverAction);
-    const requestAndWatchLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({ accuracy: 5 });
-      setBusLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-
-      const foregroundSubscription = Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.BestForNavigation,
-          distanceInterval: 5,
-        },
-        (updatedLocation) => {
-          setBusLocation({
-            latitude: updatedLocation.coords.latitude,
-            longitude: updatedLocation.coords.longitude,
-          });
-        }
-      );
-
-      return () => {
-        foregroundSubscription.remove();
-      };
-    };
-
-    // Check if the driverAction is "Drive" before requesting and watching location
-    if (driverAction === "Drive") {
-      requestAndWatchLocation();
-    }
-  }, [driverAction]);
 
   //get the current route (by id)
   useEffect(() => {
@@ -719,7 +659,7 @@ const RouteScreen = () => {
     setNextWaypoints(nextWaypoints);
   }, [addressList, currentWaypointIndex, busLocation]);
 
-  // show the arrivedmodal if the driver is in the waypoint
+  // show the arrived modal if the driver is in the waypoint
   useEffect(() => {
     if (isVanArrived && driverAction === "Drive") {
       setIsVanArrived(false);
