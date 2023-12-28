@@ -64,7 +64,7 @@ const RouteScreen = () => {
   const [showDriveConfirmation, setShowDriveConfirmation] = useState(false);
   const [driveConfirmationResponse, setDriveConfirmationResponse] =
     useState(null);
-  const [driverAction, setDriverAction] = useState(null);
+  const [driverAction, setDriverAction] = useState("Waiting");
   const [handlingNextWaypoint, setHandlingNextWaypoint] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState(
     "Do you want to start the route?"
@@ -557,34 +557,94 @@ const RouteScreen = () => {
     requestLocationPermissions();
   }, []);
 
+  // useEffect(() => {
+  //   (async () => {
+  //     let { status } = await Location.requestForegroundPermissionsAsync();
+  //     if (!status === "granted") {
+  //       setErrorMsg("Permission to access location was denied");
+  //       return;
+  //     }
+  //     let location = await Location.getCurrentPositionAsync({ accuracy: 5 });
+  //     setBusLocation({
+  //       latitude: location.coords.latitude,
+  //       longitude: location.coords.longitude,
+  //     });
+  //   })();
+
+  //   const foregroundSubscription = Location.watchPositionAsync(
+  //     {
+  //       accuracy: Location.Accuracy.BestForNavigation,
+  //       distanceInterval: 5,
+  //     },
+  //     (updatedLocation) => {
+  //       setBusLocation({
+  //         latitude: updatedLocation.coords.latitude,
+  //         longitude: updatedLocation.coords.longitude,
+  //       });
+  //     }
+  //   );
+  //   return () => foregroundSubscription;
+  // }, []);
+
   useEffect(() => {
-    (async () => {
+    const initializeLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (!status === "granted") {
+      if (status !== "granted") {
         setErrorMsg("Permission to access location was denied");
         return;
       }
+
       let location = await Location.getCurrentPositionAsync({ accuracy: 5 });
       setBusLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
-    })();
+    };
 
-    const foregroundSubscription = Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.BestForNavigation,
-        distanceInterval: 5,
-      },
-      (updatedLocation) => {
-        setBusLocation({
-          latitude: updatedLocation.coords.latitude,
-          longitude: updatedLocation.coords.longitude,
-        });
-      }
-    );
-    return () => foregroundSubscription;
+    // Initialize location once on component mount
+    initializeLocation();
+
+    //...
   }, []);
+
+  useEffect(() => {
+    console.log(driverAction);
+    const requestAndWatchLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({ accuracy: 5 });
+      setBusLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+
+      const foregroundSubscription = Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.BestForNavigation,
+          distanceInterval: 5,
+        },
+        (updatedLocation) => {
+          setBusLocation({
+            latitude: updatedLocation.coords.latitude,
+            longitude: updatedLocation.coords.longitude,
+          });
+        }
+      );
+
+      return () => {
+        foregroundSubscription.remove();
+      };
+    };
+
+    // Check if the driverAction is "Drive" before requesting and watching location
+    if (driverAction === "Drive") {
+      requestAndWatchLocation();
+    }
+  }, [driverAction]);
 
   //get the current route (by id)
   useEffect(() => {
@@ -707,7 +767,7 @@ const RouteScreen = () => {
         //provider={PROVIDER_GOOGLE}
         style={{ width, height }}
         showsUserLocation={true}
-        //followsUserLocation={true}
+        followsUserLocation={true}
         initialRegion={{
           latitude: busLocation.latitude,
           longitude: busLocation.longitude,

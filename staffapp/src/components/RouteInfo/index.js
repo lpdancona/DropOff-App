@@ -50,10 +50,10 @@ const RouteInfoComponent = ({
     }
   };
 
-  useEffect(() => {
-    if (driverAction === "Drive") {
-    }
-  }, [driverAction]);
+  // useEffect(() => {
+  //   if (driverAction === "Drive") {
+  //   }
+  // }, [driverAction]);
 
   return (
     <SafeAreaView style={styles.container}>

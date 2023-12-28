@@ -99,7 +99,7 @@ const LocationTrackingComponent = ({ locationEmitter, routeID }) => {
     // Clean up Logic
     return () => {
       console.log("calling unregister background fetch");
-      unregisterBackgroundFetchAsync();
+      //unregisterBackgroundFetchAsync();
       unregisterAllTasks();
       Location.stopLocationUpdatesAsync("background-location-task");
       locationEmitter.removeAllListeners();
