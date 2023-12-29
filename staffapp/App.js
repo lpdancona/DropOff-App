@@ -1,4 +1,5 @@
 //import 'core-js/full/symbol/async-iterator';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as TaskManager from "expo-task-manager";
 import React, { useEffect } from "react";
 import { LogBox, AppState } from "react-native";
@@ -7,7 +8,6 @@ import { withAuthenticator } from "@aws-amplify/ui-react-native";
 import AuthContextProvider from "./src/contexts/AuthContext";
 import RouteContextProvider from "./src/contexts/RouteContext";
 import RootNavigator from "./src/navigation";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import PushNotificationsContextProvider from "./src/contexts/PushNotificationsContext";
 import BackgroundTasksProvider from "./src/contexts/BackgroundTaskContext";
 

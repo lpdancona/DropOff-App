@@ -14,6 +14,7 @@ import {
 import { Auth } from "aws-amplify";
 import styles from "./styles";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 import { useNavigation } from "@react-navigation/native";
 
@@ -21,11 +22,11 @@ import { useNavigation } from "@react-navigation/native";
 // import { onUpdateRoute } from "../../graphql/subscriptions";
 
 const WaitingScreen = () => {
+  const { currentUserData } = useAuthContext();
+
   const windowWidth = useWindowDimensions().width;
   const [confirmationModalVisible, setConfirmationModalVisible] =
     useState(false);
-  //const [isWaiting, setIsWaiting] = useState(true);
-  //const { isRouteInProgress } = useRouteContext();
   const navigation = useNavigation();
 
   const funTextStyle: TextStyle = {
@@ -47,33 +48,6 @@ const WaitingScreen = () => {
     }
   };
 
-  // useEffect(() => {
-  //   console.log("is Route in Progress (wainting)", isRouteInProgress);
-  //   if (isRouteInProgress) {
-  //     navigation.navigate("Home");
-  //   } else {
-  //     navigation.navigate("Wait");
-  //   }
-  // }, [isRouteInProgress]);
-
-  // useEffect(() => {
-  //   const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
-  //     next: ({ value }) => {
-  //       if (value.status === "IN_PROGRESS") {
-  //         navigation.navigate("Home");
-  //       }
-  //     },
-  //     error: (error) => {
-  //       console.error("Subscription Error:", error);
-  //     },
-  //   });
-
-  //   return () => {
-  //     // Cleanup subscription on component unmount
-  //     sub.unsubscribe();
-  //   };
-  // }, [isWaiting]);
-
   return (
     <SafeAreaView style={styles.container}>
       <Image
@@ -86,8 +60,8 @@ const WaitingScreen = () => {
       />
       <View style={styles.centeredTextWrapper}>
         <Text style={[funTextStyle, styles.centeredText]}>
-          Hello Family, We don't have a route for your little champ yet. You
-          will be notified when we do
+          Hello {currentUserData?.name}, We don't have a route for your little
+          champ yet. You will be notified when we do
         </Text>
         <View style={styles.parallelogramContainer}>
           <View style={styles.parallelogram1}></View>

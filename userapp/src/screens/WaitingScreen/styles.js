@@ -19,6 +19,10 @@ export default StyleSheet.create({
     textAlign: "center",
     zIndex: 1,
   },
+  userText: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
   parallelogramContainer: {
     position: "absolute",
     top: 0,

@@ -22,7 +22,7 @@ import { useRoute } from "@react-navigation/native";
 import RouteInfoComponent from "../../components/RouteInfo";
 import { API } from "aws-amplify";
 import { getUser, listAddressLists, getKid } from "../../graphql/queries";
-import { updateRoute } from "../../graphql/mutations";
+import { updateRoute, updateAddressList } from "../../graphql/mutations";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
 import * as Location from "expo-location";
 //import { updateLocation } from "../../components/LocationUtils";
@@ -64,7 +64,7 @@ const RouteScreen = () => {
   const [showDriveConfirmation, setShowDriveConfirmation] = useState(false);
   const [driveConfirmationResponse, setDriveConfirmationResponse] =
     useState(null);
-  const [driverAction, setDriverAction] = useState(null);
+  const [driverAction, setDriverAction] = useState("Waiting");
   const [handlingNextWaypoint, setHandlingNextWaypoint] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState(
     "Do you want to start the route?"
@@ -281,9 +281,9 @@ const RouteScreen = () => {
   };
 
   const handleNextWaypoint = async () => {
+    setIsVanArrived(false);
     const nextWaypointIndex = currentWaypointIndex + 1;
     setCurrentWaypointIndex(nextWaypointIndex);
-    setIsVanArrived(false);
     setNotificationSent(false);
     setNotificationToDriver(false);
     //update the origin to the new bus location
@@ -297,6 +297,10 @@ const RouteScreen = () => {
     };
     setDestination(newDestination);
     // update the route (currentDestination)
+    await updateAddressListStatus(
+      addressList[currentWaypointIndex].id,
+      "FINISHED"
+    );
     await updateRouteNextDestination(addressList[nextWaypointIndex].id);
 
     // remove past waypoints from addresslist
@@ -359,6 +363,19 @@ const RouteScreen = () => {
 
   const showDriveConfirmationMessage = () => {
     setShowDriveConfirmation(true);
+  };
+
+  const updateAddressListStatus = async (id, status) => {
+    try {
+      let input = { id: id, status: status };
+      //input.departTime = formattedTime;
+      const response = await API.graphql({
+        query: updateAddressList,
+        variables: { input },
+      });
+    } catch (error) {
+      console.error("error on updating the addresslist status");
+    }
   };
 
   const updateRouteStatus = async (status) => {
@@ -549,6 +566,28 @@ const RouteScreen = () => {
     zoomInOnDriver();
   };
 
+  const calculateBearing = (startLat, startLng, endLat, endLng) => {
+    const startLatRad = degreesToRadians(startLat);
+    const startLngRad = degreesToRadians(startLng);
+    const endLatRad = degreesToRadians(endLat);
+    const endLngRad = degreesToRadians(endLng);
+
+    const dLng = endLngRad - startLngRad;
+
+    const x = Math.sin(dLng) * Math.cos(endLatRad);
+    const y =
+      Math.cos(startLatRad) * Math.sin(endLatRad) -
+      Math.sin(startLatRad) * Math.cos(endLatRad) * Math.cos(dLng);
+
+    const bearing = Math.atan2(x, y);
+    const bearingDegrees = radiansToDegrees(bearing);
+
+    return bearingDegrees;
+  };
+
+  const degreesToRadians = (degrees) => (degrees * Math.PI) / 180;
+  const radiansToDegrees = (radians) => (radians * 180) / Math.PI;
+
   /////
   /////   starting the useEffects ///
   /////
@@ -659,7 +698,7 @@ const RouteScreen = () => {
     setNextWaypoints(nextWaypoints);
   }, [addressList, currentWaypointIndex, busLocation]);
 
-  // show the arrivedmodal if the driver is in the waypoint
+  // show the arrived modal if the driver is in the waypoint
   useEffect(() => {
     if (isVanArrived && driverAction === "Drive") {
       setIsVanArrived(false);
@@ -674,6 +713,32 @@ const RouteScreen = () => {
       getRouteStatus();
     }
   }, [currentRouteData, addressList]);
+
+  useEffect(() => {
+    if (busLocation && addressList) {
+      // Calculate the bearing angle between the current and next locations
+      const bearing = calculateBearing(
+        busLocation.latitude,
+        busLocation.longitude,
+        addressList[currentWaypointIndex].latitude,
+        addressList[currentWaypointIndex].longitude
+      );
+
+      // Animate the map to the next location and rotate it based on the bearing
+      if (mapRef.current) {
+        mapRef.current.animateCamera({
+          center: {
+            latitude: busLocation.latitude,
+            longitude: busLocation.longitude,
+          },
+          heading: bearing,
+          pitch: 0,
+          altitude: 1000, // You can adjust the altitude as needed
+          zoom: 25, // You can adjust the zoom level as needed
+        });
+      }
+    }
+  }, [busLocation, addressList, mapRef.current]);
 
   ///
   /// finish the use effects
@@ -706,7 +771,7 @@ const RouteScreen = () => {
         ref={mapRef}
         //provider={PROVIDER_GOOGLE}
         style={{ width, height }}
-        showsUserLocation={true}
+        //showsUserLocation={true}
         //followsUserLocation={true}
         initialRegion={{
           latitude: busLocation.latitude,
@@ -1004,6 +1069,7 @@ const RouteScreen = () => {
 
           {routeStatus === "IN_PROGRESS" &&
             driverAction !== "Drive" &&
+            currentUserData.id === currentRouteData.driver &&
             showResumeButton && (
               <TouchableOpacity
                 onPress={() => {

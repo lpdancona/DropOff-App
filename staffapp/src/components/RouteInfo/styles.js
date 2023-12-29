@@ -74,6 +74,10 @@ export default StyleSheet.create({
   driverName: {
     fontSize: 12,
   },
+  driverAction: {
+    paddingLeft: 5,
+    fontSize: 12,
+  },
   subheading: {
     fontSize: 18,
     fontWeight: "bold",

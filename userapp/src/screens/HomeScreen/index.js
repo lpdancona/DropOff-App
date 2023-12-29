@@ -12,26 +12,14 @@ import {
   SafeAreaView,
 } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-// import { Appbar, Menu } from "react-native-paper";
-// import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import styles from "./styles";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
-//import { useAuthContext } from "../../contexts/AuthContext";
 import { useRouteContext } from "../../contexts/RouteContext";
 import { Auth } from "aws-amplify";
-// import { API, graphqlOperation } from "aws-amplify";
-// import {
-//   listRoutes,
-//   kidsByRouteID,
-//   getVan,
-//   getUser,
-// } from "../../graphql/queries";
-// import { onUpdateRoute } from "../../graphql/subscriptions";
-//import gbIcon from "../../docs/gb-logo.svg";
 import houseIcon from "../../docs/icon-house.png";
 import vanIcon from "../../docs/van.png";
 
@@ -52,28 +40,17 @@ const HomeScreen = () => {
   } = useRouteContext();
 
   const [selectedItem, setSelectedItem] = useState(null);
-  // const [dropOffLatLng, setDropLatLng] = useState(null);
-  // const [dropOffAddress, setDropOffAddress] = useState(null);
-  //const [menuVisible, setMenuVisible] = useState(false);
   const bottomSheetRef = useRef(null);
   const mapRef = useRef(null);
   const { width, height } = useWindowDimensions();
-  //const [busLocation, setBusLocation] = useState(null);
-  //const [routesData, setRoutesData] = useState(null);
-  //const [currentRouteData, setCurrentRouteData] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [totalKm, setTotalKm] = useState(0);
-  //const [matchingKids, setMatchingKids] = useState(null);
-  //const [driver, setDriver] = useState(null);
-  //const [helper, setHelper] = useState(null);
   const [strokeWidth, setStrokeWidth] = useState(1);
   const [strokeColor, setStrokeColor] = useState("rgba(0, 0, 0, 0)");
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
-  //const [isLoading, setIsLoading] = useState(true);
-  //const [noKidsAvailable, setNoKidsAvailable] = useState(false);
 
   const LoadingScreen = () => (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -163,9 +140,9 @@ const HomeScreen = () => {
             longitude: busLocation.longitude,
           },
           heading: bearing,
-          pitch: 0,
-          altitude: 1000, // You can adjust the altitude as needed
-          zoom: 15, // You can adjust the zoom level as needed
+          // pitch: 0,
+          // altitude: 1000, // You can adjust the altitude as needed
+          // zoom: 15, // You can adjust the zoom level as needed
         });
       }
     }
@@ -287,7 +264,13 @@ const HomeScreen = () => {
           }}
           title={"Gracie Barra Bus"}
           description={currentRouteData?.Van?.name}
-          icon={vanIcon}
+          // icon={vanIcon}
+          rotation={calculateBearing(
+            busLocation.latitude,
+            busLocation.longitude,
+            dropOffLatLng.latitude,
+            dropOffLatLng.longitude
+          )}
         >
           <View style={{ padding: 5 }}>
             <Image source={vanIcon} style={{ width: 40, height: 40 }} />

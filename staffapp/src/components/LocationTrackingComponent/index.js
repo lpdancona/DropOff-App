@@ -59,7 +59,7 @@ const LocationTrackingComponent = ({ locationEmitter, routeID }) => {
 
       const locationOptions = {
         accuracy: Platform.OS === "android" ? 6 : 4, //accuracy: Location.Accuracy.BestForNavigation,
-        timeInterval: 5000, // Update every 5 seconds
+        timeInterval: 10000, // Update every  10 seconds
         distanceInterval: 5,
         showsBackgroundLocationIndicator: true,
         foregroundService: {
@@ -99,7 +99,7 @@ const LocationTrackingComponent = ({ locationEmitter, routeID }) => {
     // Clean up Logic
     return () => {
       console.log("calling unregister background fetch");
-      unregisterBackgroundFetchAsync();
+      //unregisterBackgroundFetchAsync();
       unregisterAllTasks();
       Location.stopLocationUpdatesAsync("background-location-task");
       locationEmitter.removeAllListeners();
