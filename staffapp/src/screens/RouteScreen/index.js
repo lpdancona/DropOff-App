@@ -1069,6 +1069,7 @@ const RouteScreen = () => {
 
           {routeStatus === "IN_PROGRESS" &&
             driverAction !== "Drive" &&
+            currentUserData.id === currentRouteData.driver &&
             showResumeButton && (
               <TouchableOpacity
                 onPress={() => {
