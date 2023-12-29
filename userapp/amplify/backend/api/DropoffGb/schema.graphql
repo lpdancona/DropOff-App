@@ -1,3 +1,10 @@
+enum WaypointStatus {
+  FINISHED
+  IN_PROGRESS
+  WAITING_TO_START
+  PAUSED
+}
+
 type WeekDayRoutes @model @auth(rules: [{allow: public}]) {
   id: ID!
   date: AWSDate
@@ -23,6 +30,7 @@ type AddressList @model @auth(rules: [{allow: public}]) {
   longitude: Float
   routeID: ID @index(name: "byRoute")
   Kid: Kid @hasOne
+  status: WaypointStatus
 }
 
 enum RouteStatus {
