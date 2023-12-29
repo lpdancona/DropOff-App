@@ -1,81 +1,56 @@
-import { useState } from "react";
-import "./StudentForm.css";
+import React, { useState } from "react";
+import { Auth } from "aws-amplify";
+import "./EmployeeForm.css";
+
 function EmployeeForm({ onEmployeeAdded }) {
-  const [name, setName] = useState("");
-  const [photo, setPhoto] = useState("");
-  const [role, setRole] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState(null);
 
-  const handleSubmit = async (e) => {
+  const handleEmailSignup = async (e) => {
     e.preventDefault();
-    const employe = {
-      name,
-      photo,
-      role,
-    };
-    const response = await fetch(
-      "https://drop-off-app-dere.onrender.com/api/employes",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(employe),
-      }
-    );
-    const json = await response.json();
 
-    if (!response.ok) {
-      setError(json.message);
-      console.log("error", error);
-      alert("Failed to add Employee.");
+    if (!email) {
+      setError("Please enter an email address.");
+      return;
     }
-    if (response.ok) {
-      setName("");
-      setPhoto("");
-      setRole("");
-      setError(null);
-      console.log("new employee added", json);
-      alert("New employee added!");
-      onEmployeeAdded();
+
+    try {
+      // Sign up the user with email
+      await Auth.signUp({
+        username: email,
+        password: generatePassword(), // You should implement a password generation function
+        attributes: {
+          email,
+        },
+      });
+
+      // Redirect to confirmation page or show a confirmation message
+      alert("Please check your email for confirmation.");
+    } catch (error) {
+      console.error("Error signing up", error);
+      setError("Error signing up. Please try again.");
     }
   };
 
+  const generatePassword = () => {
+    // Implement a password generation logic or use a library
+    // For simplicity, you can create a random password
+    return Math.random().toString(36).slice(-8);
+  };
+
   return (
-    <form className="create" onSubmit={handleSubmit}>
-      <h3>Add a New Employee</h3>
+    <form className="create" onSubmit={handleEmailSignup}>
+      <h3>Sign Up with Email</h3>
       <div className="form-container">
         <div className="form-item">
-          <label>Employee Name:</label>
+          <label>Email:</label>
           <input
-            type="text"
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
-            value={name}
+            type="email"
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
           />
         </div>
-        <div className="form-item">
-          <label>Employee Photo:</label>
-          <input
-            type="text"
-            onChange={(e) => {
-              setPhoto(e.target.value);
-            }}
-            value={photo}
-          />
-        </div>
-        <div className="form-item">
-          <label>Employee Role:</label>
-          <input
-            type="text"
-            onChange={(e) => {
-              setRole(e.target.value);
-            }}
-            value={role}
-          />
-        </div>
-        <button className="create-btn">Add Employee</button>
+        <button className="create-btn">Sign Up</button>
         {error && <div className="error">{error}</div>}
       </div>
     </form>

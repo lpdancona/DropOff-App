@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import EmployeeForm from "./EmployeeForm";
 import { listUsers } from "../graphql/queries";
+import { deleteUser, updateUser } from "../graphql/mutations";
 
 function Employees() {
   const [employees, setEmployees] = useState([]);
@@ -22,24 +23,8 @@ function Employees() {
   const [updatedPhoto, setUpdatedPhoto] = useState("");
   const employeesPerPage = 4;
 
-  // const fetchKidsWithoutVan = async () => {
-  //   try {
-  //     const variables = {
-  //       filter: { vanID: { attributeExists: false } },
-  //     };
-  //     const kidsWithoutVanResponse = await API.graphql({
-  //       query: listKids,
-  //       variables: variables,
-  //     });
-  //     const kidsWithoutVanData = kidsWithoutVanResponse.data.listKids.items;
-  //     setKidsWithoutVan(kidsWithoutVanData);
-  //   } catch (error) {
-  //     console.error("Error fetching kids without van data:", error);
-  //   }
-  // };
-
-  useEffect(() => {
-    const fetchEmployees = async () => {
+  const fetchEmployees = async () => {
+    try {
       const variables = {
         filter: {
           or: [{ userType: { eq: "STAFF" } }, { userType: { eq: "DRIVER" } }],
@@ -49,9 +34,15 @@ function Employees() {
         query: listUsers,
         variables: variables,
       });
+
       const staff = employeesResponse.data.listUsers.items;
       setEmployees(staff);
-    };
+    } catch (error) {
+      console.error("Error fetching employees");
+    }
+  };
+
+  useEffect(() => {
     fetchEmployees();
   }, []);
 
@@ -77,77 +68,63 @@ function Employees() {
 
   const handleEmployeeClick = (employee) => {
     setSelectedEmployee(employee);
-    setUpdatedName(employee.name);
-    setUpdatedPhoto(employee.photo);
-    setUpdatedRole(employee.role);
     setMode("details");
   };
+
+  useEffect(() => {
+    if (selectedEmployee) {
+      setUpdatedName(selectedEmployee.name);
+      setUpdatedPhoto(selectedEmployee.photo);
+      setUpdatedRole(selectedEmployee.userType);
+    }
+  }, [selectedEmployee]);
+
   const handleDeleteClick = (employee) => {
     setSelectedEmployee(employee);
     setMode("delete");
   };
-  const handleDeleteEmployee = async () => {
-    try {
-      const response = await fetch(
-        `https://drop-off-app-dere.onrender.com/api/employes/${selectedEmployee._id}`,
-        {
-          method: "DELETE",
-        }
-      );
 
-      if (response.ok) {
-        const updatedEmployees = employees.filter(
-          (employee) => employee._id !== selectedEmployee._id
-        );
-        setEmployees(updatedEmployees);
-        setSelectedEmployee(null);
-        setMode("list");
-      } else {
-        console.error("Failed to delete Employee.");
-      }
+  const handleDeleteEmployee = async () => {
+    if (!selectedEmployee) {
+      return;
+    }
+
+    try {
+      await API.graphql({
+        query: deleteUser,
+        variables: { input: { id: selectedEmployee.id } },
+      });
+      setSelectedEmployee(null);
+      await fetchEmployees();
+      setMode("list");
     } catch (error) {
       console.error("Error deleting Employee:", error);
     }
   };
 
   const handleUpdateEmployee = async () => {
+    if (!selectedEmployee) {
+      return;
+    }
+
     try {
-      const response = await fetch(
-        `https://drop-off-app-dere.onrender.com/api/employes/${selectedEmployee._id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
+      await API.graphql({
+        query: updateUser,
+        variables: {
+          input: {
+            id: selectedEmployee.id,
+            name: selectedEmployee.name,
+            userType: selectedEmployee.role,
           },
-          body: JSON.stringify({
-            name: updatedName,
-            photo: updatedPhoto,
-            role: updatedRole,
-          }),
-        }
-      );
+        },
+      });
 
-      if (response.ok) {
-        const updatedEmployees = employees.map((employee) =>
-          employee._id === selectedEmployee._id
-            ? {
-                ...employee,
-                name: updatedName,
-                photo: updatedPhoto,
-                role: updatedRole,
-              }
-            : employee
-        );
-        setEmployees(updatedEmployees);
-
-        setSelectedEmployee(null);
-        setMode("list");
-        setUpdatedName("");
-        setUpdatedPhoto("");
-        setUpdatedRole("");
-      } else {
-        console.error("Failed to update Employee.");
-      }
+      await fetchEmployees();
+      setSelectedEmployee(null);
+      setMode("list");
+      setUpdatedName("");
+      setUpdatedName("");
+      setUpdatedRole("");
     } catch (error) {
       console.error("Error updating Employee:", error);
     }
@@ -172,7 +149,7 @@ function Employees() {
     <div className="home-main">
       <div className="home">
         <div className="home-container">
-          <div className="students-container">
+          <div className="employees-container">
             {mode === "list" && (
               <div>
                 <h3>Employees</h3>
@@ -184,30 +161,33 @@ function Employees() {
                     onChange={(e) => setNameFilter(e.target.value)}
                   />
                 </div>
-                <div className="student">
+                <div className="employee">
                   {displayedEmployees.map((employee) => (
                     <div
-                      className="student-details-container"
+                      className="employee-details-container"
                       key={employee._id}
                     >
                       <img
                         src={employee.photo}
                         alt=""
-                        className="student-photo"
+                        className="employee-photo"
                       />
-                      <div className="student-details">
-                        <div className="student-name">{employee.name}</div>
-                        <div className="student-address">{employee.role}</div>
+                      <div className="employee-details">
+                        <div className="employee-name">{employee.name}</div>
+                        <div className="employee-address">
+                          {employee.userType}
+                        </div>
+                        <div className="employee-email">{employee.email}</div>
                       </div>
-                      <div className="student-details-btn">
+                      <div className="employee-details-btn">
                         <button
                           onClick={() => handleEmployeeClick(employee)}
-                          className="btn btn-student-edit"
+                          className="btn btn-employee-edit"
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>
                         <button
-                          className="btn btn-student-delete"
+                          className="btn btn-employee-delete"
                           onClick={() => {
                             handleDeleteClick(employee);
                           }}
@@ -237,9 +217,9 @@ function Employees() {
               </div>
             )}
             {mode === "details" && selectedEmployee && (
-              <div className="update-student-container">
+              <div className="update-employee-container">
                 <h2>Update Employee</h2>
-                <div className="update-student">
+                <div className="update-employee">
                   <h4>{selectedEmployee.name}</h4>
                   <form onSubmit={handleUpdateEmployee}>
                     <label>Name:</label>
@@ -255,11 +235,18 @@ function Employees() {
                       onChange={(e) => setUpdatedPhoto(e.target.value)}
                     />
                     <label>Role:</label>
-                    <input
+                    <select
+                      value={updatedRole}
+                      onChange={(e) => setUpdatedRole(e.target.value)}
+                    >
+                      <option value="STAFF">STAFF</option>
+                      <option value="DRIVER">DRIVER</option>
+                    </select>
+                    {/* <input
                       type="text"
                       value={updatedRole}
                       onChange={(e) => setUpdatedRole(e.target.value)}
-                    />
+                    /> */}
                     <button type="submit" className="btn">
                       Update Employee
                     </button>
@@ -271,11 +258,11 @@ function Employees() {
               </div>
             )}
             {mode === "delete" && selectedEmployee && (
-              <div className="delete-student-container">
+              <div className="delete-employee-container">
                 <h2>Delete Employee</h2>
-                <div className="delete-student">
+                <div className="delete-employee">
                   <h4>{selectedEmployee.name}</h4>
-                  <p>Are you sure you want to delete this student?</p>
+                  <p>Are you sure you want to delete this employee?</p>
                   <button onClick={handleDeleteEmployee} className="btn">
                     Yes
                   </button>
