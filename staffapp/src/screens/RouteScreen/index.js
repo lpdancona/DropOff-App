@@ -302,6 +302,10 @@ const RouteScreen = () => {
       addressList[currentWaypointIndex].id,
       "FINISHED"
     );
+    await updateAddressListStatus(
+      addressList[nextWaypointIndex].id,
+      "IN_PROGRESS"
+    );
     await updateRouteNextDestination(addressList[nextWaypointIndex].id);
 
     // remove past waypoints from addresslist
@@ -496,16 +500,16 @@ const RouteScreen = () => {
         return `${address.latitude},${address.longitude}`;
       });
       //
-      // // Separate the first address as the origin
-      // const origin = `${busLocation.latitude},${busLocation.longitude}`;
-      // // Separate the last address as the destination
-      // const destination = waypoints.pop();
-      // // Join the remaining waypoints into a single string separated by "|"
-      // const waypointsString = waypoints.join("|");
-      // // Construct the Google Maps URL with the origin and waypoints
-      // const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
-      // // Open Google Maps with the origin and waypoints pre-set
-      // Linking.openURL(googleMapsUrl);
+      // Separate the first address as the origin
+      const origin = `${busLocation.latitude},${busLocation.longitude}`;
+      // Separate the last address as the destination
+      const destination = waypoints.pop();
+      // Join the remaining waypoints into a single string separated by "|"
+      const waypointsString = waypoints.join("|");
+      // Construct the Google Maps URL with the origin and waypoints
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
+      // Open Google Maps with the origin and waypoints pre-set
+      Linking.openURL(googleMapsUrl);
     }
   };
 
@@ -523,12 +527,12 @@ const RouteScreen = () => {
     setCurrentRouteData(routeWithId);
   };
 
-  const handleContinue = () => {
-    setIsVanArrived(false);
-    setShowArrivedModal(false);
-    setShowContinueButton(false);
-    setShowDriveButton(true);
-    handleNextWaypoint();
+  const handleContinue = async () => {
+    await setIsVanArrived(false);
+    await setShowArrivedModal(false);
+    await setShowContinueButton(false);
+    await setShowDriveButton(true);
+    await handleNextWaypoint();
   };
 
   const handleFinish = async () => {
