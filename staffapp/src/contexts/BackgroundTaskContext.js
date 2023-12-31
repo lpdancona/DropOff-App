@@ -1,5 +1,5 @@
 // BackgroundTasksContext.js
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext } from "react";
 import * as BackgroundFetch from "expo-background-fetch";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";

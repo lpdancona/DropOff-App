@@ -70,6 +70,7 @@ const RouteScreen = () => {
     "Do you want to start the route?"
   );
   const [showDriveButton, setShowDriveButton] = useState(true);
+  const [showContinueButton, setShowContinueButton] = useState(false);
   const [showResumeButton, setResumeButton] = useState(false);
   const [isVanArrived, setIsVanArrived] = useState(false);
   const [routeStatus, setRouteStatus] = useState(null);
@@ -393,6 +394,7 @@ const RouteScreen = () => {
         setCurrentRouteData((prevData) => ({
           ...prevData,
           status: status,
+          //currentDestination: addressList[currentWaypointIndex].id,
           departTime: formattedTime,
         }));
         const response = await API.graphql({
@@ -480,7 +482,12 @@ const RouteScreen = () => {
       setShowDriveButton(false); // Hide the Drive button
       // update the route status
       await updateRouteStatus("IN_PROGRESS");
+      setRouteStatus("IN_PROGRESS");
       setHandlingNextWaypoint(true);
+      await updateAddressListStatus(
+        addressList[currentWaypointIndex].id,
+        "IN_PROGRESS"
+      );
       zoomInOnDriver();
       const currentDestination = addressList[currentWaypointIndex].id;
       await updateRouteNextDestination(currentDestination);
@@ -489,16 +496,16 @@ const RouteScreen = () => {
         return `${address.latitude},${address.longitude}`;
       });
       //
-      // Separate the first address as the origin
-      const origin = `${busLocation.latitude},${busLocation.longitude}`;
-      // Separate the last address as the destination
-      const destination = waypoints.pop();
-      // Join the remaining waypoints into a single string separated by "|"
-      const waypointsString = waypoints.join("|");
-      // Construct the Google Maps URL with the origin and waypoints
-      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
-      // Open Google Maps with the origin and waypoints pre-set
-      Linking.openURL(googleMapsUrl);
+      // // Separate the first address as the origin
+      // const origin = `${busLocation.latitude},${busLocation.longitude}`;
+      // // Separate the last address as the destination
+      // const destination = waypoints.pop();
+      // // Join the remaining waypoints into a single string separated by "|"
+      // const waypointsString = waypoints.join("|");
+      // // Construct the Google Maps URL with the origin and waypoints
+      // const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}&waypoints=${waypointsString}`;
+      // // Open Google Maps with the origin and waypoints pre-set
+      // Linking.openURL(googleMapsUrl);
     }
   };
 
@@ -517,13 +524,17 @@ const RouteScreen = () => {
   };
 
   const handleContinue = () => {
+    setIsVanArrived(false);
     setShowArrivedModal(false);
-    // Implement any additional logic for continuing to the next destination
+    setShowContinueButton(false);
+    setShowDriveButton(true);
     handleNextWaypoint();
   };
 
   const handleFinish = async () => {
+    setIsVanArrived(false);
     setShowArrivedModal(false);
+
     await updateRouteStatus("FINISHED");
   };
 
@@ -546,9 +557,7 @@ const RouteScreen = () => {
         setCurrentWaypointIndex(currentWaypointIndex + currentOrder);
         setResumeButton(true);
       } else {
-        console.error(
-          "Unable to find matching waypoint for current destination ID"
-        );
+        console.error("Unable to find the current destination ID");
       }
     }
 
@@ -702,14 +711,18 @@ const RouteScreen = () => {
   useEffect(() => {
     if (isVanArrived && driverAction === "Drive") {
       setIsVanArrived(false);
+      //setShowDriveButton(false);
       setShowArrivedModal(true);
       setArrivedAddress(addressList[currentWaypointIndex]);
+    }
+    if (!isVanArrived && !driverAction === "Drive") {
+      setShowDriveButton(true);
     }
   }, [isVanArrived]);
 
   //get route status
   useEffect(() => {
-    if (currentRouteData && addressList) {
+    if (currentRouteData) {
       getRouteStatus();
     }
   }, [currentRouteData, addressList]);
@@ -733,8 +746,8 @@ const RouteScreen = () => {
           },
           heading: bearing,
           pitch: 0,
-          altitude: 1000, // You can adjust the altitude as needed
-          zoom: 25, // You can adjust the zoom level as needed
+          //altitude: 1000, // You can adjust the altitude as needed
+          //zoom: 25, // You can adjust the zoom level as needed
         });
       }
     }
@@ -804,7 +817,6 @@ const RouteScreen = () => {
               setTotalKm(result.distance);
 
               if (result.distance <= 0.1) {
-                //console.log("distance", result.distance);
                 if (!notificationToDriver) {
                   setNotificationToDriver(true);
                   sendPushNotification(
@@ -815,9 +827,13 @@ const RouteScreen = () => {
                 }
 
                 setHandlingNextWaypoint(true);
+                //setShowDriveButton(false);
+                setShowContinueButton(true);
                 setIsVanArrived(true);
 
                 //handleNextWaypoint();
+              } else {
+                setIsVanArrived(false);
               }
             }}
           />
@@ -1031,41 +1047,47 @@ const RouteScreen = () => {
                 <Text style={{ color: "white", fontSize: 20 }}>Drive</Text>
               </TouchableOpacity>
             )}
-          {handlingNextWaypoint && isVanArrived && (
-            <>
-              {currentWaypointIndex === addressList.length - 1 ? (
-                // If the current waypoint is the last one, render "Finish" button
-                <TouchableOpacity
-                  onPress={() => {
-                    handleFinish();
-                  }}
-                  style={{
-                    backgroundColor: "green",
-                    padding: 10,
-                    borderRadius: 10,
-                    marginBottom: 20,
-                  }}
-                >
-                  <Text style={{ color: "white", fontSize: 20 }}>Finish</Text>
-                </TouchableOpacity>
-              ) : (
-                // Otherwise, render "Continue" button
-                <TouchableOpacity
-                  onPress={() => {
-                    handleContinue();
-                  }}
-                  style={{
-                    backgroundColor: "blue",
-                    padding: 10,
-                    borderRadius: 10,
-                    marginBottom: 20,
-                  }}
-                >
-                  <Text style={{ color: "white", fontSize: 20 }}>Continue</Text>
-                </TouchableOpacity>
-              )}
-            </>
-          )}
+          {handlingNextWaypoint &&
+            isVanArrived &&
+            driverAction === "Drive" &&
+            showContinueButton && (
+              <>
+                {currentWaypointIndex === addressList.length - 1 ? (
+                  // If the current waypoint is the last one, render "Finish" button
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleFinish();
+                    }}
+                    style={{
+                      backgroundColor: "green",
+                      padding: 10,
+                      borderRadius: 10,
+                      marginBottom: 20,
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: 20 }}>Finish</Text>
+                  </TouchableOpacity>
+                ) : (
+                  // Otherwise, render "Continue" button
+                  <TouchableOpacity
+                    onPress={() => {
+                      //console.log("isVanArrived", isVanArrived);
+                      handleContinue();
+                    }}
+                    style={{
+                      backgroundColor: "blue",
+                      padding: 10,
+                      borderRadius: 10,
+                      marginBottom: 20,
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: 20 }}>
+                      Continue
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
 
           {routeStatus === "IN_PROGRESS" &&
             driverAction !== "Drive" &&

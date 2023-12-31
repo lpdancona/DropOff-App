@@ -28,6 +28,7 @@ const RouteContextProvider = ({ children }) => {
   const [busLocation, setBusLocation] = useState(null);
   const [isRouteInProgress, setIsRouteInProgress] = useState(false);
   const [addressList, setAddressList] = useState(null);
+  const [routeFinished, setRouteFinished] = useState(false);
 
   const getOrderAddress = async () => {
     try {
@@ -203,6 +204,7 @@ const RouteContextProvider = ({ children }) => {
       setHelper(helperData);
     }
   };
+
   //
   //Start useEffect
   //
@@ -304,7 +306,7 @@ const RouteContextProvider = ({ children }) => {
         if (value && value.data && value.data.onUpdateRoute) {
           const routeStatus = value.data.onUpdateRoute.status;
 
-          if (routeStatus === "IN_PROGRESS") {
+          if (routeStatus === "IN_PROGRESS" && !routeFinished) {
             setIsRouteInProgress(true);
           } else {
             setIsRouteInProgress(false);
@@ -320,9 +322,12 @@ const RouteContextProvider = ({ children }) => {
       // Cleanup subscription on component unmount
       sub.unsubscribe();
     };
-  }, []);
+  }, [routeFinished]);
 
   useEffect(() => {
+    if (!matchingKids) {
+      return;
+    }
     const sub = API.graphql(graphqlOperation(onUpdateAddressList)).subscribe({
       next: ({ value }) => {
         if (value && value.data && value.data.onUpdateAddressList) {
@@ -330,9 +335,8 @@ const RouteContextProvider = ({ children }) => {
 
           if (addressListStatus.addressListKidId === matchingKids[0].id) {
             if (addressListStatus.status === "FINISHED") {
-              setIsRouteInProgress(false);
-            } else {
-              setIsRouteInProgress(true);
+              setRouteFinished(true);
+              //setIsRouteInProgress(false);
             }
           }
         }
@@ -346,7 +350,13 @@ const RouteContextProvider = ({ children }) => {
       // Cleanup subscription on component unmount
       sub.unsubscribe();
     };
-  }, []);
+  }, [matchingKids]);
+
+  useEffect(() => {
+    if (routeFinished) {
+      setIsRouteInProgress(false);
+    }
+  }, [routeFinished]);
 
   return (
     <RouteContext.Provider

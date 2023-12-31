@@ -59,7 +59,7 @@ const LocationTrackingComponent = ({ locationEmitter, routeID }) => {
 
       const locationOptions = {
         accuracy: Platform.OS === "android" ? 6 : 4, //accuracy: Location.Accuracy.BestForNavigation,
-        timeInterval: 10000, // Update every  10 seconds
+        timeInterval: 5, // Update every  10 seconds
         distanceInterval: 5,
         showsBackgroundLocationIndicator: true,
         foregroundService: {

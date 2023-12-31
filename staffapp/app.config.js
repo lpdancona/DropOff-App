@@ -47,6 +47,7 @@ export default {
     favicon: "./assets/favicon.png",
   },
   extra: {
+    GOOGLE_MAPS_APIKEY: process.env.GOOGLE_MAPS_APIKEY,
     eas: {
       projectId: "86aaefd7-300b-4ba0-9f96-ede028a516c4",
     },
