@@ -11,6 +11,7 @@ import {
   RefreshControl,
 } from "react-native";
 import styles from "./styles";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useRouteContext } from "../../../src/contexts/RouteContext";
 import { useAuthContext } from "../../../src/contexts/AuthContext";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -117,7 +118,7 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
+          <MaterialIcons name="logout" size={20} color="white" />
         </TouchableOpacity>
         <View style={styles.headerGreetings}>
           <Text style={styles.title}>{`Hello, ${currentUserData?.name}`}</Text>
