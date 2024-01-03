@@ -124,7 +124,7 @@ export default StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     borderRadius: 10,
-    marginLeft: "5%",
+    marginLeft: "20%",
   },
   logoutButtonText: {
     color: "white",
