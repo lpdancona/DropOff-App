@@ -3,21 +3,23 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   container: {
     position: "absolute",
-    top: 50,
+    top: 60,
     left: 10,
     right: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backgroundColor: "rgba(255, 255, 255, 1)",
     borderRadius: 10,
-    padding: 8,
+    padding: 10,
     elevation: 5,
   },
   goBackButton: {
-    backgroundColor: "red", //"#f2f2f2",
+    backgroundColor: "red",
     width: 30, // Adjust the width and height as needed for your circle
     height: 30,
     borderRadius: 15, // Make the borderRadius half of the width/height to make it circular
     alignItems: "center",
     justifyContent: "center",
+    left: 10,
+    top: 10,
   },
 
   row: {

@@ -115,22 +115,29 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
-      <Text style={styles.title}>{`Hello, ${currentUserData?.name}`}</Text>
-      <Text style={styles.subTitle}>
-        You assigned as{" "}
-        <Text
-          style={{
-            color: currentUserData?.userType === "DRIVER" ? "red" : "blue",
-          }}
-        >
-          {currentUserData?.userType === "DRIVER" ? "Driver" : "Helper"}
-        </Text>
-        {assignedRoute && <Text> on {`(${assignedRoute?.Van.name})`} </Text>}
-      </Text>
-      <Text style={styles.subTitleDropOff}>List of Drop-Off's</Text>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+        <View style={styles.headerGreetings}>
+          <Text style={styles.title}>{`Hello, ${currentUserData?.name}`}</Text>
+
+          <Text style={styles.subTitle}>
+            You are assigned as{" "}
+            <Text
+              style={{
+                color: currentUserData?.userType === "DRIVER" ? "red" : "blue",
+              }}
+            >
+              {currentUserData?.userType === "DRIVER" ? "Driver" : "Helper"}
+            </Text>
+            {assignedRoute && (
+              <Text> on {`(${assignedRoute?.Van.name})`} </Text>
+            )}
+          </Text>
+          <Text style={styles.subTitleDropOff}>List of Drop-Off's</Text>
+        </View>
+      </View>
       <View style={styles.busContainer}>
         <FlatList
           data={routesData}
@@ -155,19 +162,23 @@ const HomeScreen = () => {
                 handleBusPress(item, index);
               }}
             >
-              <Image
-                source={
-                  images[index]
-                    ? { uri: images[index] }
-                    : { uri: defaultImageUrl }
-                }
-                style={styles.image}
-              />
-              <View style={styles.busTextContainer}>
-                <View>
-                  <Text style={styles.itemTitle}>
-                    Vehicle: {item.Van.name} {item.Van.model}
-                  </Text>
+              <View style={styles.card}>
+                <View style={styles.cardTop}>
+                  <Image
+                    source={
+                      images[index]
+                        ? { uri: images[index] }
+                        : { uri: defaultImageUrl }
+                    }
+                    style={styles.cardImg}
+                  />
+                </View>
+                <View style={styles.cardBody}>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.cardTitle}>
+                      Vehicle: {item.Van.name} {item.Van.model}
+                    </Text>
+                  </View>
                   <View style={styles.driverHelperContainer}>
                     {item.driverUser && ( // Render "Driver" and "Helper" only if driverUser is not null
                       <Text style={{ marginRight: 10 }}>
@@ -179,16 +190,19 @@ const HomeScreen = () => {
                     )}
                   </View>
                 </View>
-                <Text style={styles.itemTitle}>
-                  {item.status === "WAITING_TO_START" && (
-                    <Text style={{ color: "green" }}>Waiting to start</Text>
-                  )}
-                  {item.status === "IN_PROGRESS" && (
-                    <Text style={{ color: "blue" }}>
-                      In progress - Departed Time {routesData[index].departTime}
-                    </Text>
-                  )}
-                </Text>
+                <View style={styles.cardFooter}>
+                  <Text style={styles.cardFooterText}>
+                    {item.status === "WAITING_TO_START" && (
+                      <Text style={{ color: "green" }}>Waiting to start</Text>
+                    )}
+                    {item.status === "IN_PROGRESS" && (
+                      <Text style={{ color: "blue" }}>
+                        In progress - Departed Time{" "}
+                        {routesData[index].departTime}
+                      </Text>
+                    )}
+                  </Text>
+                </View>
               </View>
             </Pressable>
           )}
