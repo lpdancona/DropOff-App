@@ -17,8 +17,9 @@ export default {
     infoPlist: {
       GMSApiKey: process.env.GOOGLE_MAPS_APIKEY,
     },
-    supportsTablet: true,
+    supportsTablet: false,
     bundleIdentifier: "com.geodarth.DropoffUser",
+    device: ["iphone"],
   },
   android: {
     adaptiveIcon: {

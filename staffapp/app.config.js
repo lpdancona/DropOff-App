@@ -22,8 +22,9 @@ export default {
       UIBackgroundModes: ["location", "fetch"],
       GMSApiKey: process.env.GOOGLE_MAPS_APIKEY,
     },
-    supportsTablet: true,
+    supportsTablet: false,
     bundleIdentifier: "com.geodarth.dropoffgb",
+    device: ["iphone"],
   },
   android: {
     config: {
