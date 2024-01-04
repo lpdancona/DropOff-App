@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useRef, useContext } from "react";
-import { Text, View, Button, Platform } from "react-native";
+import { Platform, Linking, Alert } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
@@ -17,6 +17,7 @@ const PushNotificationsContextProvider = ({ children }) => {
 
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
+  const [permissionMessage, setPermissionMessage] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
 
@@ -26,7 +27,6 @@ const PushNotificationsContextProvider = ({ children }) => {
       sound: "default",
       title: title,
       body: body,
-      //data: { user: "geo" },
     };
 
     await fetch("https://exp.host/--/api/v2/push/send", {
@@ -66,25 +66,54 @@ const PushNotificationsContextProvider = ({ children }) => {
     if (Device.isDevice) {
       const { status: existingStatus } =
         await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
+
       if (existingStatus !== "granted") {
         const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
+
+        if (status !== "granted") {
+          setPermissionMessage(true);
+          // The user denied permission, show a confirmation dialog
+          Alert.alert(
+            "Permission Required",
+            "To receive route updates, enable push notifications for this app in your device settings.",
+            [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              {
+                text: "Open Settings",
+                onPress: async () => {
+                  await Linking.openSettings();
+                  setPermissionMessage(false);
+                },
+              },
+            ]
+          );
+
+          return;
+        }
       }
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
-        return;
-      }
+
       token = await Notifications.getExpoPushTokenAsync({
         projectId: Constants.expoConfig.extra.eas.projectId,
       });
-      //console.log(token);
+      // console.log(token);
     } else {
-      alert("Must use physical device for Push Notifications");
+      alert("Must use a physical device for Push Notifications");
+      return;
     }
+
+    // Check if the user has granted push notification permissions
+    // if (token) {
+    //   alert(
+    //     "Push notifications enabled! You'll receive updates on route uploads."
+    //   );
+    // }
 
     return token;
   }
+
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
@@ -115,6 +144,7 @@ const PushNotificationsContextProvider = ({ children }) => {
         schedulePushNotification,
         sendPushNotification,
         expoPushToken,
+        permissionMessage,
       }}
     >
       {children}

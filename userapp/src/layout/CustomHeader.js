@@ -5,25 +5,30 @@ const CustomHeader = () => {
   const {
     tokens: { space, fontSizes },
   } = useTheme();
+
   return (
     <SafeAreaView>
       <Image
         source={require("../../assets/icon.png")}
         style={{
-          width: "100%",
+          width: "20%",
           height: "30%",
-          resizeMode: "contain",
+          marginTop: 5,
+          marginBottom: 5,
+          resizeMode: "cover",
           alignSelf: "center",
+          borderRadius: 100,
+          overflow: "hidden",
         }}
       />
       <Text
         style={{
-          fontSize: 20, //fontSizes.xxl,
+          fontSize: 15, //fontSizes.xxl,
           //paddingBottom: space.xxl,
           textAlign: "center",
         }}
       >
-        AfterSchool Program Drop Off
+        After School Program Drop Off
       </Text>
     </SafeAreaView>
   );
