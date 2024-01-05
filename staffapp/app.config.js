@@ -3,14 +3,17 @@ import "dotenv/config";
 export default {
   name: "DropOff Staff",
   slug: "drop-off-gb",
-  version: "1.0.0",
+  version: "1.0.1",
   orientation: "portrait",
   icon: "./assets/icon.png",
   userInterfaceStyle: "light",
   splash: {
     image: "./assets/splash.png",
     resizeMode: "contain",
-    backgroundColor: "#0a43fc",
+    backgroundGradient: "horizontal",
+    backgroundGradientLeft: "#59dae4",
+    backgroundGradientRight: "#2287f4",
+    backgroundColor: "#59dae4",
   },
   assetBundlePatterns: ["**/*"],
   ios: {

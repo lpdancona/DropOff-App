@@ -25,7 +25,6 @@ import { getUser, listAddressLists, getKid } from "../../graphql/queries";
 import { updateRoute, updateAddressList } from "../../graphql/mutations";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
 import * as Location from "expo-location";
-//import { updateLocation } from "../../components/LocationUtils";
 import { useRouteContext } from "../../contexts/RouteContext";
 import LocationTrackingComponent from "../../components/LocationTrackingComponent";
 import { useBackgroundTaskContext } from "../../contexts/BackgroundTaskContext";
@@ -33,12 +32,9 @@ import ShowMessage from "../../components/ShowMessage";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 
-//const BACKGROUND_FETCH_TASK = "background-location-task";
-
 //
 
 const RouteScreen = () => {
-  //const navigation = useNavigation();
   const route = useRoute();
   const id = route.params?.id;
   const navigation = useNavigation();
@@ -76,28 +72,70 @@ const RouteScreen = () => {
   const [routeStatus, setRouteStatus] = useState(null);
 
   // data from contexts
-  const { schedulePushNotification, sendPushNotification, expoPushToken } =
-    usePushNotificationsContext();
+  const { sendPushNotification, expoPushToken } = usePushNotificationsContext();
   const { routesData } = useRouteContext();
   const { locationEmitter } = useBackgroundTaskContext();
   const { currentUserData } = useAuthContext();
   const [showArrivedModal, setShowArrivedModal] = useState(false);
   const [arrivedAddress, setArrivedAddress] = useState(null);
+  const [foregroundLocationPermission, setForegroundLocationPermission] =
+    useState(false);
+  const [backgroundLocationPermission, setBackgroundLocationPermission] =
+    useState(false);
 
   const requestLocationPermissions = async () => {
     const { status: foregroundStatus } =
       await Location.requestForegroundPermissionsAsync();
     if (foregroundStatus === "granted") {
+      setForegroundLocationPermission(true);
       const { status: backgroundStatus } =
         await Location.requestBackgroundPermissionsAsync();
       if (backgroundStatus === "granted") {
-        // await Location.startLocationUpdatesAsync(
-        //   registerBackgroundFetchAsync(),
-        //   {
-        //     accuracy: Location.Accuracy.Balanced,
-        //   }
-        // );
+        setBackgroundLocationPermission(true);
+      } else {
+        //Alert.alert("background location needed");
+        Alert.alert(
+          "Background Location Required",
+          "To track the bus and send updates to parents you must accept the background Location on settings.",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+              onPress: async () => {
+                // setPermissionMessage(false);
+              },
+            },
+            {
+              text: "Open Settings",
+              onPress: async () => {
+                await Linking.openSettings();
+                // setPermissionMessage(false);
+              },
+            },
+          ]
+        );
       }
+    } else {
+      Alert.alert(
+        "Foreground Location Required",
+        "To track the bus and send updates to parents you must accept the foreground Location on settings.",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: async () => {
+              // setPermissionMessage(false);
+            },
+          },
+          {
+            text: "Open Settings",
+            onPress: async () => {
+              await Linking.openSettings();
+              // setPermissionMessage(false);
+            },
+          },
+        ]
+      );
     }
   };
 
@@ -610,6 +648,9 @@ const RouteScreen = () => {
   }, []);
 
   useEffect(() => {
+    if (!foregroundLocationPermission && !backgroundLocationPermission) {
+      return;
+    }
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (!status === "granted") {
@@ -636,7 +677,7 @@ const RouteScreen = () => {
       }
     );
     return () => foregroundSubscription;
-  }, []);
+  }, [foregroundLocationPermission, backgroundLocationPermission]);
 
   //get the current route (by id)
   useEffect(() => {
@@ -676,13 +717,6 @@ const RouteScreen = () => {
       return;
     }
 
-    // const origin =
-    //   currentWaypointIndex === 0
-    //     ? busLocation
-    //     : {
-    //         latitude: addressList[currentWaypointIndex - 1].latitude,
-    //         longitude: addressList[currentWaypointIndex - 1].longitude,
-    //       };
     const origin = busLocation;
     setOrigin(origin);
 
@@ -726,7 +760,7 @@ const RouteScreen = () => {
 
   //get route status
   useEffect(() => {
-    if (currentRouteData) {
+    if (currentRouteData && addressList) {
       getRouteStatus();
     }
   }, [currentRouteData, addressList]);
@@ -760,6 +794,10 @@ const RouteScreen = () => {
   ///
   /// finish the use effects
   //
+
+  if (!foregroundLocationPermission || !backgroundLocationPermission) {
+    return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
+  }
 
   if (!busLocation || !currentRouteData) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;

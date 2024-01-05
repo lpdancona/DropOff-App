@@ -278,11 +278,23 @@ const RouteContextProvider = ({ children }) => {
     }
     const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
       next: ({ value }) => {
-        console.log("subscribe onUpdateRoute to check busLocation", value);
+        console.log(
+          "subscribe onUpdateRoute to check busLocation and route status",
+          value
+        );
+        const idUpdatedRoute = value.data.onUpdateRoute.id;
+        console.log("current route ID", currentRouteData.id);
+        console.log("idUpdatedRoute", idUpdatedRoute);
+        const routeStatus = value.data.onUpdateRoute.status;
         const newBusLocation = {
           latitude: value.data.onUpdateRoute.lat,
           longitude: value.data.onUpdateRoute.lng,
         };
+        if (routeStatus === "IN_PROGRESS" && !routeFinished) {
+          setIsRouteInProgress(true);
+        } else if (idUpdatedRoute === currentRouteData.id) {
+          setIsRouteInProgress(false);
+        }
         if (
           newBusLocation.latitude !== busLocation.lat ||
           newBusLocation.longitude !== busLocation.lng
@@ -301,41 +313,41 @@ const RouteContextProvider = ({ children }) => {
     };
   }, [busLocation]);
 
-  useEffect(() => {
-    if (!currentRouteData) {
-      return;
-    }
-    const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
-      next: ({ value }) => {
-        if (value && value.data && value.data.onUpdateRoute) {
-          const idUpdatedRoute = value.data.onUpdateRoute.id;
-          const routeStatus = value.data.onUpdateRoute.status;
+  // useEffect(() => {
+  //   if (!currentRouteData) {
+  //     return;
+  //   }
+  //   const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
+  //     next: ({ value }) => {
+  //       if (value && value.data && value.data.onUpdateRoute) {
+  //         const idUpdatedRoute = value.data.onUpdateRoute.id;
+  //         const routeStatus = value.data.onUpdateRoute.status;
 
-          console.log(
-            "subscribe on updateRoute Route in Progress",
-            idUpdatedRoute
-          );
-          if (
-            idUpdatedRoute === currentRouteData.id &&
-            routeStatus === "IN_PROGRESS" &&
-            !routeFinished
-          ) {
-            setIsRouteInProgress(true);
-          } else {
-            setIsRouteInProgress(false);
-          }
-        }
-      },
-      error: (error) => {
-        console.error("Subscription Error:", error);
-      },
-    });
+  //         console.log(
+  //           "subscribe on updateRoute Route in Progress",
+  //           idUpdatedRoute
+  //         );
+  //         if (
+  //           idUpdatedRoute === currentRouteData.id &&
+  //           routeStatus === "IN_PROGRESS" &&
+  //           !routeFinished
+  //         ) {
+  //           setIsRouteInProgress(true);
+  //         } else {
+  //           setIsRouteInProgress(false);
+  //         }
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error("Subscription Error:", error);
+  //     },
+  //   });
 
-    return () => {
-      // Cleanup subscription on component unmount
-      sub.unsubscribe();
-    };
-  }, [routeFinished]);
+  //   return () => {
+  //     // Cleanup subscription on component unmount
+  //     sub.unsubscribe();
+  //   };
+  // }, [routeFinished]);
 
   useEffect(() => {
     if (!matchingKids) {

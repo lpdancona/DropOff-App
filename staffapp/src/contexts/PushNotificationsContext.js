@@ -72,7 +72,9 @@ const PushNotificationsContextProvider = ({ children }) => {
         finalStatus = status;
       }
       if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
+        alert(
+          "Push Notification permission required! to receive route updates, please, enable push notifications your device settings."
+        );
         return;
       }
       token = await Notifications.getExpoPushTokenAsync({
