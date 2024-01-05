@@ -210,12 +210,6 @@ const RouteContextProvider = ({ children }) => {
   //
 
   useEffect(() => {
-    if (currentRouteData) {
-      getOrderAddress();
-    }
-  }, [currentRouteData]);
-
-  useEffect(() => {
     // Fetch initial data when the component mounts
     if (dbUser && userEmail) {
       const fetchInitialData = async () => {
@@ -225,6 +219,12 @@ const RouteContextProvider = ({ children }) => {
       fetchInitialData();
     }
   }, [dbUser]);
+
+  useEffect(() => {
+    if (currentRouteData) {
+      getOrderAddress();
+    }
+  }, [currentRouteData]);
 
   useEffect(() => {
     if (!currentRouteData) {
@@ -278,6 +278,7 @@ const RouteContextProvider = ({ children }) => {
     }
     const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
       next: ({ value }) => {
+        console.log("subscribe onUpdateRoute to check busLocation", value);
         const newBusLocation = {
           latitude: value.data.onUpdateRoute.lat,
           longitude: value.data.onUpdateRoute.lng,
@@ -301,12 +302,24 @@ const RouteContextProvider = ({ children }) => {
   }, [busLocation]);
 
   useEffect(() => {
+    if (!currentRouteData) {
+      return;
+    }
     const sub = API.graphql(graphqlOperation(onUpdateRoute)).subscribe({
       next: ({ value }) => {
         if (value && value.data && value.data.onUpdateRoute) {
+          const idUpdatedRoute = value.data.onUpdateRoute.id;
           const routeStatus = value.data.onUpdateRoute.status;
 
-          if (routeStatus === "IN_PROGRESS" && !routeFinished) {
+          console.log(
+            "subscribe on updateRoute Route in Progress",
+            idUpdatedRoute
+          );
+          if (
+            idUpdatedRoute === currentRouteData.id &&
+            routeStatus === "IN_PROGRESS" &&
+            !routeFinished
+          ) {
             setIsRouteInProgress(true);
           } else {
             setIsRouteInProgress(false);
