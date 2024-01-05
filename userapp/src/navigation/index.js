@@ -21,7 +21,7 @@ const RootNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {dbUser ? (
-        isRouteInProgress && permissionMessage ? (
+        isRouteInProgress && !permissionMessage ? (
           <Stack.Screen name="Home" component={HomeScreen} />
         ) : (
           <Stack.Screen name="Wait" component={WaitingScreen} />

@@ -80,6 +80,9 @@ const PushNotificationsContextProvider = ({ children }) => {
               {
                 text: "Cancel",
                 style: "cancel",
+                onPress: async () => {
+                  setPermissionMessage(false);
+                },
               },
               {
                 text: "Open Settings",

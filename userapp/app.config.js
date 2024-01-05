@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 export default {
-  name: "GB DropOff",
+  name: "ASP Drop Off",
   slug: "DropoffUser",
   version: "1.0.0",
   orientation: "portrait",
@@ -9,8 +9,11 @@ export default {
   userInterfaceStyle: "light",
   splash: {
     image: "./assets/splash.png",
-    resizeMode: "contain",
-    backgroundColor: "#2287f4",
+    //resizeMode: "contain",
+    backgroundGradient: "horizontal",
+    backgroundGradientLeft: "#59dae4",
+    backgroundGradientRight: "#2287f4",
+    backgroundColor: "#59dae4",
   },
   assetBundlePatterns: ["**/*"],
   ios: {

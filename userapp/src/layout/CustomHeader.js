@@ -17,7 +17,7 @@ const CustomHeader = () => {
           marginBottom: 5,
           resizeMode: "cover",
           alignSelf: "center",
-          borderRadius: 100,
+          borderRadius: 80,
           overflow: "hidden",
         }}
       />
