@@ -87,6 +87,7 @@ const PushNotificationsContextProvider = ({ children }) => {
 
     return token;
   }
+
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
