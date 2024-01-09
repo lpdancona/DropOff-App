@@ -9,6 +9,8 @@ import {
   Image,
   TouchableOpacity,
   RefreshControl,
+  Modal,
+  Alert,
 } from "react-native";
 import styles from "./styles";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -16,6 +18,8 @@ import { useRouteContext } from "../../../src/contexts/RouteContext";
 import { useAuthContext } from "../../../src/contexts/AuthContext";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Auth } from "aws-amplify";
+import { API } from "aws-amplify";
+import { deleteUser } from "../../../src/graphql/mutations";
 
 const HomeScreen = () => {
   const { routesData, updateRoutesData } = useRouteContext();
@@ -25,7 +29,49 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const defaultImageUrl = "https://i.imgur.com/R2PRpbV.jpg";
   const [assignedRoute, setAssignedRoute] = useState(null);
+  const [driverOrHelper, setDriverOrHelper] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [isMenuVisible, setMenuVisible] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuVisible(!isMenuVisible);
+  };
+
+  const handleDeleteAccount = () => {
+    console.log(currentUserData.id);
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete your account?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            try {
+              // Use Amplify API and Auth to delete the current user account
+              await API.graphql({
+                query: deleteUser,
+                variables: { input: { id: currentUserData.id } },
+              });
+
+              await Auth.currentAuthenticatedUser().then((user) => {
+                return Auth.deleteUser(user);
+              });
+            } catch (error) {
+              console.error("Error deleting account:", error);
+              Alert.alert(
+                "Error",
+                "An error occurred while deleting your account."
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const fetchImage = async (imageURL) => {
     try {
@@ -38,11 +84,27 @@ const HomeScreen = () => {
   };
 
   const handleLogout = async () => {
-    try {
-      await Auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    Alert.alert("Confirm Logout", "Are you sure you want to log out?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Logout",
+        onPress: async () => {
+          try {
+            // Use Amplify Auth to sign out
+            await Auth.signOut();
+
+            // After successful logout, navigate to the authentication screen
+            //navigation.navigate("Authentication"); // Replace 'Authentication' with the screen you want to navigate to after logout
+          } catch (error) {
+            console.error("Error logging out:", error);
+            Alert.alert("Error", "An error occurred while logging out.");
+          }
+        },
+      },
+    ]);
   };
 
   const fetchData = async () => {
@@ -87,14 +149,14 @@ const HomeScreen = () => {
         const driverAssignedRoute = routesData.find(
           (route) => route.driver === currentUserData.id
         );
-
+        setDriverOrHelper("DRIVER");
         setAssignedRoute(driverAssignedRoute);
       } else if (currentUserData.userType === "STAFF") {
         // Find the route where the current user is assigned as the Driver
         const helperAssignedRoute = routesData.find(
           (route) => route.helper === currentUserData.id
         );
-
+        setDriverOrHelper("HELPER");
         setAssignedRoute(helperAssignedRoute);
       }
     }
@@ -117,21 +179,29 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <MaterialIcons name="logout" size={20} color="white" />
+        <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
+          <MaterialIcons name="menu" size={35} color="red" />
         </TouchableOpacity>
+        {/* <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <MaterialIcons name="logout" size={20} color="white" />
+        </TouchableOpacity> */}
         <View style={styles.headerGreetings}>
           <Text style={styles.title}>{`Hello, ${currentUserData?.name}`}</Text>
 
           <Text style={styles.subTitle}>
-            You are assigned as{" "}
-            <Text
-              style={{
-                color: currentUserData?.userType === "DRIVER" ? "red" : "blue",
-              }}
-            >
-              {currentUserData?.userType === "DRIVER" ? "Driver" : "Helper"}
-            </Text>
+            {driverOrHelper ? (
+              <>
+                {" "}
+                You are assigned as{" "}
+                <Text
+                  style={{
+                    color: driverOrHelper === "DRIVER" ? "red" : "blue",
+                  }}
+                >
+                  {driverOrHelper === "DRIVER" ? "Driver" : "Helper"}
+                </Text>
+              </>
+            ) : null}
             {assignedRoute && (
               <Text> on {`(${assignedRoute?.Van.name})`} </Text>
             )}
@@ -209,6 +279,43 @@ const HomeScreen = () => {
           )}
         />
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isMenuVisible}
+        onRequestClose={() => {
+          setMenuVisible(!isMenuVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Pressable
+              style={styles.closeButton}
+              onPress={() => setMenuVisible(!isMenuVisible)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </Pressable>
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => {
+                handleLogout();
+                setMenuVisible(!isMenuVisible);
+              }}
+            >
+              <Text style={styles.menuItemLogout}>Logout</Text>
+            </Pressable>
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => {
+                handleDeleteAccount();
+                setMenuVisible(!isMenuVisible);
+              }}
+            >
+              <Text style={styles.menuItemDelete}>Delete my account</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

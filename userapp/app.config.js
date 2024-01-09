@@ -2,7 +2,7 @@ import "dotenv/config";
 
 export default {
   name: "ASP Drop Off",
-  slug: "DropoffUser",
+  slug: "ASP drop off user",
   version: "1.0.1",
   orientation: "portrait",
   icon: "./assets/icon.png",

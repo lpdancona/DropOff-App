@@ -4,12 +4,11 @@ import { ActivityIndicator } from "react-native";
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import RouteScreen from "../screens/RouteScreen";
-//import LoginScreen from "../screens/LoginScreen";
 
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
-  const { dbUser, loading, isDriver, userEmail } = useAuthContext();
+  const { dbUser, loading } = useAuthContext();
 
   //console.log(dbUser);
   if (loading) {
