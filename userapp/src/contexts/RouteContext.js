@@ -283,8 +283,6 @@ const RouteContextProvider = ({ children }) => {
           value
         );
         const idUpdatedRoute = value.data.onUpdateRoute.id;
-        console.log("current route ID", currentRouteData.id);
-        console.log("idUpdatedRoute", idUpdatedRoute);
         const routeStatus = value.data.onUpdateRoute.status;
         const newBusLocation = {
           latitude: value.data.onUpdateRoute.lat,

@@ -2,7 +2,7 @@ import "dotenv/config";
 
 export default {
   name: "DropOff Staff",
-  slug: "drop-off-staff",
+  slug: "drop-off-gb",
   version: "1.0.1",
   orientation: "portrait",
   icon: "./assets/icon.png",

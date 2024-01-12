@@ -224,9 +224,6 @@ const HomeScreen = () => {
           longitudeDelta: 0.007,
         }}
       >
-        <TouchableOpacity style={styles.zoomButton} onPress={zoomInOnDriver}>
-          <MaterialIcons name="place" size={24} color="white" />
-        </TouchableOpacity>
         <MapViewDirections
           apikey={GOOGLE_MAPS_APIKEY}
           origin={busLocation}
@@ -290,6 +287,9 @@ const HomeScreen = () => {
           </View>
         </Marker>
       </MapView>
+      <TouchableOpacity style={styles.zoomButton} onPress={zoomInOnDriver}>
+        <MaterialIcons name="place" size={24} color="white" />
+      </TouchableOpacity>
       <BottomSheet
         ref={bottomSheetRef}
         snapPoints={snapPoints}

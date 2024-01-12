@@ -795,11 +795,16 @@ const RouteScreen = () => {
   /// finish the use effects
   //
 
-  if (!foregroundLocationPermission || !backgroundLocationPermission) {
+  if (!foregroundLocationPermission) {
+    //|| !backgroundLocationPermission) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
 
-  if (!busLocation || !currentRouteData) {
+  if (!busLocation) {
+    return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
+  }
+
+  if (!currentRouteData) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
 

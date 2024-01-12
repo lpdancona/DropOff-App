@@ -143,22 +143,43 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (currentUserData && routesData) {
-      // Check if the user is a Driver
-      if (currentUserData.userType === "DRIVER") {
-        // Find the route where the current user is assigned as the Driver
-        const driverAssignedRoute = routesData.find(
-          (route) => route.driver === currentUserData.id
+      // Check if the current user's ID is present in either driver or helper field of any route
+      const isCurrentUserAssigned = routesData.some(
+        (route) =>
+          route.driver === currentUserData.id ||
+          route.helper === currentUserData.id
+      );
+
+      if (isCurrentUserAssigned) {
+        // Set to "DRIVER" or "HELPER" based on the type of assignment
+        setDriverOrHelper(
+          routesData.some((route) => route.driver === currentUserData.id)
+            ? "DRIVER"
+            : "HELPER"
         );
-        setDriverOrHelper("DRIVER");
-        setAssignedRoute(driverAssignedRoute);
-      } else if (currentUserData.userType === "STAFF") {
-        // Find the route where the current user is assigned as the Driver
-        const helperAssignedRoute = routesData.find(
-          (route) => route.helper === currentUserData.id
+
+        // Find the route where the current user is assigned
+        const assignedRoute = routesData.find(
+          (route) =>
+            route.driver === currentUserData.id ||
+            route.helper === currentUserData.id
         );
-        setDriverOrHelper("HELPER");
-        setAssignedRoute(helperAssignedRoute);
+
+        if (assignedRoute) {
+          setAssignedRoute(assignedRoute);
+        } else {
+          // Handle case where assignedRoute is not found
+          setAssignedRoute(null);
+        }
+      } else {
+        // No assignment found for the current user
+        setDriverOrHelper(null);
+        setAssignedRoute(null);
       }
+    } else {
+      // Handle case where currentUserData or routesData is not available
+      setDriverOrHelper(null);
+      setAssignedRoute(null);
     }
   }, [currentUserData, routesData]);
 

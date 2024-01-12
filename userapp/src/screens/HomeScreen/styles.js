@@ -9,12 +9,12 @@ export default StyleSheet.create({
   },
   containerMenu: {
     justifyContent: "space-between",
-    alignItems: "center",
+    //alignItems: "center",
     flexDirection: "row",
     backgroundColor: "#FF7276",
     padding: 20,
     maxHeight: "25%",
-    gap: "100%",
+    gap: 80,
   },
   logoutMenu: {
     marginLeft: 15,
@@ -127,10 +127,9 @@ export default StyleSheet.create({
     marginTop: 13,
   },
   zoomButton: {
-    marginTop: 2,
     position: "absolute",
-    //top: 20,
-    //left: 20,
+    top: 155,
+    left: 10,
     backgroundColor: "#FF7276",
     borderRadius: 50,
     padding: 10,
