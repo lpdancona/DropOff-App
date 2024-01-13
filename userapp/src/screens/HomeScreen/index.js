@@ -22,6 +22,7 @@ import { useRouteContext } from "../../contexts/RouteContext";
 import { Auth } from "aws-amplify";
 import houseIcon from "../../docs/icon-house.png";
 import vanIcon from "../../docs/van.png";
+import SideDrawer from "../SideDrawer/SideDrawer";
 
 const HomeScreen = () => {
   //const { kids, dbUser, currentUserData, userEmail } = useAuthContext();
@@ -51,6 +52,7 @@ const HomeScreen = () => {
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
+  const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
 
   const LoadingScreen = () => (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -193,24 +195,23 @@ const HomeScreen = () => {
   // console.log("addressList", addressList);
   // console.log("waypoints", waypoints);
   // console.log("filteredWaypoints", filteredWaypoints);
-
+  const toggleSideDrawer = () => {
+    setSideDrawerVisible(!isSideDrawerVisible);
+  };
   return (
     <View style={styles.mapContainer}>
       <View style={styles.containerMenu}>
-        <View style={styles.logoutMenu}>
-          <Pressable onPress={toggleDropdown}>
-            <MaterialIcons name="menu" size={30} color="white" />
-          </Pressable>
-        </View>
+        <TouchableOpacity onPress={toggleSideDrawer}>
+          <MaterialIcons name="menu" size={30} color="white" />
+        </TouchableOpacity>
 
-        {isDropdownVisible && (
-          <View style={styles.modalContainer}>
-            <Pressable onPress={handleLogout}>
-              <MaterialIcons name="logout" size={30} color="white" />
-            </Pressable>
-          </View>
-        )}
+        <SideDrawer
+          isVisible={isSideDrawerVisible}
+          onClose={toggleSideDrawer}
+          onLogout={handleLogout}
+        />
       </View>
+
       <MapView
         ref={mapRef}
         //provider={MapView.PROVIDER_GOOGLE}

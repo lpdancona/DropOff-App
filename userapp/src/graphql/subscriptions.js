@@ -511,3 +511,45 @@ export const onDeleteUser = /* GraphQL */ `
     }
   }
 `;
+export const onCreateMessage = /* GraphQL */ `
+  subscription OnCreateMessage($filter: ModelSubscriptionMessageFilterInput) {
+    onCreateMessage(filter: $filter) {
+      id
+      senderID
+      receiverID
+      content
+      sentAt
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateMessage = /* GraphQL */ `
+  subscription OnUpdateMessage($filter: ModelSubscriptionMessageFilterInput) {
+    onUpdateMessage(filter: $filter) {
+      id
+      senderID
+      receiverID
+      content
+      sentAt
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteMessage = /* GraphQL */ `
+  subscription OnDeleteMessage($filter: ModelSubscriptionMessageFilterInput) {
+    onDeleteMessage(filter: $filter) {
+      id
+      senderID
+      receiverID
+      content
+      sentAt
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;

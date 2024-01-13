@@ -420,3 +420,64 @@ export const listUsers = /* GraphQL */ `
     }
   }
 `;
+export const getMessage = /* GraphQL */ `
+  query GetMessage($id: ID!) {
+    getMessage(id: $id) {
+      id
+      senderID
+      receiverID
+      content
+      sentAt
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listMessages = /* GraphQL */ `
+  query ListMessages(
+    $filter: ModelMessageFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listMessages(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        senderID
+        receiverID
+        content
+        sentAt
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const GetKidByParentEmail = `
+  query GetKidByParentEmail($userEmail: String!) {
+    listKids(
+      filter: {
+        or: [
+          { parent1Email: { eq: $userEmail } },
+          { parent2Email: { eq: $userEmail } }
+        ]
+      }
+    ) {
+      items {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        # Include other fields as needed
+      }
+    }
+  }
+`;

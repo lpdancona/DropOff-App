@@ -14,6 +14,7 @@ export default StyleSheet.create({
     backgroundColor: "#FF7276",
     padding: 20,
     maxHeight: "25%",
+    paddingTop: 40,
     gap: "100%",
   },
   logoutMenu: {
