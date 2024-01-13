@@ -35,6 +35,9 @@
       },
       "api": {
         "DropoffGb": {}
+      },
+      "storage": {
+        "s3d63c740a": {}
       }
     }
   }
