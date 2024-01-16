@@ -1,3 +1,11 @@
+type Events @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  image: String
+  link: String
+  date: AWSDate
+}
+
 enum WaypointStatus {
   FINISHED
   IN_PROGRESS
@@ -5,7 +13,7 @@ enum WaypointStatus {
   PAUSED
 }
 
-type WeekDayRoutes @model @auth(rules: [{ allow: public }]) {
+type WeekDayRoutes @model @auth(rules: [{allow: public}]) {
   id: ID!
   date: AWSDate
   weekDay: String
@@ -16,14 +24,14 @@ type WeekDayRoutes @model @auth(rules: [{ allow: public }]) {
   kidDropOffAddress: String
 }
 
-type Configs @model @auth(rules: [{ allow: public }]) {
+type Configs @model @auth(rules: [{allow: public}]) {
   id: ID!
   defaultVanPhoto: String
   defaultUserPhoto: String
   phoneNumberManager: String
 }
 
-type AddressList @model @auth(rules: [{ allow: public }]) {
+type AddressList @model @auth(rules: [{allow: public}]) {
   id: ID!
   order: Int
   latitude: Float
@@ -40,7 +48,7 @@ enum RouteStatus {
   PAUSED
 }
 
-type Van @model @auth(rules: [{ allow: public }]) {
+type Van @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String
   image: String
@@ -51,7 +59,7 @@ type Van @model @auth(rules: [{ allow: public }]) {
   bosterSeats: String
 }
 
-type Route @model @auth(rules: [{ allow: public }]) {
+type Route @model @auth(rules: [{allow: public}]) {
   id: ID
   date: String
   departTime: String
@@ -68,7 +76,7 @@ type Route @model @auth(rules: [{ allow: public }]) {
   finishedTime: String
 }
 
-type Kid @model @auth(rules: [{ allow: public }]) {
+type Kid @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String!
   parent1Email: String
@@ -90,7 +98,7 @@ enum UserTypes {
   DRIVER
 }
 
-type User @model @auth(rules: [{ allow: public }]) {
+type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   sub: String!
   name: String!
@@ -104,10 +112,12 @@ type User @model @auth(rules: [{ allow: public }]) {
   photo: String
   pushToken: String
 }
-type Message @model @auth(rules: [{ allow: public }]) {
+
+type Message @model @auth(rules: [{allow: public}]) {
   id: ID!
   senderID: ID!
   receiverID: ID!
   content: String!
   sentAt: AWSDateTime!
 }
+ 

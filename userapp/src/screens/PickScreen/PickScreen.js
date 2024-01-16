@@ -3,20 +3,18 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Auth, API, graphqlOperation, Storage } from "aws-amplify";
 import { GetKidByParentEmail } from "../../graphql/queries";
 import { UpdateKid } from "../../graphql/mutations";
+import { useAuthContext } from "../../contexts/AuthContext";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-
 import styles from "./styles";
 
 const PickScreen = () => {
   const [kid, setKid] = useState([]);
-
+  const { userEmail } = useAuthContext();
+  console.log(userEmail);
   useEffect(() => {
     const fetchKidData = async () => {
       try {
-        const user = await Auth.currentAuthenticatedUser();
-        const userEmail = user.attributes.email;
-
         const kidData = await API.graphql(
           graphqlOperation(GetKidByParentEmail, {
             userEmail: userEmail,
@@ -99,15 +97,26 @@ const PickScreen = () => {
 
             return updatedKids;
           });
+          console.log("Kid ID", kid[0].id);
+          const newKidPicture = {
+            id: kid[0].id,
+            photo: imageURL,
+          };
+          const updatedKidPicture = await API.graphql({
+            query: UpdateKid,
+            variables: { input: newKidPicture },
+          });
 
-          await API.graphql(
-            graphqlOperation(UpdateKid, {
-              input: {
-                id: kid[0].id,
-                photo: imageURL,
-              },
-            })
-          );
+          console.log("Updated Kid Picture:", updatedKidPicture);
+
+          // await API.graphql(
+          //   graphqlOperation(UpdateKid, {
+          //     input: {
+          //       id: kid[0].id,
+          //       photo: imageURL,
+          //     },
+          //   })
+          // );
         } else {
           console.error("Image assets not found in the result.");
         }
@@ -129,7 +138,7 @@ const PickScreen = () => {
               {kidItem.photo && (
                 <Image
                   style={{ width: 100, height: 100 }}
-                  source={{ uri: kidItem.photo }}
+                  source={{ uri: kidItem?.photo }}
                 />
               )}
             </View>
