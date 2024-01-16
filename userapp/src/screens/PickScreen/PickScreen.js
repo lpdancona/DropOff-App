@@ -5,7 +5,6 @@ import { GetKidByParentEmail } from "../../graphql/queries";
 import { UpdateKid } from "../../graphql/mutations";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-import { Blob } from "expo-blob";
 
 import styles from "./styles";
 
@@ -42,8 +41,7 @@ const PickScreen = () => {
 
       console.log("Fetching image from:", uri);
       const response = await fetch(uri);
-      const arrayBuffer = await response.arrayBuffer();
-      const blob = new Blob([arrayBuffer]);
+      const blob = await response.blob();
 
       console.log("Uploading image to S3...");
       const filename = `kid-photo-${kidID}-${Date.now()}`;
@@ -87,7 +85,6 @@ const PickScreen = () => {
 
           console.log("Selected Image:", imageURL);
 
-          // Update the kid's photo in the state
           setKid((prevKids) => {
             const updatedKids = prevKids.map((kidItem) => {
               if (kidItem.id === kid[0].id) {
@@ -103,7 +100,6 @@ const PickScreen = () => {
             return updatedKids;
           });
 
-          // Update the kid's photo in the GraphQL API
           await API.graphql(
             graphqlOperation(UpdateKid, {
               input: {
