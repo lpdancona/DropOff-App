@@ -5648,6 +5648,11 @@
     "path-browserify" "^1.0.0"
     "url-parse" "^1.5.9"
 
+"expo-blob@^0.0.0":
+  "integrity" "sha512-cov6FuE3GEx06LEGUzpbFJAMavuw8wgsn6ejJYYEXJD7d2DBRB49dpeR4CiG93DLnhp432m31ymJtRRsWo/Uqw=="
+  "resolved" "https://registry.npmjs.org/expo-blob/-/expo-blob-0.0.0.tgz"
+  "version" "0.0.0"
+
 "expo-checkbox@~2.4.0":
   "integrity" "sha512-ZEe79B73I+NDkLZQ2pR1E5rv9ey1oleNI/s2/Jdb9zKWztS0KVU2K+drFn2t/zyoSbR1U+CNwik2v7h6JxrXcA=="
   "resolved" "https://registry.npmjs.org/expo-checkbox/-/expo-checkbox-2.4.0.tgz"
