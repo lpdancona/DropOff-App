@@ -28,6 +28,10 @@ const SideDrawer = ({ isVisible, onClose, onLogout }) => {
     navigation.navigate("Pick");
     onClose();
   };
+  const navigateLoading = () => {
+    navigation.navigate("Loading");
+    onClose();
+  };
 
   return (
     <Modal visible={isVisible} transparent={true} animationType="slide">
@@ -44,6 +48,13 @@ const SideDrawer = ({ isVisible, onClose, onLogout }) => {
           >
             <MaterialIcons name="close" size={30} color="white" />
           </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor="transparent"
+            onPress={navigateLoading}
+            style={[styles.menuItem]}
+          >
+            <Text style={{ color: "white" }}>Home</Text>
+          </TouchableHighlight>
 
           <TouchableHighlight
             underlayColor="transparent"
@@ -51,7 +62,7 @@ const SideDrawer = ({ isVisible, onClose, onLogout }) => {
             style={[styles.menuItem]}
           >
             <View style={[styles.ItemContainer]}>
-              <Text style={{ color: "white" }}>Home</Text>
+              <Text style={{ color: "white" }}>Drop Off</Text>
             </View>
           </TouchableHighlight>
           <TouchableHighlight

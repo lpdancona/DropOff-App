@@ -5,6 +5,7 @@ import ProfileScreen from "../screens/ProfileScreen";
 import WaitingScreen from "../screens/WaitingScreen";
 import ChatScreen from "../screens/ChatScreen";
 import PickScreen from "../screens/PickScreen/PickScreen";
+import LoadingScreen from "../screens/LoadingScreen/LoadingScreen";
 import { useAuthContext } from "../contexts/AuthContext";
 import { useRouteContext } from "../contexts/RouteContext";
 import { usePushNotificationsContext } from "../contexts/PushNotificationsContext";
@@ -33,6 +34,7 @@ const RootNavigator = () => {
       )}
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="Pick" component={PickScreen} />
+      <Stack.Screen name="Loading" component={LoadingScreen} />
     </Stack.Navigator>
   );
 };

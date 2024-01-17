@@ -274,7 +274,7 @@ const HomeScreen = () => {
           )}
         >
           <View style={{ padding: 5 }}>
-            <Image source={vanIcon} style={{ width: 40, height: 40 }} />
+            <Image source={vanIcon} style={{ width: 55, height: 55 }} />
           </View>
         </Marker>
         <Marker
