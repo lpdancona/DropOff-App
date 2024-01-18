@@ -97,7 +97,7 @@ const ProfileScreen = () => {
 
         // Check if the query found a matching kid.
         const foundKid = queryResult.data.getKid;
-        //console.log("found??", foundKid);
+        console.log("found??", foundKid);
         if (foundKid) {
           // If a matching kid was found, update their userID.
           // if (kidparent1Email !== null) {

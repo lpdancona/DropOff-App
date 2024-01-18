@@ -492,28 +492,3 @@ export const listMessages = /* GraphQL */ `
     }
   }
 `;
-export const GetKidByParentEmail = `
-  query GetKidByParentEmail($userEmail: String!) {
-    listKids(
-      filter: {
-        or: [
-          { parent1Email: { eq: $userEmail } },
-          { parent2Email: { eq: $userEmail } }
-        ]
-      }
-    ) {
-      items {
-        id
-        name
-        parent1Email
-        parent2Email
-        dropOffAddress
-        lat
-        lng
-        birthDate
-        photo
-        # Include other fields as needed
-      }
-    }
-  }
-`;

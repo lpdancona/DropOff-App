@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
-import { Auth, API, graphqlOperation, Storage } from "aws-amplify";
-import { GetKidByParentEmail } from "../../graphql/queries";
-import { UpdateKid } from "../../graphql/mutations";
+import {
+  View,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  Image,
+} from "react-native";
+import { API, Storage, graphqlOperation } from "aws-amplify";
+// import { GetKidByParentEmail } from "../../graphql/queries";
+import { updateKid } from "../../graphql/mutations";
 import { useAuthContext } from "../../contexts/AuthContext";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
@@ -10,18 +16,19 @@ import styles from "./styles";
 
 const PickScreen = () => {
   const [kid, setKid] = useState([]);
-  const { userEmail } = useAuthContext();
-  console.log(userEmail);
+  const { userEmail, kids } = useAuthContext();
+
   useEffect(() => {
     const fetchKidData = async () => {
       try {
-        const kidData = await API.graphql(
-          graphqlOperation(GetKidByParentEmail, {
-            userEmail: userEmail,
-          })
-        );
+        //console.log(kids);
+        // const kidData = await API.graphql(
+        //   graphqlOperation(GetKidByParentEmail, {
+        //     userEmail: userEmail,
+        //   })
+        // );
 
-        const kids = kidData.data.listKids.items;
+        // const kids = kidData.data.listKids.items;
         setKid(kids);
       } catch (error) {
         console.error("Error fetching Kid data:", error);
@@ -31,15 +38,42 @@ const PickScreen = () => {
     fetchKidData();
   }, []);
 
+  const updateKidImage = async (newPic) => {
+    try {
+      const kidId = newPic.id;
+      const kidPhoto = newPic.photo;
+      // const kidName = kid[0].name;
+      const kidDetails = {
+        id: kidId,
+        photo: kidPhoto,
+      };
+
+      //console.log("variables", kidDetails);
+
+      const updatedKid = await API.graphql(
+        graphqlOperation(updateKid, { input: kidDetails })
+      );
+
+      //console.log("Updated Kid Picture:", updatedKid);
+      // console.log("Kid ID", kid[0].id);
+      // console.log(kid.photo);
+    } catch (error) {
+      console.error("Error saving image:", error);
+    }
+  };
+
   const uploadImage = async (uri, kidID) => {
     try {
       if (!uri) {
         throw new Error("Image URI is undefined");
       }
 
-      console.log("Fetching image from:", uri);
+      //console.log("Fetching image from:", uri);
       const response = await fetch(uri);
       const blob = await response.blob();
+      if (!blob) {
+        throw new Error("Failed to create blob.");
+      }
 
       console.log("Uploading image to S3...");
       const filename = `kid-photo-${kidID}-${Date.now()}`;
@@ -50,7 +84,7 @@ const PickScreen = () => {
       console.log("Image uploaded successfully.");
 
       const imageURL = await Storage.get(filename);
-      console.log("Image URL:", imageURL);
+      //console.log("Image URL:", imageURL);
 
       return imageURL;
     } catch (error) {
@@ -75,20 +109,22 @@ const PickScreen = () => {
         aspect: [4, 3],
         quality: 1,
       });
-      console.log("ImagePicker Result:", result);
+      //console.log("ImagePicker Result:", result);
 
-      if (!result.cancelled) {
+      if (!result.canceled) {
         if (result.assets && result.assets.length > 0) {
           const imageURL = await uploadImage(result.assets[0].uri, kid[0].id);
+          const imageUrlString = imageURL.toString();
 
-          console.log("Selected Image:", imageURL);
+          // console.log("Selected Image:", imageURL);
+          // console.log("Selected Image String:", imageUrlString);
 
           setKid((prevKids) => {
             const updatedKids = prevKids.map((kidItem) => {
               if (kidItem.id === kid[0].id) {
                 return {
                   ...kidItem,
-                  photo: imageURL,
+                  photo: imageUrlString,
                 };
               } else {
                 return kidItem;
@@ -97,17 +133,13 @@ const PickScreen = () => {
 
             return updatedKids;
           });
-          console.log("Kid ID", kid[0].id);
+
           const newKidPicture = {
             id: kid[0].id,
-            photo: imageURL,
+            photo: imageUrlString,
           };
-          const updatedKidPicture = await API.graphql({
-            query: UpdateKid,
-            variables: { input: newKidPicture },
-          });
 
-          console.log("Updated Kid Picture:", updatedKidPicture);
+          await updateKidImage(newKidPicture);
 
           // await API.graphql(
           //   graphqlOperation(UpdateKid, {
@@ -129,7 +161,7 @@ const PickScreen = () => {
   return (
     <View>
       {kid ? (
-        <View>
+        <SafeAreaView style={{ marginTop: 20, marginLeft: 10 }}>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>Kid Details</Text>
           {kid.map((kidItem) => (
             <View key={kidItem.id}>
@@ -143,12 +175,13 @@ const PickScreen = () => {
               )}
             </View>
           ))}
+          {/* <TouchableOpacity onPress={updateKidImage}> */}
           <TouchableOpacity onPress={openImageLibrary}>
             <View style={styles.button}>
               <Text style={styles.buttonText}>Open Image Library</Text>
             </View>
           </TouchableOpacity>
-        </View>
+        </SafeAreaView>
       ) : (
         <Text>Loading...</Text>
       )}
