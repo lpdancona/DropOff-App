@@ -15,7 +15,8 @@ export default StyleSheet.create({
     padding: 20,
     maxHeight: "25%",
     paddingTop: 40,
-    gap: "100%",
+    gap: 80,
+    //gap: "100%",
   },
   logoutMenu: {
     marginLeft: 15,
@@ -128,10 +129,9 @@ export default StyleSheet.create({
     marginTop: 13,
   },
   zoomButton: {
-    marginTop: 2,
     position: "absolute",
-    //top: 20,
-    //left: 20,
+    top: 155,
+    left: 10,
     backgroundColor: "#FF7276",
     borderRadius: 50,
     padding: 10,

@@ -17,18 +17,12 @@ import styles from "./styles";
 const PickScreen = () => {
   const [kid, setKid] = useState([]);
   const { userEmail, kids } = useAuthContext();
+  const [photoName, setPhotoName] = useState(null);
+  const [actualPhoto, setActualPhoto] = useState();
 
   useEffect(() => {
     const fetchKidData = async () => {
       try {
-        //console.log(kids);
-        // const kidData = await API.graphql(
-        //   graphqlOperation(GetKidByParentEmail, {
-        //     userEmail: userEmail,
-        //   })
-        // );
-
-        // const kids = kidData.data.listKids.items;
         setKid(kids);
       } catch (error) {
         console.error("Error fetching Kid data:", error);
@@ -36,6 +30,17 @@ const PickScreen = () => {
     };
 
     fetchKidData();
+  }, []);
+
+  const getKidPhoto = async () => {
+    console.log(kids[0].photo);
+    const imageURL = await Storage.get(kids[0].photo);
+    setActualPhoto(imageURL);
+    console.log("Image URL:", imageURL);
+  };
+
+  useEffect(() => {
+    getKidPhoto();
   }, []);
 
   const updateKidImage = async (newPic) => {
@@ -77,14 +82,17 @@ const PickScreen = () => {
 
       console.log("Uploading image to S3...");
       const filename = `kid-photo-${kidID}-${Date.now()}`;
+
+      // console.log(filename);
       await Storage.put(filename, blob, {
         contentType: "image/jpeg",
       });
 
       console.log("Image uploaded successfully.");
+      setPhotoName(filename);
 
       const imageURL = await Storage.get(filename);
-      //console.log("Image URL:", imageURL);
+      console.log("Image URL:", imageURL);
 
       return imageURL;
     } catch (error) {
@@ -114,7 +122,7 @@ const PickScreen = () => {
       if (!result.canceled) {
         if (result.assets && result.assets.length > 0) {
           const imageURL = await uploadImage(result.assets[0].uri, kid[0].id);
-          const imageUrlString = imageURL.toString();
+          //const imageUrlString = imageURL.toString();
 
           // console.log("Selected Image:", imageURL);
           // console.log("Selected Image String:", imageUrlString);
@@ -124,7 +132,7 @@ const PickScreen = () => {
               if (kidItem.id === kid[0].id) {
                 return {
                   ...kidItem,
-                  photo: imageUrlString,
+                  photo: imageURL,
                 };
               } else {
                 return kidItem;
@@ -136,9 +144,9 @@ const PickScreen = () => {
 
           const newKidPicture = {
             id: kid[0].id,
-            photo: imageUrlString,
+            photo: photoName,
           };
-
+          console.log("newKidPicture", newKidPicture);
           await updateKidImage(newKidPicture);
 
           // await API.graphql(
@@ -170,12 +178,11 @@ const PickScreen = () => {
               {kidItem.photo && (
                 <Image
                   style={{ width: 100, height: 100 }}
-                  source={{ uri: kidItem?.photo }}
+                  source={{ uri: actualPhoto }}
                 />
               )}
             </View>
           ))}
-          {/* <TouchableOpacity onPress={updateKidImage}> */}
           <TouchableOpacity onPress={openImageLibrary}>
             <View style={styles.button}>
               <Text style={styles.buttonText}>Open Image Library</Text>
