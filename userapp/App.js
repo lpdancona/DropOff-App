@@ -18,6 +18,7 @@ import CustomHeader from "./src/layout/CustomHeader";
 import CustomFooter from "./src/layout/CustomFooter";
 import getTheme from "./src/layout/CustomTheme";
 import RouteContextProvider from "./src/contexts/RouteContext";
+import PicturesContextProvider from "./src/contexts/PicturesContext";
 
 // Aws Amplify config
 import { Amplify } from "aws-amplify";
@@ -42,11 +43,13 @@ function App() {
             <PushNotificationsContextProvider>
               <AuthContextProvider>
                 <RouteContextProvider>
-                  <GestureHandlerRootView style={{ flex: 1 }}>
-                    <PaperProvider>
-                      <RootNavigator />
-                    </PaperProvider>
-                  </GestureHandlerRootView>
+                  <PicturesContextProvider>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                      <PaperProvider>
+                        <RootNavigator />
+                      </PaperProvider>
+                    </GestureHandlerRootView>
+                  </PicturesContextProvider>
                   <StatusBar style="light" />
                 </RouteContextProvider>
               </AuthContextProvider>
