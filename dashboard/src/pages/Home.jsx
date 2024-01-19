@@ -35,7 +35,6 @@ const ProfileCard = ({ kid, onCheckInClick }) => {
 const Home = () => {
   const [kids, setKids] = useState([]);
   const [selectedKid, setSelectedKid] = useState(null);
-
   useEffect(() => {
     const fetchKids = async () => {
       try {
@@ -46,50 +45,30 @@ const Home = () => {
       }
     };
 
-    const resetCheckIn = async () => {
+    const updateCheckInStatus = async () => {
       try {
-        // Iterate through kids and reset check-in status
-        for (const kid of kids) {
-          if (kid.checkedIn) {
-            const updateResult = await API.graphql(
-              graphqlOperation(updateKid, {
-                input: {
-                  id: kid.id,
-                  checkedIn: false,
-                  lastCheckIn: null, // Optional: You can set lastCheckIn to null or a specific value
-                },
-              })
-            );
-
-            console.log("Kid check-in reset:", updateResult);
-          }
-        }
-
-        // Fetch updated kids after resetting check-in status
-        fetchKids();
+        const currentDate = new Date();
+        const twelveHoursAgo = new Date(currentDate - 12 * 60 * 60 * 1000);
+        const result = await API.graphql(graphqlOperation(listKids));
+        const currentKids = result.data.listKids.items;
+        setKids((prevKids) =>
+          prevKids.map((kid) =>
+            kid.checkedIn && new Date(kid.lastCheckIn) < twelveHoursAgo
+              ? { ...kid, checkedIn: false }
+              : kid
+          )
+        );
       } catch (error) {
-        console.error("Error resetting check-in:", error);
+        console.error("Error updating check-in status:", error);
       }
     };
-
     fetchKids();
-
-    // Set up a timer to reset check-in every day at midnight
-    const resetCheckInTimer = setInterval(() => {
-      const now = new Date();
-      const midnight = new Date(now);
-      midnight.setHours(24, 0, 0, 0);
-
-      const timeUntilMidnight = midnight - now;
-
-      setTimeout(() => {
-        resetCheckIn();
-      }, timeUntilMidnight);
-    }, 86400000); // 86400000 milliseconds = 24 hours
-
-    // Clean up the timer when the component is unmounted
-    return () => clearInterval(resetCheckInTimer);
-  }, [kids]);
+    updateCheckInStatus();
+    const updateCheckInStatusTimer = setInterval(() => {
+      updateCheckInStatus();
+    }, 12 * 60 * 60 * 1000);
+    return () => clearInterval(updateCheckInStatusTimer);
+  }, []);
 
   const openConfirmationModal = (kid) => {
     setSelectedKid(kid);
@@ -116,7 +95,6 @@ const Home = () => {
 
         console.log("Kid checked in:", updateResult);
 
-        // Update the local state to reflect the change
         setKids((prevKids) =>
           prevKids.map((kid) =>
             kid.id === selectedKid.id
@@ -125,7 +103,6 @@ const Home = () => {
           )
         );
 
-        // Close the confirmation modal
         closeConfirmationModal();
       } catch (error) {
         console.error("Error checking in kid:", error);
@@ -134,7 +111,6 @@ const Home = () => {
   };
 
   const checkInKid = (kidId, kidName) => {
-    // Ask for confirmation before checking in
     openConfirmationModal({ id: kidId, name: kidName });
   };
 
