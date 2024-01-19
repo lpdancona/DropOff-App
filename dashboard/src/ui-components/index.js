@@ -4,13 +4,16 @@
  * Any changes to this file will be overwritten when running amplify pull. *
  **************************************************************************/
 
-export { default as AddKidVan } from "./AddKidVan";
 export { default as AddressListCreateForm } from "./AddressListCreateForm";
 export { default as AddressListUpdateForm } from "./AddressListUpdateForm";
 export { default as ConfigsCreateForm } from "./ConfigsCreateForm";
 export { default as ConfigsUpdateForm } from "./ConfigsUpdateForm";
+export { default as EventsCreateForm } from "./EventsCreateForm";
+export { default as EventsUpdateForm } from "./EventsUpdateForm";
 export { default as KidCreateForm } from "./KidCreateForm";
 export { default as KidUpdateForm } from "./KidUpdateForm";
+export { default as MessageCreateForm } from "./MessageCreateForm";
+export { default as MessageUpdateForm } from "./MessageUpdateForm";
 export { default as RouteCreateForm } from "./RouteCreateForm";
 export { default as RouteUpdateForm } from "./RouteUpdateForm";
 export { default as UserCreateForm } from "./UserCreateForm";

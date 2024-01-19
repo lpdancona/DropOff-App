@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SelectFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -25,11 +25,13 @@ export declare type AddressListUpdateFormInputValues = {
     order?: number;
     latitude?: number;
     longitude?: number;
+    status?: string;
 };
 export declare type AddressListUpdateFormValidationValues = {
     order?: ValidationFunction<number>;
     latitude?: ValidationFunction<number>;
     longitude?: ValidationFunction<number>;
+    status?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type AddressListUpdateFormOverridesProps = {
@@ -37,6 +39,7 @@ export declare type AddressListUpdateFormOverridesProps = {
     order?: PrimitiveOverrideProps<TextFieldProps>;
     latitude?: PrimitiveOverrideProps<TextFieldProps>;
     longitude?: PrimitiveOverrideProps<TextFieldProps>;
+    status?: PrimitiveOverrideProps<SelectFieldProps>;
 } & EscapeHatchProps;
 export declare type AddressListUpdateFormProps = React.PropsWithChildren<{
     overrides?: AddressListUpdateFormOverridesProps | undefined | null;

@@ -1,6 +1,48 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateEvents = /* GraphQL */ `
+  subscription OnCreateEvents($filter: ModelSubscriptionEventsFilterInput) {
+    onCreateEvents(filter: $filter) {
+      id
+      name
+      image
+      link
+      date
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateEvents = /* GraphQL */ `
+  subscription OnUpdateEvents($filter: ModelSubscriptionEventsFilterInput) {
+    onUpdateEvents(filter: $filter) {
+      id
+      name
+      image
+      link
+      date
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteEvents = /* GraphQL */ `
+  subscription OnDeleteEvents($filter: ModelSubscriptionEventsFilterInput) {
+    onDeleteEvents(filter: $filter) {
+      id
+      name
+      image
+      link
+      date
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateWeekDayRoutes = /* GraphQL */ `
   subscription OnCreateWeekDayRoutes(
     $filter: ModelSubscriptionWeekDayRoutesFilterInput
@@ -121,10 +163,13 @@ export const onCreateAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -156,10 +201,13 @@ export const onUpdateAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -191,10 +239,13 @@ export const onDeleteAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
       }
+      status
       createdAt
       updatedAt
       addressListKidId
@@ -286,6 +337,8 @@ export const onCreateRoute = /* GraphQL */ `
         nextToken
         __typename
       }
+      currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId
@@ -326,6 +379,8 @@ export const onUpdateRoute = /* GraphQL */ `
         nextToken
         __typename
       }
+      currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId
@@ -366,6 +421,8 @@ export const onDeleteRoute = /* GraphQL */ `
         nextToken
         __typename
       }
+      currentDestination
+      finishedTime
       createdAt
       updatedAt
       routeVanId
@@ -389,6 +446,8 @@ export const onCreateKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -411,6 +470,8 @@ export const onUpdateKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -433,6 +494,8 @@ export const onDeleteKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -496,6 +559,48 @@ export const onDeleteUser = /* GraphQL */ `
       userType
       photo
       pushToken
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateMessage = /* GraphQL */ `
+  subscription OnCreateMessage($filter: ModelSubscriptionMessageFilterInput) {
+    onCreateMessage(filter: $filter) {
+      id
+      senderID
+      receiverID
+      content
+      sentAt
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateMessage = /* GraphQL */ `
+  subscription OnUpdateMessage($filter: ModelSubscriptionMessageFilterInput) {
+    onUpdateMessage(filter: $filter) {
+      id
+      senderID
+      receiverID
+      content
+      sentAt
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteMessage = /* GraphQL */ `
+  subscription OnDeleteMessage($filter: ModelSubscriptionMessageFilterInput) {
+    onDeleteMessage(filter: $filter) {
+      id
+      senderID
+      receiverID
+      content
+      sentAt
       createdAt
       updatedAt
       __typename

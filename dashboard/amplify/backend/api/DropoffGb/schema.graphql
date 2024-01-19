@@ -1,3 +1,18 @@
+type Events @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  image: AWSURL
+  link: String
+  date: AWSDate
+}
+
+enum WaypointStatus {
+  FINISHED
+  IN_PROGRESS
+  WAITING_TO_START
+  PAUSED
+}
+
 type WeekDayRoutes @model @auth(rules: [{allow: public}]) {
   id: ID!
   date: AWSDate
@@ -23,6 +38,7 @@ type AddressList @model @auth(rules: [{allow: public}]) {
   longitude: Float
   routeID: ID @index(name: "byRoute")
   Kid: Kid @hasOne
+  status: WaypointStatus
 }
 
 enum RouteStatus {
@@ -56,6 +72,8 @@ type Route @model @auth(rules: [{allow: public}]) {
   status: RouteStatus
   AddressLists: [AddressList] @hasMany(indexName: "byRoute", fields: ["id"])
   Kids: [Kid] @hasMany(indexName: "byRoute", fields: ["id"])
+  currentDestination: String
+  finishedTime: String
 }
 
 type Kid @model @auth(rules: [{allow: public}]) {
@@ -72,6 +90,8 @@ type Kid @model @auth(rules: [{allow: public}]) {
   Parent2ID: ID
   vanID: ID
   routeID: ID @index(name: "byRoute")
+  checkedIn: Boolean
+  lastCheckIn: AWSDateTime
 }
 
 enum UserTypes {
@@ -93,5 +113,13 @@ type User @model @auth(rules: [{allow: public}]) {
   userType: UserTypes
   photo: String
   pushToken: String
+}
+
+type Message @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  senderID: ID!
+  receiverID: ID!
+  content: String!
+  sentAt: AWSDateTime!
 }
  

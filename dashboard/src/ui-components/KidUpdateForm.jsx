@@ -6,7 +6,13 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SwitchField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
 import { getKid } from "../graphql/queries";
@@ -35,6 +41,8 @@ export default function KidUpdateForm(props) {
     Parent1ID: "",
     Parent2ID: "",
     vanID: "",
+    checkedIn: false,
+    lastCheckIn: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [parent1Email, setParent1Email] = React.useState(
@@ -53,6 +61,10 @@ export default function KidUpdateForm(props) {
   const [Parent1ID, setParent1ID] = React.useState(initialValues.Parent1ID);
   const [Parent2ID, setParent2ID] = React.useState(initialValues.Parent2ID);
   const [vanID, setVanID] = React.useState(initialValues.vanID);
+  const [checkedIn, setCheckedIn] = React.useState(initialValues.checkedIn);
+  const [lastCheckIn, setLastCheckIn] = React.useState(
+    initialValues.lastCheckIn
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = kidRecord
@@ -69,6 +81,8 @@ export default function KidUpdateForm(props) {
     setParent1ID(cleanValues.Parent1ID);
     setParent2ID(cleanValues.Parent2ID);
     setVanID(cleanValues.vanID);
+    setCheckedIn(cleanValues.checkedIn);
+    setLastCheckIn(cleanValues.lastCheckIn);
     setErrors({});
   };
   const [kidRecord, setKidRecord] = React.useState(kidModelProp);
@@ -99,6 +113,8 @@ export default function KidUpdateForm(props) {
     Parent1ID: [],
     Parent2ID: [],
     vanID: [],
+    checkedIn: [],
+    lastCheckIn: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -116,6 +132,23 @@ export default function KidUpdateForm(props) {
     }
     setErrors((errors) => ({ ...errors, [fieldName]: validationResponse }));
     return validationResponse;
+  };
+  const convertToLocal = (date) => {
+    const df = new Intl.DateTimeFormat("default", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      calendar: "iso8601",
+      numberingSystem: "latn",
+      hourCycle: "h23",
+    });
+    const parts = df.formatToParts(date).reduce((acc, part) => {
+      acc[part.type] = part.value;
+      return acc;
+    }, {});
+    return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
   };
   return (
     <Grid
@@ -137,6 +170,8 @@ export default function KidUpdateForm(props) {
           Parent1ID: Parent1ID ?? null,
           Parent2ID: Parent2ID ?? null,
           vanID: vanID ?? null,
+          checkedIn: checkedIn ?? null,
+          lastCheckIn: lastCheckIn ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -208,6 +243,8 @@ export default function KidUpdateForm(props) {
               Parent1ID,
               Parent2ID,
               vanID,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -242,6 +279,8 @@ export default function KidUpdateForm(props) {
               Parent1ID,
               Parent2ID,
               vanID,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.parent1Email ?? value;
@@ -276,6 +315,8 @@ export default function KidUpdateForm(props) {
               Parent1ID,
               Parent2ID,
               vanID,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.parent2Email ?? value;
@@ -310,6 +351,8 @@ export default function KidUpdateForm(props) {
               Parent1ID,
               Parent2ID,
               vanID,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.dropOffAddress ?? value;
@@ -348,6 +391,8 @@ export default function KidUpdateForm(props) {
               Parent1ID,
               Parent2ID,
               vanID,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.lat ?? value;
@@ -386,6 +431,8 @@ export default function KidUpdateForm(props) {
               Parent1ID,
               Parent2ID,
               vanID,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.lng ?? value;
@@ -421,6 +468,8 @@ export default function KidUpdateForm(props) {
               Parent1ID,
               Parent2ID,
               vanID,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.birthDate ?? value;
@@ -455,6 +504,8 @@ export default function KidUpdateForm(props) {
               Parent1ID,
               Parent2ID,
               vanID,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.photo ?? value;
@@ -489,6 +540,8 @@ export default function KidUpdateForm(props) {
               Parent1ID: value,
               Parent2ID,
               vanID,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.Parent1ID ?? value;
@@ -523,6 +576,8 @@ export default function KidUpdateForm(props) {
               Parent1ID,
               Parent2ID: value,
               vanID,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.Parent2ID ?? value;
@@ -557,6 +612,8 @@ export default function KidUpdateForm(props) {
               Parent1ID,
               Parent2ID,
               vanID: value,
+              checkedIn,
+              lastCheckIn,
             };
             const result = onChange(modelFields);
             value = result?.vanID ?? value;
@@ -570,6 +627,80 @@ export default function KidUpdateForm(props) {
         errorMessage={errors.vanID?.errorMessage}
         hasError={errors.vanID?.hasError}
         {...getOverrideProps(overrides, "vanID")}
+      ></TextField>
+      <SwitchField
+        label="Checked in"
+        defaultChecked={false}
+        isDisabled={false}
+        isChecked={checkedIn}
+        onChange={(e) => {
+          let value = e.target.checked;
+          if (onChange) {
+            const modelFields = {
+              name,
+              parent1Email,
+              parent2Email,
+              dropOffAddress,
+              lat,
+              lng,
+              birthDate,
+              photo,
+              Parent1ID,
+              Parent2ID,
+              vanID,
+              checkedIn: value,
+              lastCheckIn,
+            };
+            const result = onChange(modelFields);
+            value = result?.checkedIn ?? value;
+          }
+          if (errors.checkedIn?.hasError) {
+            runValidationTasks("checkedIn", value);
+          }
+          setCheckedIn(value);
+        }}
+        onBlur={() => runValidationTasks("checkedIn", checkedIn)}
+        errorMessage={errors.checkedIn?.errorMessage}
+        hasError={errors.checkedIn?.hasError}
+        {...getOverrideProps(overrides, "checkedIn")}
+      ></SwitchField>
+      <TextField
+        label="Last check in"
+        isRequired={false}
+        isReadOnly={false}
+        type="datetime-local"
+        value={lastCheckIn && convertToLocal(new Date(lastCheckIn))}
+        onChange={(e) => {
+          let value =
+            e.target.value === "" ? "" : new Date(e.target.value).toISOString();
+          if (onChange) {
+            const modelFields = {
+              name,
+              parent1Email,
+              parent2Email,
+              dropOffAddress,
+              lat,
+              lng,
+              birthDate,
+              photo,
+              Parent1ID,
+              Parent2ID,
+              vanID,
+              checkedIn,
+              lastCheckIn: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.lastCheckIn ?? value;
+          }
+          if (errors.lastCheckIn?.hasError) {
+            runValidationTasks("lastCheckIn", value);
+          }
+          setLastCheckIn(value);
+        }}
+        onBlur={() => runValidationTasks("lastCheckIn", lastCheckIn)}
+        errorMessage={errors.lastCheckIn?.errorMessage}
+        hasError={errors.lastCheckIn?.hasError}
+        {...getOverrideProps(overrides, "lastCheckIn")}
       ></TextField>
       <Flex
         justifyContent="space-between"

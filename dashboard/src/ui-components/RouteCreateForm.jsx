@@ -37,6 +37,8 @@ export default function RouteCreateForm(props) {
     helper: "",
     route: "",
     status: "",
+    currentDestination: "",
+    finishedTime: "",
   };
   const [date, setDate] = React.useState(initialValues.date);
   const [departTime, setDepartTime] = React.useState(initialValues.departTime);
@@ -46,6 +48,12 @@ export default function RouteCreateForm(props) {
   const [helper, setHelper] = React.useState(initialValues.helper);
   const [route, setRoute] = React.useState(initialValues.route);
   const [status, setStatus] = React.useState(initialValues.status);
+  const [currentDestination, setCurrentDestination] = React.useState(
+    initialValues.currentDestination
+  );
+  const [finishedTime, setFinishedTime] = React.useState(
+    initialValues.finishedTime
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setDate(initialValues.date);
@@ -56,6 +64,8 @@ export default function RouteCreateForm(props) {
     setHelper(initialValues.helper);
     setRoute(initialValues.route);
     setStatus(initialValues.status);
+    setCurrentDestination(initialValues.currentDestination);
+    setFinishedTime(initialValues.finishedTime);
     setErrors({});
   };
   const validations = {
@@ -67,6 +77,8 @@ export default function RouteCreateForm(props) {
     helper: [],
     route: [{ type: "JSON" }],
     status: [],
+    currentDestination: [],
+    finishedTime: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -102,6 +114,8 @@ export default function RouteCreateForm(props) {
           helper,
           route,
           status,
+          currentDestination,
+          finishedTime,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -172,6 +186,8 @@ export default function RouteCreateForm(props) {
               helper,
               route,
               status,
+              currentDestination,
+              finishedTime,
             };
             const result = onChange(modelFields);
             value = result?.date ?? value;
@@ -203,6 +219,8 @@ export default function RouteCreateForm(props) {
               helper,
               route,
               status,
+              currentDestination,
+              finishedTime,
             };
             const result = onChange(modelFields);
             value = result?.departTime ?? value;
@@ -238,6 +256,8 @@ export default function RouteCreateForm(props) {
               helper,
               route,
               status,
+              currentDestination,
+              finishedTime,
             };
             const result = onChange(modelFields);
             value = result?.lat ?? value;
@@ -273,6 +293,8 @@ export default function RouteCreateForm(props) {
               helper,
               route,
               status,
+              currentDestination,
+              finishedTime,
             };
             const result = onChange(modelFields);
             value = result?.lng ?? value;
@@ -304,6 +326,8 @@ export default function RouteCreateForm(props) {
               helper,
               route,
               status,
+              currentDestination,
+              finishedTime,
             };
             const result = onChange(modelFields);
             value = result?.driver ?? value;
@@ -335,6 +359,8 @@ export default function RouteCreateForm(props) {
               helper: value,
               route,
               status,
+              currentDestination,
+              finishedTime,
             };
             const result = onChange(modelFields);
             value = result?.helper ?? value;
@@ -365,6 +391,8 @@ export default function RouteCreateForm(props) {
               helper,
               route: value,
               status,
+              currentDestination,
+              finishedTime,
             };
             const result = onChange(modelFields);
             value = result?.route ?? value;
@@ -396,6 +424,8 @@ export default function RouteCreateForm(props) {
               helper,
               route,
               status: value,
+              currentDestination,
+              finishedTime,
             };
             const result = onChange(modelFields);
             value = result?.status ?? value;
@@ -431,6 +461,74 @@ export default function RouteCreateForm(props) {
           {...getOverrideProps(overrides, "statusoption3")}
         ></option>
       </SelectField>
+      <TextField
+        label="Current destination"
+        isRequired={false}
+        isReadOnly={false}
+        value={currentDestination}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              date,
+              departTime,
+              lat,
+              lng,
+              driver,
+              helper,
+              route,
+              status,
+              currentDestination: value,
+              finishedTime,
+            };
+            const result = onChange(modelFields);
+            value = result?.currentDestination ?? value;
+          }
+          if (errors.currentDestination?.hasError) {
+            runValidationTasks("currentDestination", value);
+          }
+          setCurrentDestination(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("currentDestination", currentDestination)
+        }
+        errorMessage={errors.currentDestination?.errorMessage}
+        hasError={errors.currentDestination?.hasError}
+        {...getOverrideProps(overrides, "currentDestination")}
+      ></TextField>
+      <TextField
+        label="Finished time"
+        isRequired={false}
+        isReadOnly={false}
+        value={finishedTime}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              date,
+              departTime,
+              lat,
+              lng,
+              driver,
+              helper,
+              route,
+              status,
+              currentDestination,
+              finishedTime: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.finishedTime ?? value;
+          }
+          if (errors.finishedTime?.hasError) {
+            runValidationTasks("finishedTime", value);
+          }
+          setFinishedTime(value);
+        }}
+        onBlur={() => runValidationTasks("finishedTime", finishedTime)}
+        errorMessage={errors.finishedTime?.errorMessage}
+        hasError={errors.finishedTime?.hasError}
+        {...getOverrideProps(overrides, "finishedTime")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

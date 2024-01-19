@@ -30,6 +30,8 @@ export declare type RouteCreateFormInputValues = {
     helper?: string;
     route?: string;
     status?: string;
+    currentDestination?: string;
+    finishedTime?: string;
 };
 export declare type RouteCreateFormValidationValues = {
     date?: ValidationFunction<string>;
@@ -40,6 +42,8 @@ export declare type RouteCreateFormValidationValues = {
     helper?: ValidationFunction<string>;
     route?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
+    currentDestination?: ValidationFunction<string>;
+    finishedTime?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type RouteCreateFormOverridesProps = {
@@ -52,6 +56,8 @@ export declare type RouteCreateFormOverridesProps = {
     helper?: PrimitiveOverrideProps<TextFieldProps>;
     route?: PrimitiveOverrideProps<TextAreaFieldProps>;
     status?: PrimitiveOverrideProps<SelectFieldProps>;
+    currentDestination?: PrimitiveOverrideProps<TextFieldProps>;
+    finishedTime?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type RouteCreateFormProps = React.PropsWithChildren<{
     overrides?: RouteCreateFormOverridesProps | undefined | null;

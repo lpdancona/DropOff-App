@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -33,6 +33,8 @@ export declare type KidCreateFormInputValues = {
     Parent1ID?: string;
     Parent2ID?: string;
     vanID?: string;
+    checkedIn?: boolean;
+    lastCheckIn?: string;
 };
 export declare type KidCreateFormValidationValues = {
     name?: ValidationFunction<string>;
@@ -46,6 +48,8 @@ export declare type KidCreateFormValidationValues = {
     Parent1ID?: ValidationFunction<string>;
     Parent2ID?: ValidationFunction<string>;
     vanID?: ValidationFunction<string>;
+    checkedIn?: ValidationFunction<boolean>;
+    lastCheckIn?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type KidCreateFormOverridesProps = {
@@ -61,6 +65,8 @@ export declare type KidCreateFormOverridesProps = {
     Parent1ID?: PrimitiveOverrideProps<TextFieldProps>;
     Parent2ID?: PrimitiveOverrideProps<TextFieldProps>;
     vanID?: PrimitiveOverrideProps<TextFieldProps>;
+    checkedIn?: PrimitiveOverrideProps<SwitchFieldProps>;
+    lastCheckIn?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type KidCreateFormProps = React.PropsWithChildren<{
     overrides?: KidCreateFormOverridesProps | undefined | null;

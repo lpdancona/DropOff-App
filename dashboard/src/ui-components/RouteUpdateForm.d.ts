@@ -30,6 +30,8 @@ export declare type RouteUpdateFormInputValues = {
     helper?: string;
     route?: string;
     status?: string;
+    currentDestination?: string;
+    finishedTime?: string;
 };
 export declare type RouteUpdateFormValidationValues = {
     date?: ValidationFunction<string>;
@@ -40,6 +42,8 @@ export declare type RouteUpdateFormValidationValues = {
     helper?: ValidationFunction<string>;
     route?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
+    currentDestination?: ValidationFunction<string>;
+    finishedTime?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type RouteUpdateFormOverridesProps = {
@@ -52,6 +56,8 @@ export declare type RouteUpdateFormOverridesProps = {
     helper?: PrimitiveOverrideProps<TextFieldProps>;
     route?: PrimitiveOverrideProps<TextAreaFieldProps>;
     status?: PrimitiveOverrideProps<SelectFieldProps>;
+    currentDestination?: PrimitiveOverrideProps<TextFieldProps>;
+    finishedTime?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type RouteUpdateFormProps = React.PropsWithChildren<{
     overrides?: RouteUpdateFormOverridesProps | undefined | null;

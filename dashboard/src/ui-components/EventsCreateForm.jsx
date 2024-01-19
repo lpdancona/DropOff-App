@@ -6,17 +6,11 @@
 
 /* eslint-disable */
 import * as React from "react";
-import {
-  Button,
-  Flex,
-  Grid,
-  SelectField,
-  TextField,
-} from "@aws-amplify/ui-react";
+import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
-import { createAddressList } from "../graphql/mutations";
-export default function AddressListCreateForm(props) {
+import { createEvents } from "../graphql/mutations";
+export default function EventsCreateForm(props) {
   const {
     clearOnSuccess = true,
     onSuccess,
@@ -28,28 +22,28 @@ export default function AddressListCreateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    order: "",
-    latitude: "",
-    longitude: "",
-    status: "",
+    name: "",
+    image: "",
+    link: "",
+    date: "",
   };
-  const [order, setOrder] = React.useState(initialValues.order);
-  const [latitude, setLatitude] = React.useState(initialValues.latitude);
-  const [longitude, setLongitude] = React.useState(initialValues.longitude);
-  const [status, setStatus] = React.useState(initialValues.status);
+  const [name, setName] = React.useState(initialValues.name);
+  const [image, setImage] = React.useState(initialValues.image);
+  const [link, setLink] = React.useState(initialValues.link);
+  const [date, setDate] = React.useState(initialValues.date);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    setOrder(initialValues.order);
-    setLatitude(initialValues.latitude);
-    setLongitude(initialValues.longitude);
-    setStatus(initialValues.status);
+    setName(initialValues.name);
+    setImage(initialValues.image);
+    setLink(initialValues.link);
+    setDate(initialValues.date);
     setErrors({});
   };
   const validations = {
-    order: [],
-    latitude: [],
-    longitude: [],
-    status: [],
+    name: [],
+    image: [{ type: "URL" }],
+    link: [],
+    date: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -77,10 +71,10 @@ export default function AddressListCreateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          order,
-          latitude,
-          longitude,
-          status,
+          name,
+          image,
+          link,
+          date,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -111,7 +105,7 @@ export default function AddressListCreateForm(props) {
             }
           });
           await API.graphql({
-            query: createAddressList.replaceAll("__typename", ""),
+            query: createEvents.replaceAll("__typename", ""),
             variables: {
               input: {
                 ...modelFields,
@@ -131,150 +125,118 @@ export default function AddressListCreateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "AddressListCreateForm")}
+      {...getOverrideProps(overrides, "EventsCreateForm")}
       {...rest}
     >
       <TextField
-        label="Order"
+        label="Name"
         isRequired={false}
         isReadOnly={false}
-        type="number"
-        step="any"
-        value={order}
-        onChange={(e) => {
-          let value = isNaN(parseInt(e.target.value))
-            ? e.target.value
-            : parseInt(e.target.value);
-          if (onChange) {
-            const modelFields = {
-              order: value,
-              latitude,
-              longitude,
-              status,
-            };
-            const result = onChange(modelFields);
-            value = result?.order ?? value;
-          }
-          if (errors.order?.hasError) {
-            runValidationTasks("order", value);
-          }
-          setOrder(value);
-        }}
-        onBlur={() => runValidationTasks("order", order)}
-        errorMessage={errors.order?.errorMessage}
-        hasError={errors.order?.hasError}
-        {...getOverrideProps(overrides, "order")}
-      ></TextField>
-      <TextField
-        label="Latitude"
-        isRequired={false}
-        isReadOnly={false}
-        type="number"
-        step="any"
-        value={latitude}
-        onChange={(e) => {
-          let value = isNaN(parseFloat(e.target.value))
-            ? e.target.value
-            : parseFloat(e.target.value);
-          if (onChange) {
-            const modelFields = {
-              order,
-              latitude: value,
-              longitude,
-              status,
-            };
-            const result = onChange(modelFields);
-            value = result?.latitude ?? value;
-          }
-          if (errors.latitude?.hasError) {
-            runValidationTasks("latitude", value);
-          }
-          setLatitude(value);
-        }}
-        onBlur={() => runValidationTasks("latitude", latitude)}
-        errorMessage={errors.latitude?.errorMessage}
-        hasError={errors.latitude?.hasError}
-        {...getOverrideProps(overrides, "latitude")}
-      ></TextField>
-      <TextField
-        label="Longitude"
-        isRequired={false}
-        isReadOnly={false}
-        type="number"
-        step="any"
-        value={longitude}
-        onChange={(e) => {
-          let value = isNaN(parseFloat(e.target.value))
-            ? e.target.value
-            : parseFloat(e.target.value);
-          if (onChange) {
-            const modelFields = {
-              order,
-              latitude,
-              longitude: value,
-              status,
-            };
-            const result = onChange(modelFields);
-            value = result?.longitude ?? value;
-          }
-          if (errors.longitude?.hasError) {
-            runValidationTasks("longitude", value);
-          }
-          setLongitude(value);
-        }}
-        onBlur={() => runValidationTasks("longitude", longitude)}
-        errorMessage={errors.longitude?.errorMessage}
-        hasError={errors.longitude?.hasError}
-        {...getOverrideProps(overrides, "longitude")}
-      ></TextField>
-      <SelectField
-        label="Status"
-        placeholder="Please select an option"
-        isDisabled={false}
-        value={status}
+        value={name}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              order,
-              latitude,
-              longitude,
-              status: value,
+              name: value,
+              image,
+              link,
+              date,
             };
             const result = onChange(modelFields);
-            value = result?.status ?? value;
+            value = result?.name ?? value;
           }
-          if (errors.status?.hasError) {
-            runValidationTasks("status", value);
+          if (errors.name?.hasError) {
+            runValidationTasks("name", value);
           }
-          setStatus(value);
+          setName(value);
         }}
-        onBlur={() => runValidationTasks("status", status)}
-        errorMessage={errors.status?.errorMessage}
-        hasError={errors.status?.hasError}
-        {...getOverrideProps(overrides, "status")}
-      >
-        <option
-          children="Finished"
-          value="FINISHED"
-          {...getOverrideProps(overrides, "statusoption0")}
-        ></option>
-        <option
-          children="In progress"
-          value="IN_PROGRESS"
-          {...getOverrideProps(overrides, "statusoption1")}
-        ></option>
-        <option
-          children="Waiting to start"
-          value="WAITING_TO_START"
-          {...getOverrideProps(overrides, "statusoption2")}
-        ></option>
-        <option
-          children="Paused"
-          value="PAUSED"
-          {...getOverrideProps(overrides, "statusoption3")}
-        ></option>
-      </SelectField>
+        onBlur={() => runValidationTasks("name", name)}
+        errorMessage={errors.name?.errorMessage}
+        hasError={errors.name?.hasError}
+        {...getOverrideProps(overrides, "name")}
+      ></TextField>
+      <TextField
+        label="Image"
+        isRequired={false}
+        isReadOnly={false}
+        value={image}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              image: value,
+              link,
+              date,
+            };
+            const result = onChange(modelFields);
+            value = result?.image ?? value;
+          }
+          if (errors.image?.hasError) {
+            runValidationTasks("image", value);
+          }
+          setImage(value);
+        }}
+        onBlur={() => runValidationTasks("image", image)}
+        errorMessage={errors.image?.errorMessage}
+        hasError={errors.image?.hasError}
+        {...getOverrideProps(overrides, "image")}
+      ></TextField>
+      <TextField
+        label="Link"
+        isRequired={false}
+        isReadOnly={false}
+        value={link}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              image,
+              link: value,
+              date,
+            };
+            const result = onChange(modelFields);
+            value = result?.link ?? value;
+          }
+          if (errors.link?.hasError) {
+            runValidationTasks("link", value);
+          }
+          setLink(value);
+        }}
+        onBlur={() => runValidationTasks("link", link)}
+        errorMessage={errors.link?.errorMessage}
+        hasError={errors.link?.hasError}
+        {...getOverrideProps(overrides, "link")}
+      ></TextField>
+      <TextField
+        label="Date"
+        isRequired={false}
+        isReadOnly={false}
+        type="date"
+        value={date}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              image,
+              link,
+              date: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.date ?? value;
+          }
+          if (errors.date?.hasError) {
+            runValidationTasks("date", value);
+          }
+          setDate(value);
+        }}
+        onBlur={() => runValidationTasks("date", date)}
+        errorMessage={errors.date?.errorMessage}
+        hasError={errors.date?.hasError}
+        {...getOverrideProps(overrides, "date")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
