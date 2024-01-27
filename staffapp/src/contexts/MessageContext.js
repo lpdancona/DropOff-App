@@ -1,8 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { API, graphqlOperation } from "aws-amplify";
-import { onCreateMessage } from "../graphql/subscriptions";
+import { onCreateMessage, onUpdateMessage } from "../graphql/subscriptions";
 import { listMessages } from "../graphql/queries";
-//import { useKidsContext } from "./AuthContext";
 
 const MessageContext = createContext({});
 
@@ -12,11 +11,6 @@ const MessageContextProvider = ({ children }) => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        // const variables = {
-        //   filter: {
-        //     or: [{ senderID: { eq: kidID } }, { receiverIDs: { eq: kidID } }],
-        //   },
-        // };
         const response = await API.graphql({
           query: listMessages,
           // variables: variables,
@@ -28,8 +22,6 @@ const MessageContextProvider = ({ children }) => {
         console.error("Error fetching messages:", error);
       }
     };
-
-    fetchMessages();
 
     // subscribe to get new messages
     const subscription = API.graphql(
@@ -43,40 +35,28 @@ const MessageContextProvider = ({ children }) => {
       error: (error) => console.error("Subscription error:", error),
     });
 
-    return () => subscription.unsubscribe();
+    const updateSubscription = API.graphql(
+      graphqlOperation(onUpdateMessage)
+    ).subscribe({
+      next: ({ provider, value }) => {
+        //console.log("messages db updated!", value);
+        const updatedMessage = value.data.onUpdateMessage;
+        setAllMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === updatedMessage.id ? updatedMessage : msg
+          )
+        );
+      },
+      error: (error) => console.error("Update Subscription error:", error),
+    });
+
+    fetchMessages();
+
+    return () => {
+      subscription.unsubscribe();
+      updateSubscription.unsubscribe();
+    };
   }, []);
-
-  // useEffect(() => {
-  //   // Subscribe to new messages
-  //   const subscription = API.graphql({ query: onCreateMessage }).subscribe({
-  //     next: ({ value }) => {
-  //       const newMessage = value.data.onCreateMessage;
-  //       const receiverID = newMessage.receiverIDs;
-
-  //       setAllMessages((prevMessages) => {
-  //         // Create a copy of the previous messages
-  //         const updatedMessages = { ...prevMessages };
-
-  //         // Check if the receiverID exists in the messages
-  //         if (updatedMessages[receiverID]) {
-  //           // Update the array for the specific receiverID
-  //           updatedMessages[receiverID] = [
-  //             ...updatedMessages[receiverID],
-  //             newMessage,
-  //           ];
-  //         } else {
-  //           // Create a new array for the receiverID
-  //           updatedMessages[receiverID] = [newMessage];
-  //         }
-
-  //         return updatedMessages;
-  //       });
-  //     },
-  //   });
-
-  //   // Cleanup subscription on component unmount
-  //   return () => subscription.unsubscribe();
-  // }, []);
 
   return (
     <MessageContext.Provider value={{ allMessages }}>

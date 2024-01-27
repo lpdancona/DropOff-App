@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { Bubble, GiftedChat, Send } from "react-native-gifted-chat";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -24,7 +24,14 @@ const ChatUserScreen = () => {
   const [currentKid, setCurrentKid] = useState([]);
   const [unreadMessages, setUnreadMessages] = useState([]);
 
-  const fetchAndFormatMessages = useCallback(() => {
+  useEffect(() => {
+    // Set current kid
+    const actualKid = kids.find((kid) => kid.id === kidID);
+    setCurrentKid(actualKid);
+  }, [kids]);
+
+  // get the messages from messageContext and format to giftedchat
+  useEffect(() => {
     if (allMessages && currentKid && staff) {
       const allMessagesFromStaffAndKid = allMessages.filter(
         (message) =>
@@ -56,26 +63,7 @@ const ChatUserScreen = () => {
 
       setMessages(sortedMessages);
     }
-  }, [allMessages, currentKid, staff]);
-
-  // Function to initialize readMessages state with messages already marked as read
-  const initializeUnreadMessages = useCallback(() => {
-    try {
-      if (allMessages && kidID) {
-        const unreadMessagesFromOthers = allMessages.filter(
-          (message) =>
-            message.receiverIDs === kidID &&
-            message.senderID !== kidID &&
-            message.isRead === false
-        );
-
-        console.log("Unread Messages Ids", unreadMessagesFromOthers);
-        setUnreadMessages(unreadMessagesFromOthers);
-      }
-    } catch (error) {
-      console.error("Error initializing read messages:", error);
-    }
-  }, [allMessages, kidID]);
+  }, [allMessages, currentKid]);
 
   const updateMessagesAsRead = async (id) => {
     try {
@@ -88,9 +76,9 @@ const ChatUserScreen = () => {
         variables: { input: messageDetails },
       });
 
-      setUnreadMessages((prevState) =>
-        prevState.filter((msg) => msg.id !== id)
-      );
+      // setUnreadMessages((prevState) =>
+      //   prevState.filter((msg) => msg.id !== id)
+      // );
     } catch (error) {
       console.error("error mark as read messages", error);
     } finally {
@@ -99,41 +87,49 @@ const ChatUserScreen = () => {
   };
 
   useEffect(() => {
-    fetchAndFormatMessages(); // Fetch and format messages upon opening the screen
-    initializeUnreadMessages(); // Initialize unread messages conditionally
+    //update the unreadMessages when get a new message
+    try {
+      // if (unreadMessages.length === 0) {
+      //   return;
+      // }
+      const unreadMessagesFromOthers = allMessages.filter(
+        (message) =>
+          message.receiverIDs === kidID &&
+          message.senderID !== kidID &&
+          message.isRead === false
+      );
 
-    // Set current kid
-    const actualKid = kids.find((kid) => kid.id === kidID);
-    setCurrentKid(actualKid);
-
-    // Clean up function
-    return () => {};
-  }, [fetchAndFormatMessages, initializeUnreadMessages, kids, kidID]);
-
-  useEffect(() => {
-    const markMessagesAsRead = async () => {
-      if (unreadMessages.length === 0) return; // Return if there are no unread messages
-      console.log("unreadMessages", unreadMessages);
-
-      const timer = setTimeout(async () => {
-        for (const message of unreadMessages) {
-          if (message.senderID !== kidID) {
-            await updateMessagesAsRead(message.id);
-            setUnreadMessages((prevUnreadMessages) =>
-              prevUnreadMessages.filter((msg) => msg.id !== message.id)
-            );
-          }
-        }
-      }, 5000); //5 seconds
-
-      return () => clearTimeout(timer);
-    };
-
-    // Call the function to start marking messages as read if there are unread messages
-    if (unreadMessages && unreadMessages.length !== 0) {
-      markMessagesAsRead();
+      //console.log("Unread Messages Ids", unreadMessagesFromOthers);
+      setUnreadMessages(unreadMessagesFromOthers);
+    } catch (error) {
+      console.log("error updating the unread Message", error);
     }
   }, [messages]);
+
+  const markMessagesAsRead = async () => {
+    if (unreadMessages.length === 0) return; // Return if there are no unread messages
+    //console.log("unreadMessages", unreadMessages);
+
+    const timer = setTimeout(async () => {
+      for (const message of unreadMessages) {
+        if (message.senderID !== kidID) {
+          await updateMessagesAsRead(message.id);
+          setUnreadMessages((prevUnreadMessages) =>
+            prevUnreadMessages.filter((msg) => msg.id !== message.id)
+          );
+        }
+      }
+    }, 5000); //5 seconds
+
+    return () => clearTimeout(timer);
+  };
+
+  useEffect(() => {
+    // Call the function to start marking messages as read if there are unread messages
+    //if (unreadMessages && unreadMessages.length !== 0) {
+    markMessagesAsRead();
+    //}
+  }, [unreadMessages]);
 
   const onSend = useCallback(async (newMessages = []) => {
     const newMessage = newMessages[0];

@@ -1,24 +1,16 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { API, graphqlOperation } from "aws-amplify";
-import { onCreateMessage } from "../graphql/subscriptions";
+import { onCreateMessage, onUpdateMessage } from "../graphql/subscriptions";
 import { listMessages } from "../graphql/queries";
-import { useAuthContext } from "./AuthContext";
 
 const MessageContext = createContext({});
 
 const MessageContextProvider = ({ children }) => {
-  //const [messages, setMessages] = useState([]);
-  //const { kids } = useAuthContext();
   const [allMessages, setAllMessages] = useState({});
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        // const variables = {
-        //   filter: {
-        //     or: [{ senderID: { eq: kidID } }, { receiverIDs: { eq: kidID } }],
-        //   },
-        // };
         const response = await API.graphql({
           query: listMessages,
           // variables: variables,
@@ -30,7 +22,6 @@ const MessageContextProvider = ({ children }) => {
         console.error("Error fetching messages:", error);
       }
     };
-    fetchMessages();
 
     // subscribe to get new messages
     const subscription = API.graphql(
@@ -44,50 +35,28 @@ const MessageContextProvider = ({ children }) => {
       error: (error) => console.error("Subscription error:", error),
     });
 
-    return () => subscription.unsubscribe();
+    const updateSubscription = API.graphql(
+      graphqlOperation(onUpdateMessage)
+    ).subscribe({
+      next: ({ provider, value }) => {
+        //console.log("messages db updated!", value);
+        const updatedMessage = value.data.onUpdateMessage;
+        setAllMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === updatedMessage.id ? updatedMessage : msg
+          )
+        );
+      },
+      error: (error) => console.error("Update Subscription error:", error),
+    });
+
+    fetchMessages();
+
+    return () => {
+      subscription.unsubscribe();
+      updateSubscription.unsubscribe();
+    };
   }, []);
-
-  // const fetchMessages = async () => {
-  //   try {
-  //     const allMessages = {};
-  //     //const unreadCount = {};
-
-  //     for (const kid of kids) {
-  //       const variables = {
-  //         filter: {
-  //           receiverIDs: { eq: kid.id },
-  //           //isRead: { eq: false },
-  //           // or: [{ senderID: { eq: kid.id } }, { receiverIDs: { eq: kid.id } }],
-  //           // and: [{ isRead: { eq: false } }],
-  //         },
-  //       };
-
-  //       const response = await API.graphql({
-  //         query: listMessages,
-  //         variables: variables,
-  //       });
-
-  //       const kidAllMessages = response.data.listMessages.items;
-  //       //unreadCount[kid.id] = kidUnreadMessages.length;
-  //       allMessages[kid.id] = kidAllMessages;
-  //     }
-
-  //     setAllMessages(allMessages);
-  //     //setUnreadCountMessages(unreadCount);
-  //   } catch (error) {
-  //     console.error("Error fetching messages:", error);
-  //   }
-  // };
-
-  // const fetchMessageData = async () => {
-  //   await fetchMessages();
-  // };
-
-  // useEffect(() => {
-  //   if (kids) {
-  //     fetchMessageData();
-  //   }
-  // }, [kids]);
 
   return (
     <MessageContext.Provider value={{ allMessages }}>

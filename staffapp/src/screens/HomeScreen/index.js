@@ -176,7 +176,8 @@ const HomeScreen = () => {
             {messageCount > 0 && (
               <View style={styles.messageCountBadge}>
                 <Text style={styles.messageCountText}>
-                  Messages{messageCount}
+                  {messageCount} New{" "}
+                  {messageCount === 1 ? "Message" : "Messages"}
                 </Text>
               </View>
             )}
