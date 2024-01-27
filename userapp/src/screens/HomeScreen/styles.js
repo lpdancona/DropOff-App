@@ -15,7 +15,7 @@ export default StyleSheet.create({
     padding: 20,
     maxHeight: "25%",
     paddingTop: 40,
-    gap: 80,
+    //gap: 80,
     //gap: "100%",
   },
   logoutMenu: {
@@ -191,7 +191,7 @@ export default StyleSheet.create({
   },
   profile: {
     padding: 12,
-    gap: 0,
+    //gap: 0,
     backgroundColor: "#f6f6f6",
     borderRadius: 12,
     flexDirection: "row",

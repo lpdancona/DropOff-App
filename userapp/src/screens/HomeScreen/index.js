@@ -170,8 +170,6 @@ const HomeScreen = () => {
       </View>
     );
   }
-  //console.log(addressList);
-  //onsole.log(matchingKids);
 
   const waypoints = addressList.map((address) => ({
     latitude: address.latitude,
@@ -192,12 +190,10 @@ const HomeScreen = () => {
       ? null
       : filteredWaypoints;
 
-  // console.log("addressList", addressList);
-  // console.log("waypoints", waypoints);
-  // console.log("filteredWaypoints", filteredWaypoints);
   const toggleSideDrawer = () => {
     setSideDrawerVisible(!isSideDrawerVisible);
   };
+
   return (
     <View style={styles.mapContainer}>
       <View style={styles.containerMenu}>

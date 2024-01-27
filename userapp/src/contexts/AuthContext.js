@@ -3,7 +3,9 @@ import { Auth } from "aws-amplify";
 import { API } from "aws-amplify";
 import { listUsers, listKids, getUser } from "../graphql/queries";
 import { usePushNotificationsContext } from "./PushNotificationsContext";
+import { usePicturesContext } from "./PicturesContext";
 import { updateUser } from "../graphql/mutations";
+import { useNavigation } from "@react-navigation/native";
 
 const AuthContext = createContext({});
 
@@ -16,6 +18,8 @@ const AuthContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [currentUserData, setCurrentUserData] = useState(null);
   const { expoPushToken } = usePushNotificationsContext();
+  const { getPhotoInBucket } = usePicturesContext();
+  const navigation = useNavigation();
 
   useEffect(() => {
     Auth.currentAuthenticatedUser({ bypassCache: true })
@@ -89,10 +93,22 @@ const AuthContextProvider = ({ children }) => {
         //console.log(fetchedKids);
 
         if (fetchedKids.length === 0) {
-          await Auth.signOut();
+          navigation.navigate("Wait");
+          //await Auth.signOut();
         } else {
+          const kidsWithPhotos = await Promise.all(
+            fetchedKids.map(async (kid) => {
+              if (kid.photo) {
+                const uriKid = await getPhotoInBucket(kid.photo);
+                return { ...kid, uriKid };
+              } else {
+                return kid;
+              }
+            })
+          );
+
           // Set the kids state if there is data
-          setKids(fetchedKids);
+          setKids(kidsWithPhotos);
         }
         // setKids(response.data.listKids.items);
       } catch (error) {

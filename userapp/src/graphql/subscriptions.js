@@ -163,6 +163,8 @@ export const onCreateAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -199,6 +201,8 @@ export const onUpdateAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -235,6 +239,8 @@ export const onDeleteAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -440,6 +446,8 @@ export const onCreateKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -462,6 +470,8 @@ export const onUpdateKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -484,6 +494,8 @@ export const onDeleteKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -558,9 +570,10 @@ export const onCreateMessage = /* GraphQL */ `
     onCreateMessage(filter: $filter) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename
@@ -572,9 +585,10 @@ export const onUpdateMessage = /* GraphQL */ `
     onUpdateMessage(filter: $filter) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename
@@ -586,9 +600,10 @@ export const onDeleteMessage = /* GraphQL */ `
     onDeleteMessage(filter: $filter) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename

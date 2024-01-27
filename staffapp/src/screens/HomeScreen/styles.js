@@ -1,10 +1,11 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 export default StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingTop: Platform.OS === "android" ? 25 : 0,
   },
   card: {
     borderRadius: 12,
@@ -139,11 +140,36 @@ export default StyleSheet.create({
     alignItems: "flex-start",
     padding: 0,
   },
+  headerButtons: {
+    paddingTop: 5,
+    flexDirection: "row",
+    gap: 10,
+  },
   headerGreetings: {
     width: "100%",
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
+  },
+  chatButton: {
+    // position: "absolute",
+    // bottom: 20,
+    // right: 20,
+    backgroundColor: "blue",
+    borderRadius: 20,
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "flex-end",
+  },
+  messageCountBadge: {
+    backgroundColor: "red",
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  messageCountText: {
+    color: "white",
+    fontSize: 12,
+    paddingHorizontal: 5,
   },
 });

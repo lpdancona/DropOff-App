@@ -19,16 +19,6 @@ const RouteContextProvider = ({ children }) => {
   const { dbUser, isDriver, currentUserData, userEmail } = useAuthContext();
   const [refreshing, setRefreshing] = useState(false);
 
-  //console.log("isDriver? ", isDriver);
-  // const handleLogout = async () => {
-  //   try {
-  //     // Sign out the user using Amplify Auth
-  //     await Auth.signOut();
-  //   } catch (error) {
-  //     console.error("Logout error:", error);
-  //   }
-  // };
-
   const updateRoutesData = async () => {
     setRefreshing(true); // Start refreshing indicator
 

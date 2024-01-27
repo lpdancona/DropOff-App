@@ -1,9 +1,9 @@
 //import 'core-js/full/symbol/async-iterator';
 import { StatusBar } from "expo-status-bar";
 import RootNavigator from "./src/navigation";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Auth } from "aws-amplify";
+//import { Auth } from "aws-amplify";
 import {
   withAuthenticator,
   Authenticator,
@@ -19,6 +19,8 @@ import CustomFooter from "./src/layout/CustomFooter";
 import getTheme from "./src/layout/CustomTheme";
 import RouteContextProvider from "./src/contexts/RouteContext";
 import PicturesContextProvider from "./src/contexts/PicturesContext";
+import MessageContextProvider from "./src/contexts/MessageContext";
+import StaffContextProvider from "./src/contexts/StaffContext";
 
 // Aws Amplify config
 import { Amplify } from "aws-amplify";
@@ -41,18 +43,21 @@ function App() {
         >
           <NavigationContainer>
             <PushNotificationsContextProvider>
-              <AuthContextProvider>
-                <RouteContextProvider>
-                  <PicturesContextProvider>
-                    <GestureHandlerRootView style={{ flex: 1 }}>
-                      <PaperProvider>
-                        <RootNavigator />
-                      </PaperProvider>
-                    </GestureHandlerRootView>
-                  </PicturesContextProvider>
-                  <StatusBar style="light" />
-                </RouteContextProvider>
-              </AuthContextProvider>
+              <PicturesContextProvider>
+                <AuthContextProvider>
+                  <StaffContextProvider>
+                    <MessageContextProvider>
+                      <RouteContextProvider>
+                        <GestureHandlerRootView style={{ flex: 1 }}>
+                          <PaperProvider>
+                            <RootNavigator />
+                          </PaperProvider>
+                        </GestureHandlerRootView>
+                      </RouteContextProvider>
+                    </MessageContextProvider>
+                  </StaffContextProvider>
+                </AuthContextProvider>
+              </PicturesContextProvider>
             </PushNotificationsContextProvider>
           </NavigationContainer>
         </Authenticator>

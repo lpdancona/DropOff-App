@@ -1,6 +1,57 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createEvents = /* GraphQL */ `
+  mutation CreateEvents(
+    $input: CreateEventsInput!
+    $condition: ModelEventsConditionInput
+  ) {
+    createEvents(input: $input, condition: $condition) {
+      id
+      name
+      image
+      link
+      date
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateEvents = /* GraphQL */ `
+  mutation UpdateEvents(
+    $input: UpdateEventsInput!
+    $condition: ModelEventsConditionInput
+  ) {
+    updateEvents(input: $input, condition: $condition) {
+      id
+      name
+      image
+      link
+      date
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteEvents = /* GraphQL */ `
+  mutation DeleteEvents(
+    $input: DeleteEventsInput!
+    $condition: ModelEventsConditionInput
+  ) {
+    deleteEvents(input: $input, condition: $condition) {
+      id
+      name
+      image
+      link
+      date
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createWeekDayRoutes = /* GraphQL */ `
   mutation CreateWeekDayRoutes(
     $input: CreateWeekDayRoutesInput!
@@ -134,6 +185,8 @@ export const createAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -171,6 +224,8 @@ export const updateAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -208,6 +263,8 @@ export const deleteAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -434,6 +491,8 @@ export const createKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -459,6 +518,8 @@ export const updateKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -484,6 +545,8 @@ export const deleteKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -556,6 +619,60 @@ export const deleteUser = /* GraphQL */ `
       userType
       photo
       pushToken
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createMessage = /* GraphQL */ `
+  mutation CreateMessage(
+    $input: CreateMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    createMessage(input: $input, condition: $condition) {
+      id
+      senderID
+      receiverIDs
+      content
+      sentAt
+      isRead
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateMessage = /* GraphQL */ `
+  mutation UpdateMessage(
+    $input: UpdateMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    updateMessage(input: $input, condition: $condition) {
+      id
+      senderID
+      receiverIDs
+      content
+      sentAt
+      isRead
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteMessage = /* GraphQL */ `
+  mutation DeleteMessage(
+    $input: DeleteMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    deleteMessage(input: $input, condition: $condition) {
+      id
+      senderID
+      receiverIDs
+      content
+      sentAt
+      isRead
       createdAt
       updatedAt
       __typename

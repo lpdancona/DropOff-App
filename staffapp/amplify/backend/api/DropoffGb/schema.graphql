@@ -1,3 +1,11 @@
+type Events @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  image: AWSURL
+  link: String
+  date: AWSDate
+}
+
 enum WaypointStatus {
   FINISHED
   IN_PROGRESS
@@ -82,6 +90,8 @@ type Kid @model @auth(rules: [{allow: public}]) {
   Parent2ID: ID
   vanID: ID
   routeID: ID @index(name: "byRoute")
+  checkedIn: Boolean
+  lastCheckIn: AWSDateTime
 }
 
 enum UserTypes {
@@ -103,5 +113,14 @@ type User @model @auth(rules: [{allow: public}]) {
   userType: UserTypes
   photo: String
   pushToken: String
+}
+
+type Message @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  senderID: String!
+  receiverIDs: String!
+  content: String!
+  sentAt: AWSDateTime!
+  isRead: Boolean
 }
  

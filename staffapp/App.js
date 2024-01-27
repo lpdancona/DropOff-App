@@ -10,37 +10,19 @@ import RouteContextProvider from "./src/contexts/RouteContext";
 import RootNavigator from "./src/navigation";
 import PushNotificationsContextProvider from "./src/contexts/PushNotificationsContext";
 import BackgroundTasksProvider from "./src/contexts/BackgroundTaskContext";
+import PicturesContextProvider from "./src/contexts/PicturesContext";
+import KidsContextProvider from "./src/contexts/KidsContext";
+import MessageContextProvider from "./src/contexts/MessageContext";
+import StaffContextProvider from "./src/contexts/StaffContext";
 
 // Aws Amplify config
 import { Amplify } from "aws-amplify";
 import awsExports from "./src/aws-exports";
 Amplify.configure(awsExports);
 
-// function SignOutButton() {
-//   const { signOut } = useAuthenticator();
-//   return <Button title="Sign Out" onPress={signOut} />;
-// }
-
 LogBox.ignoreLogs(["NSLocation*UsageDescription"]);
 
 function App() {
-  // useEffect(() => {
-  //   const handleAppStateChange = (nextAppState) => {
-  //     if (nextAppState === "background") {
-  //       console.log("App is in the background. Perform cleanup.");
-  //       console.log("STOPPING ALL REGISTERED TASKS");
-  //       TaskManager.unregisterAllTasksAsync();
-  //     }
-  //   };
-
-  //   AppState.addEventListener("change", handleAppStateChange);
-
-  //   return () => {
-  //     AppState.removeEventListener("change", handleAppStateChange);
-  //     console.log("Component will unmount");
-  //   };
-  // }, []);
-
   useEffect(() => {
     return () => {
       TaskManager.unregisterAllTasksAsync();
@@ -50,17 +32,24 @@ function App() {
   return (
     <NavigationContainer>
       <PushNotificationsContextProvider>
-        <AuthContextProvider>
-          <RouteContextProvider>
-            <BackgroundTasksProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <RootNavigator />
-              </GestureHandlerRootView>
-            </BackgroundTasksProvider>
-          </RouteContextProvider>
-        </AuthContextProvider>
+        <PicturesContextProvider>
+          <AuthContextProvider>
+            <KidsContextProvider>
+              <StaffContextProvider>
+                <MessageContextProvider>
+                  <RouteContextProvider>
+                    <BackgroundTasksProvider>
+                      <GestureHandlerRootView style={{ flex: 1 }}>
+                        <RootNavigator />
+                      </GestureHandlerRootView>
+                    </BackgroundTasksProvider>
+                  </RouteContextProvider>
+                </MessageContextProvider>
+              </StaffContextProvider>
+            </KidsContextProvider>
+          </AuthContextProvider>
+        </PicturesContextProvider>
       </PushNotificationsContextProvider>
-      {/* <StatusBar style="light" /> */}
     </NavigationContainer>
   );
 }

@@ -1,6 +1,42 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getEvents = /* GraphQL */ `
+  query GetEvents($id: ID!) {
+    getEvents(id: $id) {
+      id
+      name
+      image
+      link
+      date
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listEvents = /* GraphQL */ `
+  query ListEvents(
+    $filter: ModelEventsFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listEvents(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        image
+        link
+        date
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getWeekDayRoutes = /* GraphQL */ `
   query GetWeekDayRoutes($id: ID!) {
     getWeekDayRoutes(id: $id) {
@@ -99,6 +135,8 @@ export const getAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -296,6 +334,8 @@ export const getKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -323,6 +363,8 @@ export const listKids = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -361,6 +403,8 @@ export const kidsByRouteID = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -411,6 +455,44 @@ export const listUsers = /* GraphQL */ `
         userType
         photo
         pushToken
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getMessage = /* GraphQL */ `
+  query GetMessage($id: ID!) {
+    getMessage(id: $id) {
+      id
+      senderID
+      receiverIDs
+      content
+      sentAt
+      isRead
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listMessages = /* GraphQL */ `
+  query ListMessages(
+    $filter: ModelMessageFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listMessages(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        senderID
+        receiverIDs
+        content
+        sentAt
+        isRead
         createdAt
         updatedAt
         __typename

@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 import { Auth } from "aws-amplify";
 import { API, graphqlOperation } from "aws-amplify";
 import { listUsers, getUser } from "../graphql/queries";
+import { usePicturesContext } from "./PicturesContext";
 
 const AuthContext = createContext({});
 
@@ -12,6 +13,7 @@ const AuthContextProvider = ({ children }) => {
   const [userEmail, setUserEmail] = useState(null); //authUser?.attributes?.email
   const [loading, setLoading] = useState(true);
   const [currentUserData, setCurrentUserData] = useState(null);
+  const { getPhotoInBucket } = usePicturesContext();
 
   useEffect(() => {
     Auth.currentAuthenticatedUser({ bypassCache: true })
@@ -47,7 +49,12 @@ const AuthContextProvider = ({ children }) => {
       query: getUser,
       variables: { id: dbUser.id },
     });
-    setCurrentUserData(responseGetUser.data.getUser);
+    const user = responseGetUser.data.getUser;
+
+    const uriUser = await getPhotoInBucket(user.photo);
+    const userWithPhotos = { ...user, uriUser };
+
+    setCurrentUserData(userWithPhotos);
   };
 
   useEffect(() => {

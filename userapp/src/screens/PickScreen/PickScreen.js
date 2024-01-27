@@ -5,192 +5,209 @@ import {
   Text,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
 } from "react-native";
-import { API, Storage, graphqlOperation } from "aws-amplify";
-// import { GetKidByParentEmail } from "../../graphql/queries";
+import { API } from "aws-amplify";
+import { listKids } from "../../graphql/queries";
 import { updateKid } from "../../graphql/mutations";
 import { useAuthContext } from "../../contexts/AuthContext";
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
+import { usePicturesContext } from "../../contexts/PicturesContext";
 import styles from "./styles";
 
 const PickScreen = () => {
-  const [kid, setKid] = useState([]);
-  const { userEmail, kids } = useAuthContext();
-  const [photoName, setPhotoName] = useState(null);
-  const [actualPhoto, setActualPhoto] = useState();
+  const { userEmail } = useAuthContext();
+  const { savePhotoInBucket, getPhotoInBucket } = usePicturesContext();
 
-  useEffect(() => {
-    const fetchKidData = async () => {
+  const [kids, setKids] = useState([]);
+  const [actualPhotos, setActualPhotos] = useState([]);
+  const [loadingPhotos, setLoadingPhotos] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const getKidPhotos = async () => {
+    try {
+      setLoadingPhotos(true);
+
+      const photosPromises = kids.map(async (kidItem) => {
+        if (kidItem.photo) {
+          const imageURL = await getPhotoInBucket(kidItem.photo);
+          return { id: kidItem.id, imageURL };
+        }
+        return null;
+      });
+
+      const photos = await Promise.all(photosPromises);
+      setActualPhotos(photos.filter((photo) => photo !== null));
+    } finally {
+      setLoadingPhotos(false);
+    }
+  };
+
+  const fetchKidData = async () => {
+    if (userEmail) {
       try {
-        setKid(kids);
+        const variables = {
+          filter: {
+            or: [
+              { parent1Email: { eq: userEmail } },
+              { parent2Email: { eq: userEmail } },
+            ],
+          },
+        };
+        const response = await API.graphql({
+          query: listKids,
+          variables: variables,
+        });
+        const fetchedKids = response.data.listKids.items;
+        //console.log(fetchedKids);
+
+        if (fetchedKids.length !== 0) {
+          setKids(fetchedKids);
+        }
+        // setKids(response.data.listKids.items);
       } catch (error) {
-        console.error("Error fetching Kid data:", error);
+        console.error("Error fetching kids:", error);
+      } finally {
+        //setLoading(false);
       }
-    };
-
-    fetchKidData();
-  }, []);
-
-  const getKidPhoto = async () => {
-    console.log(kids[0].photo);
-    const imageURL = await Storage.get(kids[0].photo);
-    setActualPhoto(imageURL);
-    console.log("Image URL:", imageURL);
+    }
   };
 
   useEffect(() => {
-    getKidPhoto();
+    fetchData();
   }, []);
 
-  const updateKidImage = async (newPic) => {
+  const fetchData = async () => {
+    setRefreshing(true);
+    await fetchKidData();
+    await getKidPhotos();
+    setRefreshing(false);
+  };
+  useEffect(() => {
+    if (kids) {
+      getKidPhotos();
+    }
+  }, [kids]);
+
+  const updateKidImage = async (kid, fileName) => {
     try {
-      const kidId = newPic.id;
-      const kidPhoto = newPic.photo;
-      // const kidName = kid[0].name;
       const kidDetails = {
-        id: kidId,
-        photo: kidPhoto,
+        id: kid,
+        photo: fileName,
       };
 
-      //console.log("variables", kidDetails);
+      // const updatedKid = await API.graphql(
+      //   graphqlOperation(updateKid, { input: kidDetails })
+      // );
 
-      const updatedKid = await API.graphql(
-        graphqlOperation(updateKid, { input: kidDetails })
-      );
-
-      //console.log("Updated Kid Picture:", updatedKid);
-      // console.log("Kid ID", kid[0].id);
-      // console.log(kid.photo);
+      const updatedKid = await API.graphql({
+        query: updateKid,
+        variables: { input: kidDetails },
+      });
     } catch (error) {
       console.error("Error saving image:", error);
     }
   };
 
-  const uploadImage = async (uri, kidID) => {
+  const handleChangePhoto = async (kidId) => {
     try {
-      if (!uri) {
-        throw new Error("Image URI is undefined");
+      setLoading(true);
+      const { filename, result } = await savePhotoInBucket(
+        `kid-photo-${kidId}-${Date.now()}`
+      );
+      //console.log(result.canceled);
+      if (result) {
+        await updateKidImage(kidId, filename);
+        alert("Image successfully updated!!");
+        //await getKidPhotos();
+        await fetchKidData();
+      } else {
+        console.log("Image selection canceled or encountered an error");
+        // Handle the case where the user canceled or an error occurred
       }
-
-      //console.log("Fetching image from:", uri);
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      if (!blob) {
-        throw new Error("Failed to create blob.");
-      }
-
-      console.log("Uploading image to S3...");
-      const filename = `kid-photo-${kidID}-${Date.now()}`;
-
-      // console.log(filename);
-      await Storage.put(filename, blob, {
-        contentType: "image/jpeg",
-      });
-
-      console.log("Image uploaded successfully.");
-      setPhotoName(filename);
-
-      const imageURL = await Storage.get(filename);
-      console.log("Image URL:", imageURL);
-
-      return imageURL;
     } catch (error) {
-      console.error("Error uploading image:", error);
-      throw error;
+      console.log("Error saving image to storage", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const openImageLibrary = async () => {
-    try {
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (permissionResult.granted === false) {
-        console.log("Permission to access camera roll is required!");
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-      //console.log("ImagePicker Result:", result);
-
-      if (!result.canceled) {
-        if (result.assets && result.assets.length > 0) {
-          const imageURL = await uploadImage(result.assets[0].uri, kid[0].id);
-          //const imageUrlString = imageURL.toString();
-
-          // console.log("Selected Image:", imageURL);
-          // console.log("Selected Image String:", imageUrlString);
-
-          setKid((prevKids) => {
-            const updatedKids = prevKids.map((kidItem) => {
-              if (kidItem.id === kid[0].id) {
-                return {
-                  ...kidItem,
-                  photo: imageURL,
-                };
-              } else {
-                return kidItem;
-              }
-            });
-
-            return updatedKids;
-          });
-
-          const newKidPicture = {
-            id: kid[0].id,
-            photo: photoName,
-          };
-          console.log("newKidPicture", newKidPicture);
-          await updateKidImage(newKidPicture);
-
-          // await API.graphql(
-          //   graphqlOperation(UpdateKid, {
-          //     input: {
-          //       id: kid[0].id,
-          //       photo: imageURL,
-          //     },
-          //   })
-          // );
-        } else {
-          console.error("Image assets not found in the result.");
-        }
-      }
-    } catch (error) {
-      console.error("Error picking image:", error);
-    }
+  const getInitials = (name) => {
+    const nameArray = name.split(" ");
+    return nameArray
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase();
   };
 
+  const renderKidItem = ({ item }) => (
+    <View key={item.id}>
+      <Text>Name: {item.name}</Text>
+      <Text>Drop-off Address: {item.dropOffAddress}</Text>
+      {actualPhotos &&
+      actualPhotos.length > 0 &&
+      actualPhotos.find((photo) => photo.id === item.id)?.imageURL ? (
+        <View>
+          <Image
+            style={{ width: 100, height: 100 }}
+            source={{
+              uri: actualPhotos.find((photo) => photo.id === item.id).imageURL,
+            }}
+          />
+        </View>
+      ) : (
+        <View style={styles.initialsContainer}>
+          <Text style={styles.initialsText}>{getInitials(item.name)}</Text>
+        </View>
+      )}
+      <View>
+        <TouchableOpacity onPress={() => handleChangePhoto(item.id)}>
+          <View style={styles.button}>
+            <Text style={styles.buttonText}>Update photo</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  if (!kids) {
+    return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
+  }
   return (
     <View>
-      {kid ? (
+      {loading && (
+        <ActivityIndicator
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            zIndex: 999,
+          }}
+          size="large"
+          color="#0000ff"
+        />
+      )}
+      {loadingPhotos ? (
+        <ActivityIndicator style={{ padding: 50 }} size={"large"} />
+      ) : (
         <SafeAreaView style={{ marginTop: 20, marginLeft: 10 }}>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>Kid Details</Text>
-          {kid.map((kidItem) => (
-            <View key={kidItem.id}>
-              <Text>Name: {kidItem.name}</Text>
-              <Text>Drop-off Address: {kidItem.dropOffAddress}</Text>
-              {kidItem.photo && (
-                <Image
-                  style={{ width: 100, height: 100 }}
-                  source={{ uri: actualPhoto }}
-                />
-              )}
-            </View>
-          ))}
-          <TouchableOpacity onPress={openImageLibrary}>
-            <View style={styles.button}>
-              <Text style={styles.buttonText}>Open Image Library</Text>
-            </View>
-          </TouchableOpacity>
+          <FlatList
+            data={kids}
+            keyExtractor={(item) => item.id}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={fetchKidData}
+              />
+            }
+            renderItem={renderKidItem}
+          />
         </SafeAreaView>
-      ) : (
-        <Text>Loading...</Text>
       )}
     </View>
   );

@@ -11,21 +11,64 @@ import {
   RefreshControl,
 } from "react-native";
 import styles from "./styles";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useRouteContext } from "../../../src/contexts/RouteContext";
 import { useAuthContext } from "../../../src/contexts/AuthContext";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Auth } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
+import { listMessages } from "../../graphql/queries";
+import { onCreateMessage } from "../../graphql/subscriptions";
 
 const HomeScreen = () => {
   const { routesData, updateRoutesData } = useRouteContext();
   const { currentUserData } = useAuthContext();
+  const [messageCount, setMessageCount] = useState(0);
 
   const [images, setImages] = useState({});
   const navigation = useNavigation();
   const defaultImageUrl = "https://i.imgur.com/R2PRpbV.jpg";
   const [assignedRoute, setAssignedRoute] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // useEffect to fetch and update the message count
+  useEffect(() => {
+    if (!currentUserData) {
+      return;
+    }
+    const fetchMessageCount = async () => {
+      try {
+        const result = await API.graphql(
+          graphqlOperation(listMessages, {
+            filter: {
+              //receiverIDs: { eq: currentUserData.id },
+              isRead: { eq: false },
+            },
+          })
+        );
+
+        const unreadMessages = result.data.listMessages.items;
+        //console.log("unreadMessages", unreadMessages);
+        setMessageCount(unreadMessages.length);
+      } catch (error) {
+        console.error("Error fetching message count:", error);
+      }
+    };
+
+    fetchMessageCount();
+
+    // Subscription to update message count when a new message arrives
+    const subscription = API.graphql(
+      graphqlOperation(onCreateMessage)
+    ).subscribe({
+      next: () => {
+        fetchMessageCount();
+      },
+    });
+
+    return () => subscription.unsubscribe();
+  }, [currentUserData]);
 
   const fetchImage = async (imageURL) => {
     try {
@@ -117,9 +160,28 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <MaterialIcons name="logout" size={20} color="white" />
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <MaterialIcons name="logout" size={20} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.chatButton}
+            onPress={() => navigation.navigate("Chat")}
+          >
+            <MaterialCommunityIcons
+              name="message-text-outline"
+              size={25}
+              color="white"
+            />
+            {messageCount > 0 && (
+              <View style={styles.messageCountBadge}>
+                <Text style={styles.messageCountText}>
+                  Messages{messageCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
         <View style={styles.headerGreetings}>
           <Text style={styles.title}>{`Hello, ${currentUserData?.name}`}</Text>
 

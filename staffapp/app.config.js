@@ -3,7 +3,7 @@ import "dotenv/config";
 export default {
   name: "DropOff Staff",
   slug: "drop-off-gb",
-  version: "1.0.1",
+  version: "1.0.2",
   orientation: "portrait",
   icon: "./assets/icon.png",
   userInterfaceStyle: "light",

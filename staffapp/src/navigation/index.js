@@ -4,6 +4,8 @@ import { ActivityIndicator } from "react-native";
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import RouteScreen from "../screens/RouteScreen";
+import ChatScreen from "../screens/ChatScreen";
+import ChatUserScreen from "../screens/ChatUserScreen";
 //import LoginScreen from "../screens/LoginScreen";
 
 const Stack = createNativeStackNavigator();
@@ -24,6 +26,8 @@ const RootNavigator = () => {
         <Stack.Screen name="StaffLogin" component={ProfileScreen} />
       )}
       <Stack.Screen name="Route" component={RouteScreen} />
+      <Stack.Screen name="Chat" component={ChatScreen} />
+      <Stack.Screen name="ChatUser" component={ChatUserScreen} />
     </Stack.Navigator>
   );
 };

@@ -185,6 +185,8 @@ export const createAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -222,6 +224,8 @@ export const updateAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -259,6 +263,8 @@ export const deleteAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -485,6 +491,8 @@ export const createKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -510,6 +518,8 @@ export const updateKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -535,6 +545,8 @@ export const deleteKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -621,9 +633,10 @@ export const createMessage = /* GraphQL */ `
     createMessage(input: $input, condition: $condition) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename
@@ -638,9 +651,10 @@ export const updateMessage = /* GraphQL */ `
     updateMessage(input: $input, condition: $condition) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename
@@ -655,9 +669,10 @@ export const deleteMessage = /* GraphQL */ `
     deleteMessage(input: $input, condition: $condition) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename

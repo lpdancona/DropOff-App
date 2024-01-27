@@ -135,6 +135,8 @@ export const getAddressList = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -332,6 +334,8 @@ export const getKid = /* GraphQL */ `
       Parent2ID
       vanID
       routeID
+      checkedIn
+      lastCheckIn
       createdAt
       updatedAt
       __typename
@@ -359,6 +363,8 @@ export const listKids = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -397,6 +403,8 @@ export const kidsByRouteID = /* GraphQL */ `
         Parent2ID
         vanID
         routeID
+        checkedIn
+        lastCheckIn
         createdAt
         updatedAt
         __typename
@@ -461,9 +469,10 @@ export const getMessage = /* GraphQL */ `
     getMessage(id: $id) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename
@@ -480,9 +489,10 @@ export const listMessages = /* GraphQL */ `
       items {
         id
         senderID
-        receiverID
+        receiverIDs
         content
         sentAt
+        isRead
         createdAt
         updatedAt
         __typename
