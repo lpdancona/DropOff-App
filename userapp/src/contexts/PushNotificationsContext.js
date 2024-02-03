@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useRef, useContext } from "react";
 import { Platform, Linking, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
@@ -20,13 +21,15 @@ const PushNotificationsContextProvider = ({ children }) => {
   const [permissionMessage, setPermissionMessage] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
+  const navigation = useNavigation();
 
-  async function sendPushNotification(expoPushToken, title, body) {
+  async function sendPushNotification(expoPushToken, title, body, data) {
     const message = {
       to: expoPushToken,
       sound: "default",
       title: title,
       body: body,
+      data: data,
     };
 
     await fetch("https://exp.host/--/api/v2/push/send", {
@@ -129,7 +132,19 @@ const PushNotificationsContextProvider = ({ children }) => {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
+        // Handle notification response
+
+        // Extract data from the notification
+        const { notification } = response;
+        const { data } = notification.request.content;
+        //console.log("response", data.kidID);
+        // Assuming the notification contains information about the chat
+        // Navigate to the chat screen passing necessary data
+
+        //navigation.navigate("ChatUser", { id: user.id });
+        if (data.kidID) {
+          navigation.navigate("ChatUser", { id: data.kidID });
+        }
       });
 
     return () => {

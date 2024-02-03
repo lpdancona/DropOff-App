@@ -77,7 +77,7 @@ const PicturesContextProvider = ({ children }) => {
 
   const getPhotoInBucket = async (filename) => {
     try {
-      const imageURL = await Storage.get(filename);
+      const imageURL = await Storage.get(filename, { expires: 1800 });
       //console.log("Image URL:", imageURL);
       return imageURL;
     } catch (error) {

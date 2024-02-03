@@ -145,44 +145,41 @@ const RouteContextProvider = ({ children }) => {
   };
 
   const checkKidsInRoutes = () => {
-    if (kids && routesData) {
-      //console.log("routesData", routesData);
-      // Find the first route that has at least one kid from the context
-      const routeWithMatchingKids = routesData.find((item) => {
-        if (item.Kid && Array.isArray(item.Kid)) {
-          return item.Kid.some((routeKid) =>
-            kids.some((contextKid) => routeKid.id === contextKid.id)
-          );
-        }
-        return false;
-      });
-
-      if (routeWithMatchingKids) {
-        // Update the state variable with the route that has matching kids
-        setCurrentRouteData(routeWithMatchingKids);
-        //
-        const matchingKidsArray = kids.filter((contextKid) =>
-          routeWithMatchingKids.Kid.some(
-            (routeKid) => routeKid.id === contextKid.id
-          )
+    //console.log("routesData", routesData);
+    // Find the first route that has at least one kid from the context
+    const routeWithMatchingKids = routesData.find((item) => {
+      if (item.Kid && Array.isArray(item.Kid)) {
+        return item.Kid.some((routeKid) =>
+          kids.some((contextKid) => routeKid.id === contextKid.id)
         );
-        if (matchingKidsArray.length > 0) {
-          // Update the state variable with matching kids
-          setMatchingKids(matchingKidsArray);
+      } else {
+        return false;
+      }
+    });
+    if (routeWithMatchingKids) {
+      // Update the state variable with the route that has matching kids
+      setCurrentRouteData(routeWithMatchingKids);
+      //
+      const matchingKidsArray = kids.filter((contextKid) =>
+        routeWithMatchingKids.Kid.some(
+          (routeKid) => routeKid.id === contextKid.id
+        )
+      );
+      if (matchingKidsArray.length > 0) {
+        // Update the state variable with matching kids
+        setMatchingKids(matchingKidsArray);
 
-          // Loop through matching kids and extract dropOffAddress and dropOffLatLng
-          matchingKidsArray.forEach((matchingKid) => {
-            const { dropOffAddress, lat, lng } = matchingKid;
-            setDropLatLng({ latitude: lat, longitude: lng });
-            setDropOffAddress(dropOffAddress);
-          });
-        }
+        // Loop through matching kids and extract dropOffAddress and dropOffLatLng
+        matchingKidsArray.forEach((matchingKid) => {
+          const { dropOffAddress, lat, lng } = matchingKid;
+          setDropLatLng({ latitude: lat, longitude: lng });
+          setDropOffAddress(dropOffAddress);
+        });
         return true;
       }
+    } else {
       return false;
     }
-    setNoKidsAvailable(true);
-    return false;
   };
 
   const getStaffData = async () => {
@@ -241,17 +238,13 @@ const RouteContextProvider = ({ children }) => {
   }, [routesData]);
 
   useEffect(() => {
-    if (routesData) {
+    if (routesData && kids) {
       // Check kids in routes after fetching initial data
       if (!checkKidsInRoutes()) {
+        console.log("noKidsAvailadsdable", noKidsAvailable);
         setIsLoading(false);
         setNoKidsAvailable(true);
-        // alert(
-        //   `We sorry but, your child ${kids[0].name} is not on any route today!`
-        // );
         setIsRouteInProgress(false);
-        //navigation.navigate("Wait");
-        // handleLogout();
       }
     }
   }, [routesData, kids]);

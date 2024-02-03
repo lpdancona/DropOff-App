@@ -6,51 +6,64 @@ import { listMessages } from "../graphql/queries";
 const MessageContext = createContext({});
 
 const MessageContextProvider = ({ children }) => {
-  const [allMessages, setAllMessages] = useState({});
+  const [newMessages, setNewMessages] = useState([]);
+  const [unreadMessages, setUnreadMessages] = useState([]);
 
+  // check all unreadMessages and setUnreadMessages
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await API.graphql({
-          query: listMessages,
-          // variables: variables,
-        });
-        const allKidMessages = response.data.listMessages.items;
-
-        setAllMessages(allKidMessages);
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
+    const fetchUnreadMessages = async () => {
+      const response = await API.graphql({
+        query: listMessages,
+        variables: { filter: { isRead: { eq: false } } },
+      });
+      const fetchedMessages = response.data.listMessages.items;
+      setUnreadMessages(fetchedMessages);
     };
 
+    fetchUnreadMessages();
+    // }
+  }, []);
+
+  const getAllMessagesByUser = async (filter, limit) => {
+    const variables = { filter, limit };
+
+    const response = await API.graphql({
+      query: listMessages,
+      variables: variables,
+    });
+    const fetchedMessages = response.data.listMessages.items;
+    return fetchedMessages;
+  };
+
+  useEffect(() => {
     // subscribe to get new messages
     const subscription = API.graphql(
       graphqlOperation(onCreateMessage)
     ).subscribe({
       next: ({ provider, value }) => {
         const newMessage = value.data.onCreateMessage;
-        // Update allMessages state with the new message
-        setAllMessages((prevMessages) => [...prevMessages, newMessage]);
+        // Update newMessages state with the new message
+        setNewMessages((prevMessages) => [...prevMessages, newMessage]);
+        setUnreadMessages((prevUnreadMessages) => [
+          ...prevUnreadMessages,
+          newMessage,
+        ]);
       },
       error: (error) => console.error("Subscription error:", error),
     });
 
-    const updateSubscription = API.graphql(
-      graphqlOperation(onUpdateMessage)
-    ).subscribe({
+    const updateSubscription = API.graphql({
+      query: onUpdateMessage,
+    }).subscribe({
       next: ({ provider, value }) => {
-        //console.log("messages db updated!", value);
         const updatedMessage = value.data.onUpdateMessage;
-        setAllMessages((prevMessages) =>
-          prevMessages.map((msg) =>
+        setUnreadMessages((unreadPrevMessages) => {
+          return unreadPrevMessages.map((msg) =>
             msg.id === updatedMessage.id ? updatedMessage : msg
-          )
-        );
+          );
+        });
       },
-      error: (error) => console.error("Update Subscription error:", error),
     });
-
-    fetchMessages();
 
     return () => {
       subscription.unsubscribe();
@@ -59,7 +72,15 @@ const MessageContextProvider = ({ children }) => {
   }, []);
 
   return (
-    <MessageContext.Provider value={{ allMessages }}>
+    <MessageContext.Provider
+      value={{
+        newMessages,
+        unreadMessages,
+        setUnreadMessages,
+        setNewMessages,
+        getAllMessagesByUser,
+      }}
+    >
       {children}
     </MessageContext.Provider>
   );

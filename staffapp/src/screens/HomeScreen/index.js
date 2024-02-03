@@ -17,58 +17,35 @@ import { useRouteContext } from "../../../src/contexts/RouteContext";
 import { useAuthContext } from "../../../src/contexts/AuthContext";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Auth } from "aws-amplify";
-import { API, graphqlOperation } from "aws-amplify";
-import { listMessages } from "../../graphql/queries";
-import { onCreateMessage } from "../../graphql/subscriptions";
+import { useMessageContext } from "../../contexts/MessageContext";
 
 const HomeScreen = () => {
   const { routesData, updateRoutesData } = useRouteContext();
   const { currentUserData } = useAuthContext();
-  const [messageCount, setMessageCount] = useState(0);
+  const { unreadMessages, setUnreadMessages } = useMessageContext();
 
   const [images, setImages] = useState({});
   const navigation = useNavigation();
   const defaultImageUrl = "https://i.imgur.com/R2PRpbV.jpg";
   const [assignedRoute, setAssignedRoute] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [msgsCount, setMsgsCount] = useState(0);
 
   // useEffect to fetch and update the message count
   useEffect(() => {
-    if (!currentUserData) {
-      return;
-    }
-    const fetchMessageCount = async () => {
+    if (unreadMessages) {
+      // Count the number of unread messages
       try {
-        const result = await API.graphql(
-          graphqlOperation(listMessages, {
-            filter: {
-              //receiverIDs: { eq: currentUserData.id },
-              isRead: { eq: false },
-            },
-          })
-        );
-
-        const unreadMessages = result.data.listMessages.items;
-        //console.log("unreadMessages", unreadMessages);
-        setMessageCount(unreadMessages.length);
+        const unreadCount = unreadMessages.filter(
+          (message) => !message.isRead
+        ).length;
+        console.log("unreadMessages", unreadCount);
+        setMsgsCount(unreadCount);
       } catch (error) {
-        console.error("Error fetching message count:", error);
+        console.log("error updating the unread Message", error);
       }
-    };
-
-    fetchMessageCount();
-
-    // Subscription to update message count when a new message arrives
-    const subscription = API.graphql(
-      graphqlOperation(onCreateMessage)
-    ).subscribe({
-      next: () => {
-        fetchMessageCount();
-      },
-    });
-
-    return () => subscription.unsubscribe();
-  }, [currentUserData]);
+    }
+  }, [unreadMessages]);
 
   const fetchImage = async (imageURL) => {
     try {
@@ -90,6 +67,7 @@ const HomeScreen = () => {
 
   const fetchData = async () => {
     setRefreshing(true);
+    //console.log("unread messages ", unreadMessages);
     await updateRoutesData();
     setRefreshing(false);
   };
@@ -173,11 +151,10 @@ const HomeScreen = () => {
               size={25}
               color="white"
             />
-            {messageCount > 0 && (
+            {msgsCount > 0 && (
               <View style={styles.messageCountBadge}>
                 <Text style={styles.messageCountText}>
-                  {messageCount} New{" "}
-                  {messageCount === 1 ? "Message" : "Messages"}
+                  {msgsCount} New {msgsCount === 1 ? "Message" : "Messages"}
                 </Text>
               </View>
             )}

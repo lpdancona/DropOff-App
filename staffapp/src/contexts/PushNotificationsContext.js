@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useRef, useContext } from "react";
 import { Text, View, Button, Platform } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
@@ -19,15 +20,17 @@ const PushNotificationsContextProvider = ({ children }) => {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
+  const navigation = useNavigation();
 
-  async function sendPushNotification(expoPushToken, title, body) {
+  async function sendPushNotification(expoPushToken, title, body, data) {
     const message = {
       to: expoPushToken,
       sound: "default",
       title: title,
       body: body,
-      //data: { userID: "150105" },
+      data: data,
     };
+    console.log("message", message);
 
     await fetch("https://exp.host/--/api/v2/push/send", {
       method: "POST",
@@ -80,7 +83,7 @@ const PushNotificationsContextProvider = ({ children }) => {
       token = await Notifications.getExpoPushTokenAsync({
         projectId: Constants.expoConfig.extra.eas.projectId,
       });
-      console.log(token);
+      //console.log(token);
     } else {
       //alert("Must use physical device for Push Notifications");
     }
@@ -98,7 +101,19 @@ const PushNotificationsContextProvider = ({ children }) => {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
+        // Handle notification response
+
+        // Extract data from the notification
+        const { notification } = response;
+        const { data } = notification.request.content;
+        //console.log("response", data.kidID);
+        // Assuming the notification contains information about the chat
+        // Navigate to the chat screen passing necessary data
+
+        //navigation.navigate("ChatUser", { id: user.id });
+        if (data.kidID) {
+          navigation.navigate("ChatUser", { id: data.kidID });
+        }
       });
 
     return () => {

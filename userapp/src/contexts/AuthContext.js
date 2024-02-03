@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from "react";
+import { ActivityIndicator } from "react-native";
 import { Auth } from "aws-amplify";
 import { API } from "aws-amplify";
 import { listUsers, listKids, getUser } from "../graphql/queries";
@@ -41,6 +42,7 @@ const AuthContextProvider = ({ children }) => {
     setDbUser(response);
     setLoading(false);
   };
+
   const updatePushToken = async (id, updatedPushToken) => {
     try {
       const userDetails = {
@@ -55,6 +57,7 @@ const AuthContextProvider = ({ children }) => {
       console.log("error updating token", error);
     }
   };
+
   const getCurrentUserData = async () => {
     // get current user data and check the expoPushToken
     const responseGetUser = await API.graphql({
@@ -138,6 +141,13 @@ const AuthContextProvider = ({ children }) => {
     //console.log(isEmailVerified);
   }, [userEmail]);
 
+  // Check if all necessary data has been fetched, then set loading to false
+  useEffect(() => {
+    if (authUser && dbUser && userEmail && currentUserData && kids) {
+      setLoading(false);
+    }
+  }, [authUser, dbUser, userEmail, currentUserData, kids]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -151,7 +161,13 @@ const AuthContextProvider = ({ children }) => {
         currentUserData,
       }}
     >
-      {children}
+      {loading ? (
+        // Render a loading indicator while the context is loading
+        <ActivityIndicator />
+      ) : (
+        // Render children when context has finished loading
+        children
+      )}
     </AuthContext.Provider>
   );
 };

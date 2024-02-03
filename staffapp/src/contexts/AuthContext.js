@@ -1,19 +1,23 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { Auth } from "aws-amplify";
-import { API, graphqlOperation } from "aws-amplify";
+import { API } from "aws-amplify";
+import { updateUser } from "../graphql/mutations";
 import { listUsers, getUser } from "../graphql/queries";
 import { usePicturesContext } from "./PicturesContext";
+import { usePushNotificationsContext } from "./PushNotificationsContext";
+import { ActivityIndicator } from "react-native";
 
 const AuthContext = createContext({});
 
 const AuthContextProvider = ({ children }) => {
   const [authUser, setAuthUser] = useState(null);
   const [dbUser, setDbUser] = useState(null);
-  const sub = authUser?.attributes?.sub;
   const [userEmail, setUserEmail] = useState(null); //authUser?.attributes?.email
   const [loading, setLoading] = useState(true);
   const [currentUserData, setCurrentUserData] = useState(null);
   const { getPhotoInBucket } = usePicturesContext();
+  const { expoPushToken } = usePushNotificationsContext();
+  const sub = authUser?.attributes?.sub;
 
   useEffect(() => {
     Auth.currentAuthenticatedUser({ bypassCache: true })
@@ -40,8 +44,25 @@ const AuthContextProvider = ({ children }) => {
       //   setIsDriver(true);
       // }
       setDbUser(userResponse);
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  const updatePushToken = async (id, updatedPushToken) => {
+    try {
+      const userDetails = {
+        id: id,
+        pushToken: updatedPushToken,
+      };
+      const updatedUser = await API.graphql({
+        query: updateUser,
+        variables: { input: userDetails },
+      });
+    } catch (error) {
+      console.log("error updating token", error);
+    } finally {
+      console.log("push token updated successfully!!");
+    }
   };
 
   const getCurrentUserData = async () => {
@@ -50,6 +71,17 @@ const AuthContextProvider = ({ children }) => {
       variables: { id: dbUser.id },
     });
     const user = responseGetUser.data.getUser;
+
+    if (expoPushToken) {
+      //console.log(expoPushToken);
+      const actualPushToken = user.pushToken;
+      if (actualPushToken !== expoPushToken.data || actualPushToken === null) {
+        await updatePushToken(
+          responseGetUser.data.getUser.id,
+          expoPushToken.data
+        );
+      }
+    }
 
     const uriUser = await getPhotoInBucket(user.photo);
     const userWithPhotos = { ...user, uriUser };
@@ -71,6 +103,13 @@ const AuthContextProvider = ({ children }) => {
     getCurrentUserData();
   }, [dbUser]);
 
+  // Check if all necessary data has been fetched, then set loading to false
+  useEffect(() => {
+    if (authUser && dbUser && userEmail && currentUserData) {
+      setLoading(false);
+    }
+  }, [authUser, dbUser, userEmail, currentUserData]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -83,7 +122,13 @@ const AuthContextProvider = ({ children }) => {
         currentUserData,
       }}
     >
-      {children}
+      {loading ? (
+        // Render a loading indicator while the context is loading
+        <ActivityIndicator />
+      ) : (
+        // Render children when context has finished loading
+        children
+      )}
     </AuthContext.Provider>
   );
 };

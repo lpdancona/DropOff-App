@@ -103,10 +103,10 @@ const ProfileScreen = () => {
           // if (kidparent1Email !== null) {
 
           const parentField =
-            kid.parent1Email !== null ? "Parent1ID" : "Parent2ID";
+            kid.parent1Email === null ? "Parent1ID" : "Parent2ID";
 
           // console.log("parent 1 Email ", kid.parent1Email);
-          // console.log("parent Field ", parentField);
+          console.log("parent Field ", parentField);
           //console.log(dbUser);
           const variables = {
             input: {

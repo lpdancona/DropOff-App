@@ -14,8 +14,7 @@ import { useMessageContext } from "../../contexts/MessageContext";
 const ChatScreen = ({ navigation }) => {
   const { kids } = useAuthContext();
   const [users, setUsers] = useState([]);
-  const { allMessages } = useMessageContext();
-  //const [messages, setMessages] = useState([]);
+  const { unreadMessages } = useMessageContext();
 
   const getInitials = (name) => {
     const nameArray = name.split(" ");
@@ -38,11 +37,13 @@ const ChatScreen = ({ navigation }) => {
 
   const renderUserItem = ({ item: user }) => {
     // Calculate the number of unread messages for the current user
-    const unreadCount = allMessages
-      ? allMessages.filter(
-          (message) => message.receiverIDs === user.id && !message.isRead
-        ).length
-      : 0;
+    const unreadCount = unreadMessages?.filter(
+      (message) =>
+        !message.isRead &&
+        message.receiverIDs.includes(user.id) &&
+        message.senderID !== user.id
+    ).length;
+
     return (
       <TouchableOpacity onPress={() => onUserPress(user)}>
         <View style={{ flex: 1, alignItems: "left", padding: 16 }}>

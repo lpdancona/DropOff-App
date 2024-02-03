@@ -21,6 +21,7 @@ const RootNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {dbUser ? (
+        //<Stack.Screen name="Chat" component={ChatScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
       ) : (
         <Stack.Screen name="StaffLogin" component={ProfileScreen} />
