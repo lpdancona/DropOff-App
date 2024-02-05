@@ -10,12 +10,14 @@ import {
   RefreshControl,
 } from "react-native";
 import { API } from "aws-amplify";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { listKids } from "../../graphql/queries";
 import { updateKid } from "../../graphql/mutations";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { usePicturesContext } from "../../contexts/PicturesContext";
 import styles from "./styles";
-
+import SideDrawer from "../SideDrawer/SideDrawer";
+import { differenceInHours } from "date-fns";
 const PickScreen = () => {
   const { userEmail } = useAuthContext();
   const { savePhotoInBucket, getPhotoInBucket } = usePicturesContext();
@@ -25,7 +27,7 @@ const PickScreen = () => {
   const [loadingPhotos, setLoadingPhotos] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
   const getKidPhotos = async () => {
     try {
       setLoadingPhotos(true);
@@ -141,37 +143,89 @@ const PickScreen = () => {
       .join("")
       .toUpperCase();
   };
+  const handleLogout = async () => {
+    try {
+      // Sign out the user using Amplify Auth
+      await Auth.signOut();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setDropdownVisible(false);
+      setLogoutModalVisible(false);
+    }
+  };
+  const toggleSideDrawer = () => {
+    setSideDrawerVisible(!isSideDrawerVisible);
+  };
+  const updateCheckedInStatus = async (kidId, checkedInStatus) => {
+    try {
+      const response = await API.graphql({
+        query: updateKid,
+        variables: {
+          input: {
+            id: kidId,
+            checkedIn: checkedInStatus,
+          },
+        },
+      });
+      console.log("Backend updated:", response.data.updateKid);
+    } catch (error) {
+      console.error("Error updating backend:", error);
+    }
+  };
 
-  const renderKidItem = ({ item }) => (
-    <View key={item.id}>
-      <Text>Name: {item.name}</Text>
-      <Text>Drop-off Address: {item.dropOffAddress}</Text>
-      {actualPhotos &&
-      actualPhotos.length > 0 &&
-      actualPhotos.find((photo) => photo.id === item.id)?.imageURL ? (
-        <View>
-          <Image
-            style={{ width: 100, height: 100 }}
-            source={{
-              uri: actualPhotos.find((photo) => photo.id === item.id).imageURL,
-            }}
-          />
+  const renderKidItem = ({ item }) => {
+    const lastCheckInTime = item.lastCheckIn
+      ? new Date(item.lastCheckIn)
+      : null;
+    const isLastCheckInExpired =
+      lastCheckInTime && differenceInHours(new Date(), lastCheckInTime) > 8;
+
+    if (isLastCheckInExpired) {
+      updateCheckedInStatus(item.id, false);
+      item.checkedIn = false;
+    }
+    return (
+      <View key={item.id} style={styles.kidContainer}>
+        <View style={styles.kidInfoContainer}>
+          <Text style={styles.kidName}>Name: {item.name}</Text>
+          <Text style={styles.kidAddress}>Address: {item.dropOffAddress}</Text>
         </View>
-      ) : (
-        <View style={styles.initialsContainer}>
-          <Text style={styles.initialsText}>{getInitials(item.name)}</Text>
+        <View style={styles.photoContainer}>
+          {actualPhotos &&
+          actualPhotos.length > 0 &&
+          actualPhotos.find((photo) => photo.id === item.id)?.imageURL ? (
+            <Image
+              style={styles.kidPhoto}
+              source={{
+                uri: actualPhotos.find((photo) => photo.id === item.id)
+                  .imageURL,
+              }}
+            />
+          ) : (
+            <View style={styles.initialsContainer}>
+              <Text style={styles.initialsText}>{getInitials(item.name)}</Text>
+            </View>
+          )}
+          <TouchableOpacity onPress={() => handleChangePhoto(item.id)}>
+            <View style={styles.button}>
+              <MaterialIcons
+                name="add-photo-alternate"
+                size={40}
+                color="#FF7276"
+              />
+            </View>
+          </TouchableOpacity>
         </View>
-      )}
-      <View>
-        <TouchableOpacity onPress={() => handleChangePhoto(item.id)}>
-          <View style={styles.button}>
-            <Text style={styles.buttonText}>Update photo</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.cardSeparator} />
+        <View style={styles.checkInStatus}>
+          <Text style={{ color: item.checkedIn ? "green" : "red" }}>
+            {item.checkedIn ? "Checked In" : "Not Checked In"}
+          </Text>
+        </View>
       </View>
-    </View>
-  );
-
+    );
+  };
   if (!kids) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
@@ -194,20 +248,32 @@ const PickScreen = () => {
       {loadingPhotos ? (
         <ActivityIndicator style={{ padding: 50 }} size={"large"} />
       ) : (
-        <SafeAreaView style={{ marginTop: 20, marginLeft: 10 }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Kid Details</Text>
-          <FlatList
-            data={kids}
-            keyExtractor={(item) => item.id}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={fetchKidData}
-              />
-            }
-            renderItem={renderKidItem}
-          />
-        </SafeAreaView>
+        <View style={styles.container}>
+          <View style={styles.containerMenu}>
+            <TouchableOpacity onPress={toggleSideDrawer}>
+              <MaterialIcons name="menu" size={30} color="white" />
+            </TouchableOpacity>
+
+            <SideDrawer
+              isVisible={isSideDrawerVisible}
+              onClose={toggleSideDrawer}
+              onLogout={handleLogout}
+            />
+          </View>
+          <View>
+            <FlatList
+              data={kids}
+              keyExtractor={(item) => item.id}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={fetchKidData}
+                />
+              }
+              renderItem={renderKidItem}
+            />
+          </View>
+        </View>
       )}
     </View>
   );

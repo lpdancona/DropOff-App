@@ -10,7 +10,6 @@ import LoadingScreen from "../screens/LoadingScreen/LoadingScreen";
 import { useAuthContext } from "../contexts/AuthContext";
 import { useRouteContext } from "../contexts/RouteContext";
 import { usePushNotificationsContext } from "../contexts/PushNotificationsContext";
-
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
