@@ -5,6 +5,7 @@ import Dashboard from "../Images/dashboard.png";
 import People from "../Images/people.png";
 import School from "../Images/school.png";
 import House from "../Images/house.png";
+import GbBus from "../Images/vanDashboard.png"
 import Settings from "../Images/settings.png";
 import ArrowIcon from "../Images/drop-down-arrow.png";
 import { useLocation } from "react-router-dom";
@@ -87,24 +88,28 @@ const Sidebar = () => {
               <li>
                 <a href="/parents">Parents</a>
               </li>
+              <li>
+                <a href="/staff">Staff</a>
+              </li>
+              
             </ul>
           )}
+          <li className={location.pathname === "/vans" ? "active" : ""}>
+            <img src={GbBus} alt="vehicles" />
+            <a href="/vans">Vehicles</a>
+          </li>
           <li className={location.pathname === "/pickup" ? "active" : ""}>
             <img src={School} alt="pickup" />
             <a href="/pickup">Pickup</a>
           </li>
           <li className={location.pathname === "/drop-off" ? "active" : ""}>
             <img src={House} alt="drop-off" />
-            <a href="/drop-off">Drop-Off</a>
+            <a href="/routes">Drop-Off</a>
           </li>
           <li className={location.pathname === "/settings" ? "active" : ""}>
             <img src={Settings} alt="settings" />
             <a href="/settings">Settings</a>
           </li>
-          {/* <li className={location.pathname === "/" ? "active" : ""}>
-            <img src={Support} alt="suppport" />
-            <a href="/support">Support</a>
-          </li> */}
         </ul>
       </div>
     </div>

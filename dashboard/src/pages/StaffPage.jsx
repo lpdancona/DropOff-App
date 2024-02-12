@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./ParentsPage.css";
+import "./StaffPage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { API } from "aws-amplify";
 import {
@@ -9,32 +9,31 @@ import {
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { listUsers } from "../graphql/queries";
-import ParentsForm from "../components/ParentsForm";
+//import ParentsForm from "../components/ParentsForm";
 
-function ParentsPage() {
-  const [parents, setParents] = useState([]);
-  const [selectedParents, setSelectedParents] = useState(null);
+function StaffPage() {
+  const [staffs, setStaffs] = useState([]);
+  const [selectedStaffs, setSelectedStaffs] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [nameFilter, setNameFilter] = useState("");
   const [mode, setMode] = useState("list");
   const [updatedName, setUpdatedName] = useState("");
-  const parentsPerPage = 4;
-
+  const staffsPerPage = 4;
   useEffect(() => {
-    const fetchParents = async () => {
+    const fetchStaff = async () => {
       const variables = {
         filter: {
-          userType: { eq: "PARENT" },
+          userType: { eq: "STAFF" },
         },
       };
       const employeesResponse = await API.graphql({
         query: listUsers,
         variables: variables,
       });
-      const parents = employeesResponse.data.listUsers.items;
-      setParents(parents);
+      const staff = employeesResponse.data.listUsers.items;
+      setStaffs(staff);
     };
-    fetchParents();
+    fetchStaff();
   }, []);
 
   const handleNextPage = () => {
@@ -45,42 +44,42 @@ function ParentsPage() {
     setCurrentPage((prevPage) => prevPage - 1);
   };
 
-  const startIndex = (currentPage - 1) * parentsPerPage;
-  const endIndex = startIndex + parentsPerPage;
+  const startIndex = (currentPage - 1) * staffsPerPage;
+  const endIndex = startIndex + staffsPerPage;
 
-  const filteredParents = parents.filter((parents) => {
+  const filteredStaffs = staffs.filter((staffs) => {
     return (
       nameFilter === "" ||
-      parents.name.toLowerCase().includes(nameFilter.toLowerCase())
+      staffs.name.toLowerCase().includes(nameFilter.toLowerCase())
     );
   });
 
-  const displayedParents = filteredParents.slice(startIndex, endIndex);
+  const displayedStaffs = filteredStaffs.slice(startIndex, endIndex);
 
-  const handleParentsClick = (parents) => {
-    setSelectedParents(parents);
-    setUpdatedName(parents.name);
+  const handleStaffsClick = (staffs) => {
+    setSelectedStaffs(staffs);
+    setUpdatedName(staffs.name);
     setMode("details");
   };
   const handleDeleteClick = (employee) => {
-    setSelectedParents(employee);
+    setSelectedStaffs(employee);
     setMode("delete");
   };
-  const handleDeleteParents = async () => {
+  const handleDeletestaffs = async () => {
     try {
       const response = await fetch(
-        `https://drop-off-app-dere.onrender.com/api/employes/${selectedParents._id}`,
+        `https://drop-off-app-dere.onrender.com/api/employes/${selectedStaffs._id}`,
         {
           method: "DELETE",
         }
       );
 
       if (response.ok) {
-        const updatedParents = parents.filter(
-          (parents) => parents._id !== selectedParents._id
+        const updatedstaffs = staffs.filter(
+          (staffs) => staffs._id !== selectedStaffs._id
         );
-        setParents(updatedParents);
-        setSelectedParents(null);
+        setStaffs(updatedstaffs);
+        setSelectedStaffs(null);
         setMode("list");
       } else {
         console.error("Failed to delete Employee.");
@@ -93,7 +92,7 @@ function ParentsPage() {
   const handleUpdateEmployee = async () => {
     try {
       const response = await fetch(
-        `https://drop-off-app-dere.onrender.com/api/employes/${selectedParents._id}`,
+        `https://drop-off-app-dere.onrender.com/api/employes/${selectedStaffs._id}`,
         {
           method: "PATCH",
           headers: {
@@ -106,17 +105,17 @@ function ParentsPage() {
       );
 
       if (response.ok) {
-        const updatedParents = parents.map((employee) =>
-          employee._id === selectedParents._id
+        const updatedstaffs = staffs.map((employee) =>
+          employee._id === selectedStaffs._id
             ? {
                 ...employee,
                 name: updatedName,
               }
             : employee
         );
-        setParents(updatedParents);
+        setStaffs(updatedstaffs);
 
-        setSelectedParents(null);
+        setSelectedStaffs(null);
         setMode("list");
         setUpdatedName("");
       } else {
@@ -127,7 +126,7 @@ function ParentsPage() {
     }
   };
 
-  const handleParentsAdded = async () => {
+  const handlestaffsAdded = async () => {
     try {
       const response = await fetch(
         "https://drop-off-app-dere.onrender.com/api/employes"
@@ -135,7 +134,7 @@ function ParentsPage() {
       const json = await response.json();
 
       if (response.ok) {
-        setParents(json.parents);
+        setStaffs(json.staffs);
       }
     } catch (error) {
       console.error("Error fetching Employees:", error);
@@ -149,7 +148,7 @@ function ParentsPage() {
           <div className="students-container">
             {mode === "list" && (
               <div>
-                <h3>Parents</h3>
+                <h3>staffs</h3>
                 <div className="filters">
                   <input
                     type="text"
@@ -159,7 +158,7 @@ function ParentsPage() {
                   />
                 </div>
                 <div className="student">
-                  {displayedParents.map((employee) => (
+                  {displayedStaffs.map((employee) => (
                     <div
                       className="student-details-container"
                       key={employee._id}
@@ -175,7 +174,7 @@ function ParentsPage() {
                       </div>
                       <div className="student-details-btn">
                         <button
-                          onClick={() => handleParentsClick(employee)}
+                          onClick={() => handleStaffsClick(employee)}
                           className="btn btn-student-edit"
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
@@ -202,7 +201,7 @@ function ParentsPage() {
                   </button>
                   <button
                     onClick={handleNextPage}
-                    disabled={endIndex >= filteredParents.length}
+                    disabled={endIndex >= filteredStaffs.length}
                     className="btn"
                   >
                     <FontAwesomeIcon icon={faArrowRight} beat />
@@ -210,11 +209,11 @@ function ParentsPage() {
                 </div>
               </div>
             )}
-            {mode === "details" && selectedParents && (
+            {mode === "details" && selectedStaffs && (
               <div className="update-student-container">
                 <h2>Update Employee</h2>
                 <div className="update-student">
-                  <h4>{selectedParents.name}</h4>
+                  <h4>{selectedStaffs.name}</h4>
                   <form onSubmit={handleUpdateEmployee}>
                     <label>Name:</label>
                     <input
@@ -244,13 +243,13 @@ function ParentsPage() {
                 </div>
               </div>
             )}
-            {mode === "delete" && selectedParents && (
+            {mode === "delete" && selectedStaffs && (
               <div className="delete-student-container">
                 <h2>Delete Employee</h2>
                 <div className="delete-student">
-                  <h4>{selectedParents.name}</h4>
+                  <h4>{selectedStaffs.name}</h4>
                   <p>Are you sure you want to delete this student?</p>
-                  <button onClick={handleDeleteParents} className="btn">
+                  <button onClick={handleDeletestaffs} className="btn">
                     Yes
                   </button>
                   <button onClick={() => setMode("list")} className="btn">
@@ -260,13 +259,13 @@ function ParentsPage() {
               </div>
             )}
           </div>
-          <div className="left-container">
-            <ParentsForm onParentsAdded={handleParentsAdded} />
-          </div>
+          {/* <div className="left-container">
+            <staffsForm onstaffsAdded={handlestaffsAdded} />
+          </div> */}
         </div>
       </div>
     </div>
   );
 }
 
-export default ParentsPage;
+export default StaffPage;
