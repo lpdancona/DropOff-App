@@ -13,6 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "antd";
 import GoogleMapsAutocomplete from "./GoogleMapsAutocomplete";
+import { useLocation } from "react-router-dom";
 
 function Students() {
   const [students, setStudents] = useState([]);
@@ -32,6 +33,7 @@ function Students() {
   const [updatedLat, setUpdatedLat] = useState("");
   const [updatedLng, setUpdatedLng] = useState("");
   const updateAutoCompleteRef = useRef();
+  const location = useLocation();
 
   const fetchKids = async () => {
     try {
@@ -78,7 +80,6 @@ function Students() {
 
   // Use useEffect to perform actions after setSelectedStudent has completed
   useEffect(() => {
-    // Ensure that selectedStudent is updated before executing the following statements
     if (selectedStudent) {
       setUpdatedName(selectedStudent.name);
       setUpdatedAddress(selectedStudent.dropOffAddress);
@@ -333,7 +334,7 @@ function Students() {
               </div>
             )}
           </div>
-          <div className="left-container">
+          <div className="right-container">
             <StudentForm onStudentAdded={handleStudentAdded} />
           </div>
         </div>

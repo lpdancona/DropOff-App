@@ -117,9 +117,10 @@ type User @model @auth(rules: [{allow: public}]) {
 
 type Message @model @auth(rules: [{allow: public}]) {
   id: ID!
-  senderID: ID!
-  receiverID: ID!
+  senderID: String!
+  receiverIDs: String!
   content: String!
   sentAt: AWSDateTime!
+  isRead: Boolean
 }
  

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { API } from "aws-amplify";
 import { createKid } from "../graphql/mutations";
-import "./StudentForm.css";
+//import "./StudentForm.css";
 import GoogleMapsAutocomplete from "./GoogleMapsAutocomplete";
 import { Card } from "antd";
 

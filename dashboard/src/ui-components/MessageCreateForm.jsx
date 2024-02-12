@@ -6,7 +6,13 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SwitchField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
 import { createMessage } from "../graphql/mutations";
@@ -23,27 +29,33 @@ export default function MessageCreateForm(props) {
   } = props;
   const initialValues = {
     senderID: "",
-    receiverID: "",
+    receiverIDs: "",
     content: "",
     sentAt: "",
+    isRead: false,
   };
   const [senderID, setSenderID] = React.useState(initialValues.senderID);
-  const [receiverID, setReceiverID] = React.useState(initialValues.receiverID);
+  const [receiverIDs, setReceiverIDs] = React.useState(
+    initialValues.receiverIDs
+  );
   const [content, setContent] = React.useState(initialValues.content);
   const [sentAt, setSentAt] = React.useState(initialValues.sentAt);
+  const [isRead, setIsRead] = React.useState(initialValues.isRead);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setSenderID(initialValues.senderID);
-    setReceiverID(initialValues.receiverID);
+    setReceiverIDs(initialValues.receiverIDs);
     setContent(initialValues.content);
     setSentAt(initialValues.sentAt);
+    setIsRead(initialValues.isRead);
     setErrors({});
   };
   const validations = {
     senderID: [{ type: "Required" }],
-    receiverID: [{ type: "Required" }],
+    receiverIDs: [{ type: "Required" }],
     content: [{ type: "Required" }],
     sentAt: [{ type: "Required" }],
+    isRead: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -89,9 +101,10 @@ export default function MessageCreateForm(props) {
         event.preventDefault();
         let modelFields = {
           senderID,
-          receiverID,
+          receiverIDs,
           content,
           sentAt,
+          isRead,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -155,9 +168,10 @@ export default function MessageCreateForm(props) {
           if (onChange) {
             const modelFields = {
               senderID: value,
-              receiverID,
+              receiverIDs,
               content,
               sentAt,
+              isRead,
             };
             const result = onChange(modelFields);
             value = result?.senderID ?? value;
@@ -173,31 +187,32 @@ export default function MessageCreateForm(props) {
         {...getOverrideProps(overrides, "senderID")}
       ></TextField>
       <TextField
-        label="Receiver id"
+        label="Receiver i ds"
         isRequired={true}
         isReadOnly={false}
-        value={receiverID}
+        value={receiverIDs}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
               senderID,
-              receiverID: value,
+              receiverIDs: value,
               content,
               sentAt,
+              isRead,
             };
             const result = onChange(modelFields);
-            value = result?.receiverID ?? value;
+            value = result?.receiverIDs ?? value;
           }
-          if (errors.receiverID?.hasError) {
-            runValidationTasks("receiverID", value);
+          if (errors.receiverIDs?.hasError) {
+            runValidationTasks("receiverIDs", value);
           }
-          setReceiverID(value);
+          setReceiverIDs(value);
         }}
-        onBlur={() => runValidationTasks("receiverID", receiverID)}
-        errorMessage={errors.receiverID?.errorMessage}
-        hasError={errors.receiverID?.hasError}
-        {...getOverrideProps(overrides, "receiverID")}
+        onBlur={() => runValidationTasks("receiverIDs", receiverIDs)}
+        errorMessage={errors.receiverIDs?.errorMessage}
+        hasError={errors.receiverIDs?.hasError}
+        {...getOverrideProps(overrides, "receiverIDs")}
       ></TextField>
       <TextField
         label="Content"
@@ -209,9 +224,10 @@ export default function MessageCreateForm(props) {
           if (onChange) {
             const modelFields = {
               senderID,
-              receiverID,
+              receiverIDs,
               content: value,
               sentAt,
+              isRead,
             };
             const result = onChange(modelFields);
             value = result?.content ?? value;
@@ -238,9 +254,10 @@ export default function MessageCreateForm(props) {
           if (onChange) {
             const modelFields = {
               senderID,
-              receiverID,
+              receiverIDs,
               content,
               sentAt: value,
+              isRead,
             };
             const result = onChange(modelFields);
             value = result?.sentAt ?? value;
@@ -255,6 +272,34 @@ export default function MessageCreateForm(props) {
         hasError={errors.sentAt?.hasError}
         {...getOverrideProps(overrides, "sentAt")}
       ></TextField>
+      <SwitchField
+        label="Is read"
+        defaultChecked={false}
+        isDisabled={false}
+        isChecked={isRead}
+        onChange={(e) => {
+          let value = e.target.checked;
+          if (onChange) {
+            const modelFields = {
+              senderID,
+              receiverIDs,
+              content,
+              sentAt,
+              isRead: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.isRead ?? value;
+          }
+          if (errors.isRead?.hasError) {
+            runValidationTasks("isRead", value);
+          }
+          setIsRead(value);
+        }}
+        onBlur={() => runValidationTasks("isRead", isRead)}
+        errorMessage={errors.isRead?.errorMessage}
+        hasError={errors.isRead?.hasError}
+        {...getOverrideProps(overrides, "isRead")}
+      ></SwitchField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
