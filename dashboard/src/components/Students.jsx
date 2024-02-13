@@ -187,9 +187,9 @@ function Students() {
   };
 
   return (
-    <div className="home-main">
-      <div className="home">
-        <div className="home-container">
+    <div>
+      <div>
+        <div>
           <div className="student-container">
             {mode === "list" && (
               <div>

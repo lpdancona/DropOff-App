@@ -1,20 +1,12 @@
 @import "./_variables";
 
 body {
-  overflow: hidden;
-  height: 100vh;
-  width: 100vw;
+  // overflow: hidden;
+  // height: 100vh;
+  // width: 100vw;
   font-family: $fontFamily;
-  background-color: $veryLightGreen;
-  text-transform: capitalize;
-}
-
-h1 {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  // background-color: $veryLightGreen;
+  // text-transform: capitalize;
 }
 
 .sidebar {
