@@ -31,7 +31,7 @@ const Sidebar = () => {
         }
       >
         <img src={GbIcon} alt="icon" className="logo" />
-        <h2 className="title">gracie barra vancouver</h2>
+        <h2 className="title">Gracie Barra Vancouver</h2>
       </div>
       <div
         className={

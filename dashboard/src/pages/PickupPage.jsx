@@ -1,53 +1,67 @@
 import React, { useState } from "react";
+import { Card, Button } from "antd";
 import "./PickupPage.scss";
 
 const PickupPage = () => {
-  // Define the days of the week
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-
-  // Define sample kid data (you'll replace this with fetched data later)
-  const kids = ["Alice", "Bob", "Charlie", "David", "Eve"];
-
-  // Initialize state to manage attendance
+  const kids = ["Emma", "Bob", "Charlie", "David", "Eve"];
   const [attendance, setAttendance] = useState({});
 
-  // Function to handle toggling attendance status
   const toggleAttendance = (kid, day) => {
     const updatedAttendance = { ...attendance };
-    const currentStatus = updatedAttendance[kid]?.[day] || "P"; // Default to 'Present' if not set
+    const currentStatus = updatedAttendance[kid]?.[day] || "P";
     const newStatus =
       currentStatus === "P" ? "A" : currentStatus === "A" ? "N" : "P"; // Toggle status
     updatedAttendance[kid] = { ...updatedAttendance[kid], [day]: newStatus };
     setAttendance(updatedAttendance);
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "A":
+        return { backgroundColor: "red", color: "white" }; // Red color for 'A'
+      case "P":
+        return { backgroundColor: "green", color: "white" }; // Green color for 'P'
+      case "N":
+        return { backgroundColor: "blue", color: "white" }; // Blue color for 'N'
+      default:
+        return { backgroundColor: "blue", color: "white" }; // Default to blue if status is not recognized
+    }
+  };
+
   return (
     <div className="pickupContainer">
-      <h1>Pickup Schedule</h1>
-      <p>Manage the pickup schedule for the kids:</p>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            {daysOfWeek.map((day) => (
-              <th key={day}>{day}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {kids.map((kid) => (
-            <tr key={kid}>
-              <td>{kid}</td>
+      <Card className="scheduleCard">
+        <h1>Pickup Schedule</h1>
+        <p>Manage the pickup schedule for the kids:</p>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
               {daysOfWeek.map((day) => (
-                <td key={day} onClick={() => toggleAttendance(kid, day)}>
-                  {attendance[kid]?.[day] || "N"}{" "}
-                  {/* Default to 'Non-Day' if not set */}
-                </td>
+                <th key={day}>{day}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {kids.map((kid) => (
+              <tr key={kid}>
+                <td>{kid}</td>
+                {daysOfWeek.map((day) => (
+                  <td key={day}>
+                    <Button
+                      style={getStatusColor(attendance[kid]?.[day])}
+                      onClick={() => toggleAttendance(kid, day)}
+                    >
+                      {attendance[kid]?.[day] || "N"}
+                    </Button>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
     </div>
   );
 };

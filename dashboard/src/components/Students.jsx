@@ -35,6 +35,14 @@ function Students() {
   const updateAutoCompleteRef = useRef();
   const location = useLocation();
 
+  const [selectedDays, setSelectedDays] = useState({
+    Monday: false,
+    Tuesday: false,
+    Wednesday: false,
+    Thursday: false,
+    Friday: false,
+  });
+
   const fetchKids = async () => {
     try {
       const response = await API.graphql({ query: listKids });
