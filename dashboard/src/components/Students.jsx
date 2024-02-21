@@ -14,6 +14,7 @@ import {
 import { Card } from "antd";
 import GoogleMapsAutocomplete from "./GoogleMapsAutocomplete";
 import { useLocation } from "react-router-dom";
+import { useKidsContext } from "../contexts/KidsContext";
 
 function Students() {
   const [students, setStudents] = useState([]);
@@ -201,7 +202,7 @@ function Students() {
           <div className="student-container">
             {mode === "list" && (
               <div>
-                <h3>Kids</h3>
+                <h3>List of Kids (students.jsx)</h3>
                 <div className="filters">
                   <input
                     type="text"
@@ -225,6 +226,7 @@ function Students() {
                         <div className="student-address">
                           {student.dropOffAddress}
                         </div>
+                        <div className="studentSchedule">{student}</div>
                       </div>
                       <div className="student-details-btn">
                         <button
@@ -265,7 +267,7 @@ function Students() {
             )}
             {mode === "details" && selectedStudent && (
               <div className="update-student-container">
-                <h2>Update Student</h2>
+                <h2>Update Student (students.jsx)</h2>
                 <div className="update-student">
                   <h4>{selectedStudent.name}</h4>
                   <Card>

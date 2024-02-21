@@ -9,10 +9,12 @@ import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
-import { createEvents } from "../graphql/mutations";
-export default function EventsCreateForm(props) {
+import { getPictures } from "../graphql/queries";
+import { updatePictures } from "../graphql/mutations";
+export default function PicturesUpdateForm(props) {
   const {
-    clearOnSuccess = true,
+    id: idProp,
+    pictures: picturesModelProp,
     onSuccess,
     onError,
     onSubmit,
@@ -22,28 +24,39 @@ export default function EventsCreateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    name: "",
-    image: "",
-    link: "",
-    date: "",
+    picture: "",
+    kidID: "",
   };
-  const [name, setName] = React.useState(initialValues.name);
-  const [image, setImage] = React.useState(initialValues.image);
-  const [link, setLink] = React.useState(initialValues.link);
-  const [date, setDate] = React.useState(initialValues.date);
+  const [picture, setPicture] = React.useState(initialValues.picture);
+  const [kidID, setKidID] = React.useState(initialValues.kidID);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    setName(initialValues.name);
-    setImage(initialValues.image);
-    setLink(initialValues.link);
-    setDate(initialValues.date);
+    const cleanValues = picturesRecord
+      ? { ...initialValues, ...picturesRecord }
+      : initialValues;
+    setPicture(cleanValues.picture);
+    setKidID(cleanValues.kidID);
     setErrors({});
   };
+  const [picturesRecord, setPicturesRecord] = React.useState(picturesModelProp);
+  React.useEffect(() => {
+    const queryData = async () => {
+      const record = idProp
+        ? (
+            await API.graphql({
+              query: getPictures.replaceAll("__typename", ""),
+              variables: { id: idProp },
+            })
+          )?.data?.getPictures
+        : picturesModelProp;
+      setPicturesRecord(record);
+    };
+    queryData();
+  }, [idProp, picturesModelProp]);
+  React.useEffect(resetStateValues, [picturesRecord]);
   const validations = {
-    name: [],
-    image: [],
-    link: [],
-    date: [],
+    picture: [],
+    kidID: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -71,10 +84,8 @@ export default function EventsCreateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          name,
-          image,
-          link,
-          date,
+          picture: picture ?? null,
+          kidID: kidID ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -105,18 +116,16 @@ export default function EventsCreateForm(props) {
             }
           });
           await API.graphql({
-            query: createEvents.replaceAll("__typename", ""),
+            query: updatePictures.replaceAll("__typename", ""),
             variables: {
               input: {
+                id: picturesRecord.id,
                 ...modelFields,
               },
             },
           });
           if (onSuccess) {
             onSuccess(modelFields);
-          }
-          if (clearOnSuccess) {
-            resetStateValues();
           }
         } catch (err) {
           if (onError) {
@@ -125,130 +134,72 @@ export default function EventsCreateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "EventsCreateForm")}
+      {...getOverrideProps(overrides, "PicturesUpdateForm")}
       {...rest}
     >
       <TextField
-        label="Name"
+        label="Picture"
         isRequired={false}
         isReadOnly={false}
-        value={name}
+        value={picture}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              name: value,
-              image,
-              link,
-              date,
+              picture: value,
+              kidID,
             };
             const result = onChange(modelFields);
-            value = result?.name ?? value;
+            value = result?.picture ?? value;
           }
-          if (errors.name?.hasError) {
-            runValidationTasks("name", value);
+          if (errors.picture?.hasError) {
+            runValidationTasks("picture", value);
           }
-          setName(value);
+          setPicture(value);
         }}
-        onBlur={() => runValidationTasks("name", name)}
-        errorMessage={errors.name?.errorMessage}
-        hasError={errors.name?.hasError}
-        {...getOverrideProps(overrides, "name")}
+        onBlur={() => runValidationTasks("picture", picture)}
+        errorMessage={errors.picture?.errorMessage}
+        hasError={errors.picture?.hasError}
+        {...getOverrideProps(overrides, "picture")}
       ></TextField>
       <TextField
-        label="Image"
+        label="Kid id"
         isRequired={false}
         isReadOnly={false}
-        value={image}
+        value={kidID}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              name,
-              image: value,
-              link,
-              date,
+              picture,
+              kidID: value,
             };
             const result = onChange(modelFields);
-            value = result?.image ?? value;
+            value = result?.kidID ?? value;
           }
-          if (errors.image?.hasError) {
-            runValidationTasks("image", value);
+          if (errors.kidID?.hasError) {
+            runValidationTasks("kidID", value);
           }
-          setImage(value);
+          setKidID(value);
         }}
-        onBlur={() => runValidationTasks("image", image)}
-        errorMessage={errors.image?.errorMessage}
-        hasError={errors.image?.hasError}
-        {...getOverrideProps(overrides, "image")}
-      ></TextField>
-      <TextField
-        label="Link"
-        isRequired={false}
-        isReadOnly={false}
-        value={link}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              name,
-              image,
-              link: value,
-              date,
-            };
-            const result = onChange(modelFields);
-            value = result?.link ?? value;
-          }
-          if (errors.link?.hasError) {
-            runValidationTasks("link", value);
-          }
-          setLink(value);
-        }}
-        onBlur={() => runValidationTasks("link", link)}
-        errorMessage={errors.link?.errorMessage}
-        hasError={errors.link?.hasError}
-        {...getOverrideProps(overrides, "link")}
-      ></TextField>
-      <TextField
-        label="Date"
-        isRequired={false}
-        isReadOnly={false}
-        type="date"
-        value={date}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              name,
-              image,
-              link,
-              date: value,
-            };
-            const result = onChange(modelFields);
-            value = result?.date ?? value;
-          }
-          if (errors.date?.hasError) {
-            runValidationTasks("date", value);
-          }
-          setDate(value);
-        }}
-        onBlur={() => runValidationTasks("date", date)}
-        errorMessage={errors.date?.errorMessage}
-        hasError={errors.date?.hasError}
-        {...getOverrideProps(overrides, "date")}
+        onBlur={() => runValidationTasks("kidID", kidID)}
+        errorMessage={errors.kidID?.errorMessage}
+        hasError={errors.kidID?.hasError}
+        {...getOverrideProps(overrides, "kidID")}
       ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
       >
         <Button
-          children="Clear"
+          children="Reset"
           type="reset"
           onClick={(event) => {
             event.preventDefault();
             resetStateValues();
           }}
-          {...getOverrideProps(overrides, "ClearButton")}
+          isDisabled={!(idProp || picturesModelProp)}
+          {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
           gap="15px"
@@ -258,7 +209,10 @@ export default function EventsCreateForm(props) {
             children="Submit"
             type="submit"
             variation="primary"
-            isDisabled={Object.values(errors).some((e) => e?.hasError)}
+            isDisabled={
+              !(idProp || picturesModelProp) ||
+              Object.values(errors).some((e) => e?.hasError)
+            }
             {...getOverrideProps(overrides, "SubmitButton")}
           ></Button>
         </Flex>

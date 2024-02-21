@@ -90,7 +90,7 @@ function StudentForm({ onStudentAdded }) {
   return (
     <Card className="create">
       {" "}
-      <h3>Add a New Kid </h3>{" "}
+      <h3>Add a New Kid (StudentForm.jsx)</h3>{" "}
       <div className="form-container">
         {" "}
         <div className="form-item">

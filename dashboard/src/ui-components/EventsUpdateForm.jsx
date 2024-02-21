@@ -62,7 +62,7 @@ export default function EventsUpdateForm(props) {
   React.useEffect(resetStateValues, [eventsRecord]);
   const validations = {
     name: [],
-    image: [{ type: "URL" }],
+    image: [],
     link: [],
     date: [],
   };

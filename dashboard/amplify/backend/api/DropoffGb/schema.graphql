@@ -1,7 +1,23 @@
+type KidsSchedule @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  Monday: Boolean
+  Tuesday: Boolean
+  Wednesday: Boolean
+  Thursday: Boolean
+  Friday: Boolean
+  Kid: Kid @hasOne
+}
+
+type Pictures @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  picture: String
+  kidID: String
+}
+
 type Events @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String
-  image: AWSURL
+  image: String
   link: String
   date: AWSDate
 }
