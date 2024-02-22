@@ -16,13 +16,12 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import panelImage from "../../../assets/slimeParty.png";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { format, getDay } from "date-fns";
+import { usePicturesContext } from "../../contexts/PicturesContext";
 const LoadingScreen = () => {
   const [events, setEvents] = useState([]);
   const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
-  const { dbUser } = useAuthContext();
-  const { kids } = useAuthContext();
-  console.log(kids);
-  console.log(dbUser);
+  const { kids, dbUser } = useAuthContext();
+  const { getPhotoInBucket } = usePicturesContext();
   useEffect(() => {
     const fetchEvents = async () => {
       try {

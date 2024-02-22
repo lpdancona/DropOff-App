@@ -159,6 +159,11 @@ const HomeScreen = () => {
               </View>
             )}
           </TouchableOpacity>
+          <View style={styles.checkBtn}>
+            <TouchableOpacity onPress={() => navigation.navigate("CheckIn")}>
+              <MaterialIcons name="account-box" size={20} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.headerGreetings}>
           <Text style={styles.title}>{`Hello, ${currentUserData?.name}`}</Text>

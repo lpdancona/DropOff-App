@@ -7,6 +7,17 @@ export default StyleSheet.create({
     alignItems: "center",
     paddingTop: Platform.OS === "android" ? 25 : 0,
   },
+  headerButtons: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  checkBtn: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 10,
+    marginLeft: "50%",
+  },
   card: {
     borderRadius: 12,
     backgroundColor: "white",

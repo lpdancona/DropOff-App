@@ -32,6 +32,10 @@ const SideDrawer = ({ isVisible, onClose, onLogout }) => {
     navigation.navigate("Loading");
     onClose();
   };
+  const navigateGallery = () => {
+    navigation.navigate("Gallery");
+    onClose();
+  };
 
   return (
     <Modal visible={isVisible} transparent={true} animationType="slide">
@@ -78,6 +82,13 @@ const SideDrawer = ({ isVisible, onClose, onLogout }) => {
             style={[styles.menuItem]}
           >
             <Text style={{ color: "white" }}>Kid Info</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor="transparent"
+            onPress={navigateGallery}
+            style={[styles.menuItem]}
+          >
+            <Text style={{ color: "white" }}>Gallery</Text>
           </TouchableHighlight>
           <TouchableHighlight
             underlayColor="transparent"
