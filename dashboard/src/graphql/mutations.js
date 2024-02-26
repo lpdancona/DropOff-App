@@ -1,6 +1,168 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createKidsSchedule = /* GraphQL */ `
+  mutation CreateKidsSchedule(
+    $input: CreateKidsScheduleInput!
+    $condition: ModelKidsScheduleConditionInput
+  ) {
+    createKidsSchedule(input: $input, condition: $condition) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const updateKidsSchedule = /* GraphQL */ `
+  mutation UpdateKidsSchedule(
+    $input: UpdateKidsScheduleInput!
+    $condition: ModelKidsScheduleConditionInput
+  ) {
+    updateKidsSchedule(input: $input, condition: $condition) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const deleteKidsSchedule = /* GraphQL */ `
+  mutation DeleteKidsSchedule(
+    $input: DeleteKidsScheduleInput!
+    $condition: ModelKidsScheduleConditionInput
+  ) {
+    deleteKidsSchedule(input: $input, condition: $condition) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const createPictures = /* GraphQL */ `
+  mutation CreatePictures(
+    $input: CreatePicturesInput!
+    $condition: ModelPicturesConditionInput
+  ) {
+    createPictures(input: $input, condition: $condition) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updatePictures = /* GraphQL */ `
+  mutation UpdatePictures(
+    $input: UpdatePicturesInput!
+    $condition: ModelPicturesConditionInput
+  ) {
+    updatePictures(input: $input, condition: $condition) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deletePictures = /* GraphQL */ `
+  mutation DeletePictures(
+    $input: DeletePicturesInput!
+    $condition: ModelPicturesConditionInput
+  ) {
+    deletePictures(input: $input, condition: $condition) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createEvents = /* GraphQL */ `
   mutation CreateEvents(
     $input: CreateEventsInput!
@@ -633,9 +795,10 @@ export const createMessage = /* GraphQL */ `
     createMessage(input: $input, condition: $condition) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename
@@ -650,9 +813,10 @@ export const updateMessage = /* GraphQL */ `
     updateMessage(input: $input, condition: $condition) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename
@@ -667,9 +831,10 @@ export const deleteMessage = /* GraphQL */ `
     deleteMessage(input: $input, condition: $condition) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename

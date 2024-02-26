@@ -72,6 +72,21 @@
   width: 90%;
   margin: auto;
 }
+
+.studentSchedule {
+  /* background-color: #ed3337; */
+}
+
+.days-of-week {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stars {
+  display: flex;
+  justify-content: space-between;
+}
+
 .student-details-btn {
   margin-right: 5%;
   display: flex;

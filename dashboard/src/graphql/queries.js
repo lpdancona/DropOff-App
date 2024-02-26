@@ -1,6 +1,98 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getKidsSchedule = /* GraphQL */ `
+  query GetKidsSchedule($id: ID!) {
+    getKidsSchedule(id: $id) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const listKidsSchedules = /* GraphQL */ `
+  query ListKidsSchedules(
+    $filter: ModelKidsScheduleFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listKidsSchedules(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        Monday
+        Tuesday
+        Wednesday
+        Thursday
+        Friday
+        createdAt
+        updatedAt
+        kidsScheduleKidId
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getPictures = /* GraphQL */ `
+  query GetPictures($id: ID!) {
+    getPictures(id: $id) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listPictures = /* GraphQL */ `
+  query ListPictures(
+    $filter: ModelPicturesFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listPictures(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        picture
+        kidID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getEvents = /* GraphQL */ `
   query GetEvents($id: ID!) {
     getEvents(id: $id) {
@@ -469,9 +561,10 @@ export const getMessage = /* GraphQL */ `
     getMessage(id: $id) {
       id
       senderID
-      receiverID
+      receiverIDs
       content
       sentAt
+      isRead
       createdAt
       updatedAt
       __typename
@@ -488,9 +581,10 @@ export const listMessages = /* GraphQL */ `
       items {
         id
         senderID
-        receiverID
+        receiverIDs
         content
         sentAt
+        isRead
         createdAt
         updatedAt
         __typename

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
+
 import { API } from "aws-amplify";
 import { updateKid, deleteKid } from "../graphql/mutations";
-import { listKids } from "../graphql/queries";
+//import { listKids } from "../graphql/queries";
 import "./Students.css";
 import StudentForm from "../components/StudentForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,6 +11,8 @@ import {
   faTrash,
   faArrowRight,
   faArrowLeft,
+  faStars,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "antd";
 import GoogleMapsAutocomplete from "./GoogleMapsAutocomplete";
@@ -17,7 +20,8 @@ import { useLocation } from "react-router-dom";
 import { useKidsContext } from "../contexts/KidsContext";
 
 function Students() {
-  const [students, setStudents] = useState([]);
+  const { kids } = useKidsContext();
+  //const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [nameFilter, setNameFilter] = useState("");
@@ -35,6 +39,15 @@ function Students() {
   const [updatedLng, setUpdatedLng] = useState("");
   const updateAutoCompleteRef = useRef();
   const location = useLocation();
+  const [photo, setPhoto] = useState(null);
+
+  const [attendanceDays, setAttendanceDays] = useState({
+    Monday: false,
+    Tuesday: false,
+    Wednesday: false,
+    Thursday: false,
+    Friday: false,
+  });
 
   const [selectedDays, setSelectedDays] = useState({
     Monday: false,
@@ -44,19 +57,48 @@ function Students() {
     Friday: false,
   });
 
-  const fetchKids = async () => {
-    try {
-      const response = await API.graphql({ query: listKids });
-      const kidsData = response.data.listKids.items;
-      setStudents(kidsData);
-    } catch (error) {
-      console.error("Error fetching kids", error);
-    }
+  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+
+  function getDayOfWeek(index) {
+    const daysOfWeek = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    return daysOfWeek[index];
+  }
+
+  const handleAttendanceToggle = (day) => {
+    setAttendanceDays((prevDays) => ({
+      ...prevDays,
+      [day]: !prevDays[day],
+    }));
   };
 
-  useEffect(() => {
-    fetchKids();
-  }, []);
+  // Function to handle photo upload
+  const handlePhotoChange = (e) => {
+    const selectedPhoto = e.target.files[0];
+    setPhoto(selectedPhoto);
+  };
+
+  const fetchKids = async () => {
+    // try {
+    //   const response = await API.graphql({ query: listKids });
+    //   const kidsData = response.data.listKids.items;
+    //   setStudents(kidsData);
+    // } catch (error) {
+    //   console.error("Error fetching kids", error);
+    // }
+  };
+
+  // useEffect(() => {
+  //   console.log("kids from context", kids);
+  //   fetchKids();
+  // }, []);
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);
@@ -69,18 +111,16 @@ function Students() {
   const startIndex = (currentPage - 1) * studentsPerPage;
   const endIndex = startIndex + studentsPerPage;
 
-  const filteredStudents = students.filter((student) => {
+  const filteredKids = kids.filter((kid) => {
     return (
       (nameFilter === "" ||
-        student.name?.toLowerCase().includes(nameFilter.toLowerCase())) &&
+        kid.name?.toLowerCase().includes(nameFilter.toLowerCase())) &&
       (addressFilter === "" ||
-        student.dropOffAddress
-          ?.toLowerCase()
-          .includes(addressFilter.toLowerCase()))
+        kid.dropOffAddress?.toLowerCase().includes(addressFilter.toLowerCase()))
     );
   });
 
-  const displayedStudents = filteredStudents.slice(startIndex, endIndex);
+  const displayedKids = filteredKids.slice(startIndex, endIndex);
 
   const handleStudentClick = (student) => {
     setSelectedStudent(student);
@@ -218,27 +258,69 @@ function Students() {
                   />
                 </div>
                 <div className="student">
-                  {displayedStudents.map((student) => (
-                    <div className="student-details-container" key={student.id}>
-                      <img src={student.photo} className="student-photo" />
+                  {displayedKids.map((kid) => (
+                    <div className="student-details-container" key={kid.id}>
+                      <img
+                        src={kid.uriKid}
+                        className="student-photo"
+                        alt="pic"
+                      />
                       <div className="student-details">
-                        <div className="student-name">{student.name}</div>
+                        <div className="student-name">{kid.name}</div>
                         <div className="student-address">
-                          {student.dropOffAddress}
+                          {kid.dropOffAddress}
                         </div>
-                        <div className="studentSchedule">{student}</div>
+                        {/* {kid.AttendanceDays && (
+                          <div className="studentSchedule">
+                            <h4>Attendance Schedule</h4>
+                            <p>{kid.AttendanceDays.join(", ")}</p>
+                          </div>
+                        )} */}
+                        {kid.AttendanceDays && (
+                          <div className="studentSchedule">
+                            <h4>Attendance</h4>
+                            <div className="attendance-icons">
+                              <div className="days-of-week">
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                              </div>
+                              <div className="stars">
+                                {[
+                                  "Monday",
+                                  "Tuesday",
+                                  "Wednesday",
+                                  "Thursday",
+                                  "Friday",
+                                ].map((day) => (
+                                  <FontAwesomeIcon
+                                    key={day}
+                                    icon={faStar}
+                                    style={{
+                                      color: kid.AttendanceDays.includes(day)
+                                        ? "green"
+                                        : "gray",
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div className="student-details-btn">
                         <button
                           className="btn-student btn-student-edit"
-                          onClick={() => handleStudentClick(student)}
+                          onClick={() => handleStudentClick(kid)}
                         >
                           <FontAwesomeIcon icon={faPenToSquare} />
                         </button>
                         <button
                           className="btn-student btn-student-delete"
                           onClick={() => {
-                            handleDeleteClick(student);
+                            handleDeleteClick(kid);
                           }}
                         >
                           <FontAwesomeIcon icon={faTrash} />
@@ -257,7 +339,7 @@ function Students() {
                   </button>
                   <button
                     onClick={handleNextPage}
-                    disabled={endIndex >= filteredStudents.length}
+                    disabled={endIndex >= filteredKids.length}
                     className="btn-student"
                   >
                     <FontAwesomeIcon icon={faArrowRight} beat />
@@ -312,6 +394,38 @@ function Students() {
                       value={updatedParent2Email || ""}
                       onChange={(e) => setUpdatedParent2Email(e.target.value)}
                     />
+                    <div className="form-item">
+                      <label>Attendance Days:</label>
+                      <div className="days-of-week">
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                      </div>
+                      <div className="attendance-options">
+                        {daysOfWeek.map((day) => (
+                          <FontAwesomeIcon
+                            key={day}
+                            icon={faStar}
+                            className={
+                              attendanceDays[day]
+                                ? "star-active"
+                                : "star-inactive"
+                            }
+                            onClick={() => handleAttendanceToggle(day)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="form-item">
+                      <label>Photo:</label>
+                      <input
+                        type="file"
+                        accept="image/jpeg, image/png"
+                        onChange={handlePhotoChange}
+                      />
+                    </div>
                     <button
                       onClick={handleUpdateStudent}
                       className="btn-student"
