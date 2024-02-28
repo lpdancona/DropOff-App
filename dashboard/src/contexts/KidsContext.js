@@ -1,11 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { API } from "aws-amplify";
-import {
-  listKids,
-  getUser,
-  listKidsSchedules,
-  kidsByRouteID,
-} from "../graphql/queries";
+import { listKids, getUser, listKidsSchedules } from "../graphql/queries";
+import { updateKid } from "../graphql/mutations";
 import { usePicturesContext } from "./PicturesContext";
 
 const KidsContext = createContext({});
@@ -81,11 +77,33 @@ const KidsContextProvider = ({ children }) => {
           }
         })
       );
-      console.log("completeKids", completeKids);
+      //console.log("completeKids", completeKids);
 
       setKids(completeKids);
     } catch (error) {
       console.error("Error fetching kids data", error);
+    }
+  };
+
+  const updateKidOnDb = async (id, updates) => {
+    try {
+      const updatedFields = updates.map(({ fieldName, value }) => ({
+        [fieldName]: value,
+      }));
+
+      // Merge all updated fields into a single object
+      const updatedKid = Object.assign({}, ...updatedFields);
+
+      // Perform the update operation using the API or other method
+      await API.graphql({
+        query: updateKid,
+        variables: { input: { id, ...updatedKid } },
+      });
+
+      console.log("Kid updated successfully!");
+    } catch (error) {
+      console.error("Error updating kid:", error);
+      throw error;
     }
   };
 
@@ -94,15 +112,10 @@ const KidsContextProvider = ({ children }) => {
     fetchKidsData();
   }, []);
 
-  // // Check if all necessary data has been fetched, then set loading to false
-  // useEffect(() => {
-  //   if (kids) {
-  //     setLoading(false);
-  //   }
-  // }, [kids]);
-
   return (
-    <KidsContext.Provider value={{ kids }}>{children}</KidsContext.Provider>
+    <KidsContext.Provider value={{ kids, fetchKidsData, updateKidOnDb }}>
+      {children}
+    </KidsContext.Provider>
   );
 };
 

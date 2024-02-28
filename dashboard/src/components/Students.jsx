@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 
 import { API } from "aws-amplify";
 import { updateKid, deleteKid } from "../graphql/mutations";
-//import { listKids } from "../graphql/queries";
 import "./Students.css";
 import StudentForm from "../components/StudentForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,17 +17,19 @@ import { Card } from "antd";
 import GoogleMapsAutocomplete from "./GoogleMapsAutocomplete";
 import { useLocation } from "react-router-dom";
 import { useKidsContext } from "../contexts/KidsContext";
+import { usePicturesContext } from "../contexts/PicturesContext";
+import { Storage } from "aws-amplify";
 
 function Students() {
   const { kids } = useKidsContext();
-  //const [students, setStudents] = useState([]);
+  const { savePhotoInBucket, updateKidOnDb, fetchKidsData } =
+    usePicturesContext();
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [nameFilter, setNameFilter] = useState("");
   const [addressFilter, setAddressFilter] = useState("");
   const [mode, setMode] = useState("list");
   const [updatedName, setUpdatedName] = useState("");
-  const [updatedAddress, setUpdatedAddress] = useState("");
   const [updatedAge, setUpdatedAge] = useState("");
   const [updatedParent2Email, setUpdatedParent2Email] = useState("");
   const [updatedParent1Email, setUpdatedParent1Email] = useState("");
@@ -40,6 +41,9 @@ function Students() {
   const updateAutoCompleteRef = useRef();
   const location = useLocation();
   const [photo, setPhoto] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
 
   const [attendanceDays, setAttendanceDays] = useState({
     Monday: false,
@@ -59,18 +63,18 @@ function Students() {
 
   const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 
-  function getDayOfWeek(index) {
-    const daysOfWeek = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    return daysOfWeek[index];
-  }
+  // function getDayOfWeek(index) {
+  //   const daysOfWeek = [
+  //     "Sunday",
+  //     "Monday",
+  //     "Tuesday",
+  //     "Wednesday",
+  //     "Thursday",
+  //     "Friday",
+  //     "Saturday",
+  //   ];
+  //   return daysOfWeek[index];
+  // }
 
   const handleAttendanceToggle = (day) => {
     setAttendanceDays((prevDays) => ({
@@ -83,6 +87,34 @@ function Students() {
   const handlePhotoChange = (e) => {
     const selectedPhoto = e.target.files[0];
     setPhoto(selectedPhoto);
+  };
+
+  const handleUpload = async (file) => {
+    try {
+      console.log("Uploading image to S3...");
+      const filename = `kid-photo-${selectedStudent.id}-${Date.now()}`;
+      console.log(filename);
+      await savePhotoInBucket(filename, file);
+      const updates = [{ fieldName: "photo", value: filename }];
+      await updateKidOnDb(selectedStudent.id, updates);
+
+      console.log("Image uploaded successfully.");
+      const imageURL = await Storage.get(filename);
+      console.log("Image URL:", imageURL);
+      setUploadedImageUrl(imageURL); // Update state with uploaded image URL
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
+
+  const handleFileChange = () => {
+    fileInputRef.current.click(); // Trigger click on file input
+  };
+
+  const handleFileSelection = (event) => {
+    const selectedPhoto = event.target.files[0];
+    setSelectedFile(selectedPhoto);
+    handleUpload(selectedPhoto);
   };
 
   const fetchKids = async () => {
@@ -131,10 +163,13 @@ function Students() {
   useEffect(() => {
     if (selectedStudent) {
       setUpdatedName(selectedStudent.name);
-      setUpdatedAddress(selectedStudent.dropOffAddress);
+      setUpdatedDropOffAddress(selectedStudent.dropOffAddress);
       setUpdatedAge(selectedStudent.birthDate);
       setUpdatedParent1Email(selectedStudent.parent1Email);
       setUpdatedParent2Email(selectedStudent.parent2Email);
+      setUpdatedLat(selectedStudent.lat);
+      setUpdatedLng(selectedStudent.lng);
+
       setUpdatedPhoto(selectedStudent.photo);
     }
   }, [selectedStudent]);
@@ -173,7 +208,9 @@ function Students() {
     if (!selectedStudent) {
       return;
     }
-    console.log(selectedStudent);
+    //console.log("kid to update", selectedStudent);
+    //console.log(updatedLat);
+    //console.log(updatedDropOffAddress);
     const nameUpdated = selectedStudent.name;
     try {
       await API.graphql({
@@ -184,7 +221,7 @@ function Students() {
             name: updatedName,
             parent1Email: updatedParent1Email,
             parent2Email: updatedParent2Email,
-            dropOffAddress: updatedAddress,
+            dropOffAddress: updatedDropOffAddress,
             lat: updatedLat,
             lng: updatedLng,
             birthDate: updatedAge,
@@ -205,10 +242,12 @@ function Students() {
       setSelectedStudent(null);
       setMode("list");
       setUpdatedName("");
-      setUpdatedAddress("");
+      setUpdatedDropOffAddress("");
       setUpdatedAge("");
       setUpdatedParent1Email("");
       setUpdatedParent2Email("");
+      setUpdatedLat("");
+      setUpdatedLng("");
       setUpdatedPhoto("");
     } catch (error) {
       console.error("Error updating student:", error);
@@ -353,6 +392,35 @@ function Students() {
                 <div className="update-student">
                   <h4>{selectedStudent.name}</h4>
                   <Card>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: "none" }}
+                      onChange={handleFileSelection}
+                    />
+                    <div className="photo-container" onClick={handleFileChange}>
+                      <img
+                        src={uploadedImageUrl || selectedStudent.uriKid}
+                        className="student-photo"
+                        alt="pic"
+                      />
+                      <div className="photo-overlay">
+                        <FontAwesomeIcon icon={faPenToSquare} />
+                      </div>
+                    </div>
+                    {/* <div
+                      className="photo-container"
+                      onClick={() => handleFileChange()}
+                    >
+                      <img
+                        src={selectedStudent.uriKid}
+                        className="student-photo"
+                        alt="pic"
+                      />
+                      <div className="photo-overlay">
+                        <FontAwesomeIcon icon={faPenToSquare} />
+                      </div>
+                    </div> */}
                     <label>Name:</label>
                     <input
                       type="text"
@@ -369,7 +437,7 @@ function Students() {
                     <GoogleMapsAutocomplete
                       onPlaceSelect={handleUpdateAddressSelect}
                       ref={updateAutoCompleteRef}
-                      defaultValue={updatedAddress}
+                      defaultValue={updatedDropOffAddress}
                     />
                     {/* <input
                       type="text"
@@ -418,14 +486,14 @@ function Students() {
                         ))}
                       </div>
                     </div>
-                    <div className="form-item">
+                    {/* <div className="form-item">
                       <label>Photo:</label>
                       <input
                         type="file"
                         accept="image/jpeg, image/png"
                         onChange={handlePhotoChange}
                       />
-                    </div>
+                    </div> */}
                     <button
                       onClick={handleUpdateStudent}
                       className="btn-student"

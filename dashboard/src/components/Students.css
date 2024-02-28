@@ -108,3 +108,18 @@
 .student-address {
   font-size: 12px;
 }
+
+.photo-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer; /* Change cursor on hover */
+}
+
+.photo-container:hover {
+  opacity: 0.8; /* Change opacity on hover if desired */
+}
+
+.photo-container img {
+  width: 10%;
+  height: auto;
+}
