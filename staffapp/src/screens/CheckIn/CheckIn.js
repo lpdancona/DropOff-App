@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,54 +7,15 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import styles from "./styles";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-
-const studentsData = [
-  {
-    id: 1,
-    name: "John Doe",
-    profilePicture: "https://i.ibb.co/F6k9FyF/IMG-6588.jpg",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    profilePicture: "https://i.ibb.co/hZxxBPc/Subject.png",
-  },
-  {
-    id: 3,
-    name: "John Doe",
-    profilePicture: "https://i.ibb.co/dmrG0Rh/test-pic.png",
-  },
-  {
-    id: 4,
-    name: "Jane Smith",
-    profilePicture: "https://i.ibb.co/hZxxBPc/Subject.png",
-  },
-  {
-    id: 5,
-    name: "John Doe",
-    profilePicture: "https://i.ibb.co/F6k9FyF/IMG-6588.jpg",
-  },
-  {
-    id: 6,
-    name: "Jane Smith",
-    profilePicture: "https://i.ibb.co/hZxxBPc/Subject.png",
-  },
-  {
-    id: 7,
-    name: "John Doe",
-    profilePicture: "https://i.ibb.co/dmrG0Rh/test-pic.png",
-  },
-  {
-    id: 8,
-    name: "Jane Smith",
-    profilePicture: "https://i.ibb.co/hZxxBPc/Subject.png",
-  },
-];
+import { API, graphqlOperation } from "aws-amplify";
+import { useKidsContext } from "../../contexts/KidsContext";
 
 const CheckIn = ({ schoolName }) => {
+  const { kids } = useKidsContext();
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [filter, setFilter] = useState("");
 
@@ -73,7 +34,7 @@ const CheckIn = ({ schoolName }) => {
     return selectedStudents.indexOf(studentId) !== -1;
   };
 
-  const filteredStudents = studentsData.filter((student) =>
+  const filteredStudents = kids.filter((student) =>
     student.name.toLowerCase().includes(filter.toLowerCase())
   );
 
@@ -85,10 +46,7 @@ const CheckIn = ({ schoolName }) => {
         isStudentSelected(item.id) && styles.selectedStudent,
       ]}
     >
-      <Image
-        source={{ uri: item.profilePicture }}
-        style={styles.profilePicture}
-      />
+      <Image source={{ uri: item.uriKid }} style={styles.profilePicture} />
       <Text style={styles.studentName}>{item.name}</Text>
     </TouchableOpacity>
   );
@@ -109,7 +67,7 @@ const CheckIn = ({ schoolName }) => {
       <FlatList
         data={filteredStudents}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id}
         numColumns={3}
         contentContainerStyle={styles.studentsList}
       />

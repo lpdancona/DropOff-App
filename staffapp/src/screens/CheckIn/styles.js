@@ -4,21 +4,23 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#FFFFFF",
   },
   schoolName: {
     fontSize: 24,
     fontWeight: "bold",
     marginTop: 25,
-    color: "white",
+    color: "#FFFFFF",
   },
   studentsList: {
-    justifyContent: "space-between",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
   },
   studentContainer: {
     alignItems: "center",
-    marginBottom: 10,
-    marginVertical: "7%",
-    marginHorizontal: "5%",
+    marginBottom: 20,
+    marginHorizontal: 10,
   },
   profilePicture: {
     width: 80,
@@ -29,12 +31,12 @@ export default StyleSheet.create({
   studentName: {
     fontSize: 14,
     textAlign: "center",
+    color: "black",
   },
   buttonContainer: {
     marginTop: 20,
     width: "100%",
-    height: "6%",
-    marginBottom: 30,
+    alignItems: "center",
   },
   touchableOpacityStyle: {
     flexDirection: "row",
@@ -43,6 +45,7 @@ export default StyleSheet.create({
     backgroundColor: "#FF7276",
     paddingVertical: 10,
     paddingHorizontal: 20,
+    borderRadius: 25,
   },
   buttonText: {
     color: "#FFFFFF",
