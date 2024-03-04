@@ -1,227 +1,127 @@
 import { StyleSheet } from "react-native";
-
 export default StyleSheet.create({
-  mapContainer: {
-    paddingTop: 15,
-    backgroundColor: "#FF7276",
+  container: {
     flex: 1,
-    position: "relative",
   },
-  containerMenu: {
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexDirection: "row",
-    backgroundColor: "#FF7276",
-    padding: 20,
-    maxHeight: "25%",
-    paddingTop: 40,
-    //gap: 80,
-    //gap: "100%",
+  // containerMenu: {
+  //   flexDirection: "row",
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  //   backgroundColor: "#FF7276",
+  //   padding: 10,
+  // },
+  // containerMenu: {
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  //   flexDirection: "row",
+  //   backgroundColor: "#FF7276",
+  //   padding: 20,
+  //   maxHeight: "25%",
+  //   paddingTop: 40,
+  //   gap: "100%",
+  // },
+  swiper: {
+    height: "50%",
+    marginTop: "15%",
   },
-  logoutMenu: {
-    marginLeft: 15,
+  welcomeContainer: {
     marginTop: 20,
-    marginRight: "50%",
+    marginLeft: 10,
   },
-  modalContainer: {
-    marginTop: 40,
+  date: {
+    marginTop: 10,
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
   },
-
-  handleIndicator: {
-    backgroundColor: "grey",
-    width: 100,
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: "bold",
     color: "#FF7276",
+    marginBottom: 20,
   },
-  handleIndicatorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingBottom: 50,
-  },
-  routeDetailsText: {
+  eventHeader: {
     fontSize: 20,
-    letterSpacing: 2,
-  },
-  deliveryDetailsContainer: {
-    paddingHorizontal: 20,
-  },
-  infoOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    //zIndex: 2, // Higher zIndex to be on top of the map
-    padding: 10,
-    zIndex: 1,
-  },
-  infoBoard: {
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    padding: 15,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  infoText: {
-    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 10,
   },
-  restaurantName: {
-    fontSize: 25,
-    letterSpacing: 1,
-    paddingVertical: 20,
-  },
-  addressContainer: {
-    flexDirection: "row",
-    marginBottom: 20,
-    alignItems: "center",
-  },
-  addressText: {
-    fontSize: 20,
-    color: "grey",
-    fontWeight: "500",
-    letterSpacing: 0.5,
-    marginLeft: 15,
-    textAlign: "center",
-  },
-  orderDetailsContainer: {
-    borderTopWidth: 1,
-    borderColor: "lightgrey",
-    paddingTop: 20,
-  },
-  orderItemText: {
-    fontSize: 18,
-    color: "grey",
-    fontWeight: "500",
-    letterSpacing: 0.5,
-    marginBottom: 5,
-  },
-  buttonContainer: {
-    backgroundColor: "#3fc060",
-    marginTop: "auto",
-    marginVertical: 30,
-    marginHorizontal: 10,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "white",
-    paddingVertical: 15,
-    fontSize: 25,
-    fontWeight: "500",
-    textAlign: "center",
-    letterSpacing: 0.5,
-  },
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 20,
-  },
-  imageDriver: {
-    // flex: 1,
-    width: 170,
-    aspectRatio: 2 / 3,
-    marginBottom: 5,
-  },
-  imageHelper: {
-    // flex: 1,
-    width: 180,
-    //height: 271,
-    aspectRatio: 3 / 3,
-    marginTop: 13,
-  },
-  zoomButton: {
-    position: "absolute",
-    top: 155,
-    left: 10,
-    backgroundColor: "#FF7276",
-    borderRadius: 50,
-    padding: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modalContainer: {
-    paddingVertical: 48,
-    paddingHorizontal: 0,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-  },
-  modalContent: {
-    padding: 16,
-    flexDirection: "column",
-    alignItems: "center",
+  eventContainer: {
+    borderRadius: 15,
+    overflow: "hidden",
+    width: "90%",
+    marginLeft: "auto",
+    marginRight: "auto",
     backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: "#e3e3e3",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-  profileName: {
-    marginTop: 12,
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#090909",
+  eventImage: {
+    width: "100%",
+    height: 200,
+    resizeMode: "cover",
   },
-  profileEmail: {
-    marginTop: 6,
+  eventDetails: {
+    padding: 15,
+  },
+  eventName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
+  },
+  eventDate: {
     fontSize: 16,
-    fontWeight: "400",
-    color: "#848484",
+    color: "#555",
   },
-  staffNumber: {
-    marginTop: 6,
-    fontSize: 16,
-  },
-  closeButton: {
-    marginTop: 10,
-    alignItems: "center",
-    backgroundColor: "red",
+  kidsContainer: {
     padding: 10,
-    borderRadius: 30, // Adjust the border radius as needed
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    marginTop: 20,
+    width: "70%",
+    marginLeft: "15%",
+    marginRight: "15%",
   },
-  closeButtonText: {
-    color: "white", // Text color
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  kidItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  kidImageContainer: {
+    position: "relative",
+  },
+  kidImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+  },
+  placeholderImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "lightgray",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  placeholderText: {
+    color: "white",
+  },
+  kidName: {
     fontSize: 16,
     fontWeight: "bold",
-  },
-  driverContainer: {
-    paddingVertical: 5,
-    paddingHorizontal: 50,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-  },
-  profile: {
-    padding: 12,
-    //gap: 0,
-    backgroundColor: "#f6f6f6",
-    borderRadius: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  profileAvatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 9999,
-    marginRight: 12,
-  },
-  profileName: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#292929",
-  },
-  profileHandle: {
-    marginTop: 2,
-    fontSize: 16,
-    fontWeight: "400",
-    color: "#858585",
-  },
-  helperDsc: {
-    marginTop: 20,
-  },
-  callBtn: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
   },
 });

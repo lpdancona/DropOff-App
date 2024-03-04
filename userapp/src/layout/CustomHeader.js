@@ -13,11 +13,12 @@ const CustomHeader = () => {
         style={{
           width: "20%",
           height: "30%",
+          //paddingTop: 20,
           marginTop: 5,
           marginBottom: 5,
           resizeMode: "cover",
           alignSelf: "center",
-          borderRadius: 80,
+          borderRadius: 100,
           overflow: "hidden",
         }}
       />
@@ -28,7 +29,7 @@ const CustomHeader = () => {
           textAlign: "center",
         }}
       >
-        After School Program Drop Off
+        After School Program
       </Text>
     </SafeAreaView>
   );

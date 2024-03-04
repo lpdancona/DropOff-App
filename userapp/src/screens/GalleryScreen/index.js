@@ -4,7 +4,7 @@ import styles from "./styles";
 import SideDrawer from "../SideDrawer/SideDrawer";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-const Gallery = () => {
+const GalleryScreen = () => {
   const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
   // Dummy data
   const kid = {
@@ -83,4 +83,4 @@ const Gallery = () => {
   );
 };
 
-export default Gallery;
+export default GalleryScreen;

@@ -15,7 +15,6 @@ import { Auth } from "aws-amplify";
 import styles from "./styles";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useAuthContext } from "../../contexts/AuthContext";
-
 import { useNavigation } from "@react-navigation/native";
 
 // import { API, graphqlOperation } from "aws-amplify";
