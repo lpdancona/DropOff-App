@@ -1,28 +1,19 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Linking,
-  FlatList,
-} from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, Image, Linking, FlatList, Pressable } from "react-native";
 import Swiper from "react-native-swiper";
 import { API, graphqlOperation } from "aws-amplify";
 import { listEvents } from "../../graphql/queries";
 import styles from "./styles";
-//import SideDrawer from "../SideDrawer/SideDrawer";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import panelImage from "../../../assets/slimeParty.png";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { format, getDay } from "date-fns";
 import { usePicturesContext } from "../../contexts/PicturesContext";
 
 const HomeScreen = () => {
   const [events, setEvents] = useState([]);
-  // const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
   const { kids, dbUser } = useAuthContext();
+  const [currentIndex, setCurrentIndex] = useState(0);
   const { getPhotoInBucket } = usePicturesContext();
+  const swiperRef = useRef(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -32,8 +23,20 @@ const HomeScreen = () => {
             limit: 10,
           })
         );
+        const eventsList = response.data.listEvents.items;
 
-        setEvents(response.data.listEvents.items);
+        const eventsWithPhotos = await Promise.all(
+          eventsList.map(async (event) => {
+            if (event.image) {
+              const uriEventImage = await getPhotoInBucket(event.image);
+              return { ...event, uriEventImage };
+            } else {
+              return event;
+            }
+          })
+        );
+
+        setEvents(eventsWithPhotos);
       } catch (error) {
         console.error("Error fetching events:", error);
       }
@@ -41,16 +44,6 @@ const HomeScreen = () => {
 
     fetchEvents();
   }, []);
-
-  // const handleLogout = async () => {
-  //   try {
-  //     await Auth.signOut();
-  //   } catch (error) {
-  //     console.error("Logout error:", error);
-  //   } finally {
-  //     setSideDrawerVisible(false);
-  //   }
-  // };
 
   const handleEventPress = (link) => {
     if (link) {
@@ -66,22 +59,27 @@ const HomeScreen = () => {
     }
   };
 
+  const handleIndexChanged = (index) => {
+    console.log(currentIndex);
+    setCurrentIndex(index);
+  };
+
   const renderEvent = (item) => {
-    console.log("Event Image URL:", item.image);
+    //console.log("Event Image URL:", item.image);
 
     return (
-      <TouchableOpacity
-        key={item.id}
-        onPress={() => handleEventPress(item.link)}
-      >
+      <Pressable key={item.id} onPress={() => handleEventPress(item.link)}>
         <View style={styles.eventContainer}>
-          <Image source={panelImage} style={styles.eventImage} />
+          <Image
+            source={{ uri: item.uriEventImage }}
+            style={styles.eventImage}
+          />
           <View style={styles.eventDetails}>
             <Text style={styles.eventName}>{item.name}</Text>
             <Text style={styles.eventDate}>{item.date}</Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
@@ -132,7 +130,14 @@ const HomeScreen = () => {
       </View>
       <View style={styles.swiper}>
         <Text style={styles.eventHeader}>Upcoming Events</Text>
-        <Swiper loop={false} autoplay={true}>
+        <Swiper
+          ref={swiperRef}
+          autoplay={true}
+          autoplayTimeout={2}
+          loop={true}
+          index={currentIndex}
+          onIndexChanged={handleIndexChanged}
+        >
           {events.map(renderEvent)}
         </Swiper>
       </View>

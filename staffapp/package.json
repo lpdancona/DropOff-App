@@ -29,7 +29,7 @@
     "axios": "^1.5.0",
     "core-js": "^3.32.0",
     "dotenv": "^16.3.1",
-    "expo": "^49.0.0",
+    "expo": "^50.0.8",
     "expo-background-fetch": "~11.3.0",
     "expo-constants": "~14.4.2",
     "expo-dev-client": "~2.4.12",
@@ -67,5 +67,6 @@
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@4.1.1"
 }
