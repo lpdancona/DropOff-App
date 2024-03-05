@@ -16,7 +16,7 @@ import { updateKid } from "../../graphql/mutations";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { usePicturesContext } from "../../contexts/PicturesContext";
 import styles from "./styles";
-import SideDrawer from "../SideDrawer/SideDrawer";
+//import SideDrawer from "../SideDrawer/SideDrawer";
 import { differenceInHours } from "date-fns";
 const PickScreen = () => {
   const { userEmail } = useAuthContext();
@@ -27,7 +27,7 @@ const PickScreen = () => {
   const [loadingPhotos, setLoadingPhotos] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
+  //const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
   const getKidPhotos = async () => {
     try {
       setLoadingPhotos(true);
@@ -143,20 +143,23 @@ const PickScreen = () => {
       .join("")
       .toUpperCase();
   };
-  const handleLogout = async () => {
-    try {
-      // Sign out the user using Amplify Auth
-      await Auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      setDropdownVisible(false);
-      setLogoutModalVisible(false);
-    }
-  };
-  const toggleSideDrawer = () => {
-    setSideDrawerVisible(!isSideDrawerVisible);
-  };
+
+  // const handleLogout = async () => {
+  //   try {
+  //     // Sign out the user using Amplify Auth
+  //     await Auth.signOut();
+  //   } catch (error) {
+  //     console.error("Logout error:", error);
+  //   } finally {
+  //     setDropdownVisible(false);
+  //     setLogoutModalVisible(false);
+  //   }
+  // };
+
+  // const toggleSideDrawer = () => {
+  //   setSideDrawerVisible(!isSideDrawerVisible);
+  // };
+
   const updateCheckedInStatus = async (kidId, checkedInStatus) => {
     try {
       const response = await API.graphql({
@@ -249,7 +252,7 @@ const PickScreen = () => {
         <ActivityIndicator style={{ padding: 50 }} size={"large"} />
       ) : (
         <View style={styles.container}>
-          <View style={styles.containerMenu}>
+          {/* <View style={styles.containerMenu}>
             <TouchableOpacity onPress={toggleSideDrawer}>
               <MaterialIcons name="menu" size={30} color="white" />
             </TouchableOpacity>
@@ -259,7 +262,7 @@ const PickScreen = () => {
               onClose={toggleSideDrawer}
               onLogout={handleLogout}
             />
-          </View>
+          </View> */}
           <View>
             <FlatList
               data={kids}

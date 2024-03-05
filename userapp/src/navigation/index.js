@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import React from "react";
+// import { SafeAreaView } from "react-native-safe-area-context";
+// import { useNavigation } from "@react-navigation/native";
 //import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -15,7 +15,6 @@ import PickScreen from "../screens/PickScreen";
 import GalleryScreen from "../screens/GalleryScreen";
 //import SideDrawer from "../screens/SideDrawer/SideDrawer";
 import { useAuthContext } from "../contexts/AuthContext";
-import { Auth } from "aws-amplify";
 import {
   SimpleLineIcons,
   FontAwesome5,
@@ -23,38 +22,22 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 
-// import { useRouteContext } from "../contexts/RouteContext";
+import { useRouteContext } from "../contexts/RouteContext";
+import customDrawerContent from "../components/customDrawerContent";
 // import { usePushNotificationsContext } from "../contexts/PushNotificationsContext";
 
 const RootNavigator = () => {
   const { dbUser, loading } = useAuthContext();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { isRouteInProgress } = useRouteContext();
+  //const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const StackNav = () => {
-    const Stack = createNativeStackNavigator();
-    const navigation = useNavigation();
-
-    return (
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {dbUser ? (
-          // isRouteInProgress && !permissionMessage ? (
-          // <Stack.Screen name="Chat" component={ChatScreen} />
-          // <Stack.Screen name="Route" component={RouteScreen} />
-          // ) : (
-          <Stack.Screen name="HomeStack" component={HomeScreen} />
-        ) : (
-          // )
-          <Stack.Screen name="ParentLogin" component={ProfileScreen} />
-        )}
-        <Stack.Screen name="ChatUser" component={ChatUserScreen} />
-      </Stack.Navigator>
-    );
-  };
+  const Stack = createNativeStackNavigator();
+  const Drawer = createDrawerNavigator();
 
   const DrawerNav = () => {
-    const Drawer = createDrawerNavigator();
     return (
       <Drawer.Navigator
+        drawerContent={customDrawerContent}
         screenOptions={{
           // headerShown: false,
           drawerStyle: {
@@ -83,7 +66,7 @@ const RootNavigator = () => {
               <SimpleLineIcons name="home" size={20} color="#808080" />
             ),
           }}
-          component={StackNav}
+          component={HomeScreen}
         />
         <Drawer.Screen
           name="Chat"
@@ -97,7 +80,7 @@ const RootNavigator = () => {
           component={ChatScreen}
         />
         <Drawer.Screen
-          name="DropOffRoute"
+          name={isRouteInProgress ? "DropOffRoute" : "Wait"}
           options={{
             drawerLabel: "DropOffRoute",
             title: "Drop Off",
@@ -105,7 +88,7 @@ const RootNavigator = () => {
               <FontAwesome5 name="bus" size={20} color="#808080" />
             ),
           }}
-          component={DropOffRouteScreen}
+          component={isRouteInProgress ? DropOffRouteScreen : WaitingScreen}
         />
         <Drawer.Screen
           name="Pick"
@@ -137,6 +120,27 @@ const RootNavigator = () => {
     );
   };
 
+  const StackNav = () => {
+    //const navigation = useNavigation();
+
+    return (
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {dbUser ? (
+          // isRouteInProgress && !permissionMessage ? (
+          // <Stack.Screen name="Chat" component={ChatScreen} />
+          // <Stack.Screen name="Route" component={RouteScreen} />
+          // ) : (
+          <Stack.Screen name="DrawerNav" component={DrawerNav} />
+        ) : (
+          // )
+          <Stack.Screen name="ParentLogin" component={ProfileScreen} />
+        )}
+        <Stack.Screen name="Wait" component={WaitingScreen} />
+        <Stack.Screen name="ChatUser" component={ChatUserScreen} />
+      </Stack.Navigator>
+    );
+  };
+
   // const { isRouteInProgress } = useRouteContext();
   // const { permissionMessage } = usePushNotificationsContext();
 
@@ -144,48 +148,7 @@ const RootNavigator = () => {
     return <ActivityIndicator size="large" color="gray" />;
   }
 
-  const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
-
-  const handleLogout = async () => {
-    try {
-      // Sign out the user using Amplify Auth
-      await Auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      setConfirmationModalVisible(false);
-    }
-  };
-
-  return <DrawerNav />;
+  return <StackNav />;
 };
 
 export default RootNavigator;
-
-// <View style={{ flex: 1 }}>
-//   <SideDrawer
-//     isVisible={isDrawerOpen}
-//     onClose={toggleDrawer}
-//     onLogout={handleLogout}
-//   />
-//   <Stack.Navigator screenOptions={{ headerShown: false }}>
-//     {dbUser ? (
-//       // isRouteInProgress && !permissionMessage ? (
-//       // <Stack.Screen name="Chat" component={ChatScreen} />
-//       // <Stack.Screen name="Route" component={RouteScreen} />
-//       // ) : (
-//       <Stack.Screen name="Home" component={HomeScreen} />
-//     ) : (
-//       // )
-//       <Stack.Screen name="ParentLogin" component={ProfileScreen} />
-//     )}
-//     <Stack.Screen name="Chat" component={ChatScreen} />
-//     <Stack.Screen name="ChatUser" component={ChatUserScreen} />
-//     <Stack.Screen name="Wait" component={WaitingScreen} />
-//     <Stack.Screen name="Pick" component={PickScreen} />
-//     <Stack.Screen name="Gallery" component={GalleryScreen} />
-//     <Stack.Screen name="DropOffRoute" component={DropOffRouteScreen} />
-//   </Stack.Navigator>
-// </View>

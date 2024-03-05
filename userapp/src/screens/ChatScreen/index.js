@@ -8,10 +8,12 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useMessageContext } from "../../contexts/MessageContext";
 
-const ChatScreen = ({ navigation }) => {
+const ChatScreen = () => {
+  const navigation = useNavigation();
   const { kids } = useAuthContext();
   const [users, setUsers] = useState([]);
   const { unreadMessages } = useMessageContext();

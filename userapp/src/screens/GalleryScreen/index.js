@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import styles from "./styles";
-import SideDrawer from "../SideDrawer/SideDrawer";
+//import SideDrawer from "../SideDrawer/SideDrawer";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 const GalleryScreen = () => {
-  const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
+  //const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
   // Dummy data
   const kid = {
     name: "Davi",
@@ -17,23 +17,23 @@ const GalleryScreen = () => {
     ],
   };
 
-  const handleLogout = async () => {
-    try {
-      await Auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      setSideDrawerVisible(false);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await Auth.signOut();
+  //   } catch (error) {
+  //     console.error("Logout error:", error);
+  //   } finally {
+  //     setSideDrawerVisible(false);
+  //   }
+  // };
 
-  const toggleSideDrawer = () => {
-    setSideDrawerVisible(!isSideDrawerVisible);
-  };
+  // const toggleSideDrawer = () => {
+  //   setSideDrawerVisible(!isSideDrawerVisible);
+  // };
 
   return (
     <View style={styles.container}>
-      <View style={styles.containerMenu}>
+      {/* <View style={styles.containerMenu}>
         <TouchableOpacity onPress={toggleSideDrawer}>
           <MaterialIcons name="menu" size={30} color="white" />
         </TouchableOpacity>
@@ -43,7 +43,7 @@ const GalleryScreen = () => {
           onClose={toggleSideDrawer}
           onLogout={handleLogout}
         />
-      </View>
+      </View> */}
       {/* Profile Section */}
       <View style={styles.profileContainer}>
         <Image

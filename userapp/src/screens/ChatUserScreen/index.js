@@ -4,10 +4,10 @@ import { Bubble, GiftedChat, Send } from "react-native-gifted-chat";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { Entypo } from "@expo/vector-icons";
 import styles from "./styles";
-import { useRoute } from "@react-navigation/native";
-import SideDrawer from "../SideDrawer/SideDrawer";
-import { Auth, API, graphqlOperation } from "aws-amplify";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { API, graphqlOperation } from "aws-amplify";
 import { createMessage, updateMessage } from "../../graphql/mutations";
 import { listMessages } from "../../graphql/queries";
 import { useAuthContext } from "../../contexts/AuthContext";
@@ -17,6 +17,7 @@ import { usePushNotificationsContext } from "../../contexts/PushNotificationsCon
 
 const ChatUserScreen = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const kidID = route.params?.id;
   const { kids } = useAuthContext();
   const { staff } = useStaffContext();
@@ -26,10 +27,13 @@ const ChatUserScreen = () => {
   const [allMessages, setAllMessages] = useState(null);
   const { sendPushNotification } = usePushNotificationsContext();
   const [messages, setMessages] = useState([]);
-  const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
   const [currentKidData, setCurrentKidData] = useState(null);
   const [unreadOthersMessages, setUnreadOthersMessages] = useState([]);
   const [isMarkedAsRead, setIsMarkedAsRead] = useState(false);
+
+  const goBack = () => {
+    navigation.goBack();
+  };
 
   useEffect(() => {
     if (unreadMessages.length > 0 && messages.length > 0) {
@@ -334,21 +338,6 @@ const ChatUserScreen = () => {
     <FontAwesome name="angle-double-down" size={22} color="#333" />
   );
 
-  const toggleSideDrawer = () => {
-    setSideDrawerVisible(!isSideDrawerVisible);
-  };
-
-  const handleLogout = async () => {
-    try {
-      // Sign out the user using Amplify Auth
-      await Auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      setSideDrawerVisible(false); // Fix: Close the side drawer after logout
-    }
-  };
-
   if (!currentKidData) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
@@ -356,15 +345,9 @@ const ChatUserScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.containerMenu}>
-        <TouchableOpacity onPress={toggleSideDrawer}>
-          <MaterialIcons name="menu" size={30} color="white" />
+        <TouchableOpacity style={styles.goBackIcon} onPress={() => goBack()}>
+          <Entypo name="chevron-left" size={30} color="white" />
         </TouchableOpacity>
-
-        <SideDrawer
-          isVisible={isSideDrawerVisible}
-          onClose={toggleSideDrawer}
-          onLogout={handleLogout}
-        />
       </View>
       <View style={{ flex: 1 }}>
         <GiftedChat

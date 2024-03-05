@@ -3,6 +3,14 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  goBackIcon: {
+    position: "absolute",
+    alignItems: "center",
+    top: 22,
+    left: 10,
+    zIndex: 1,
   },
   containerMenu: {
     justifyContent: "space-between",

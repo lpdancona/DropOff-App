@@ -2,8 +2,8 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   mapContainer: {
-    paddingTop: 15,
-    backgroundColor: "#FF7276",
+    //paddingTop: 15,
+    //backgroundColor: "#FF7276",
     flex: 1,
     position: "relative",
   },

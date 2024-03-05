@@ -22,7 +22,7 @@ import { useRouteContext } from "../../contexts/RouteContext";
 import { Auth } from "aws-amplify";
 import houseIcon from "../../docs/icon-house.png";
 import vanIcon from "../../docs/van.png";
-import SideDrawer from "../SideDrawer/SideDrawer";
+//import SideDrawer from "../SideDrawer/SideDrawer";
 
 const DropOffRouteScreen = () => {
   //const { kids, dbUser, currentUserData, userEmail } = useAuthContext();
@@ -52,7 +52,7 @@ const DropOffRouteScreen = () => {
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const snapPoints = useMemo(() => ["12%", "95%"], []);
   const navigation = useNavigation();
-  const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
+  //const [isSideDrawerVisible, setSideDrawerVisible] = useState(false);
 
   const LoadingScreen = () => (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -190,13 +190,13 @@ const DropOffRouteScreen = () => {
       ? null
       : filteredWaypoints;
 
-  const toggleSideDrawer = () => {
-    setSideDrawerVisible(!isSideDrawerVisible);
-  };
+  // const toggleSideDrawer = () => {
+  //   setSideDrawerVisible(!isSideDrawerVisible);
+  // };
 
   return (
     <View style={styles.mapContainer}>
-      <View style={styles.containerMenu}>
+      {/* <View style={styles.containerMenu}>
         <TouchableOpacity onPress={toggleSideDrawer}>
           <MaterialIcons name="menu" size={30} color="white" />
         </TouchableOpacity>
@@ -206,7 +206,7 @@ const DropOffRouteScreen = () => {
           onClose={toggleSideDrawer}
           onLogout={handleLogout}
         />
-      </View>
+      </View> */}
 
       <MapView
         ref={mapRef}
