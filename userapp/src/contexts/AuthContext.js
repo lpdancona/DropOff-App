@@ -64,6 +64,13 @@ const AuthContextProvider = ({ children }) => {
       query: getUser,
       variables: { id: dbUser.id },
     });
+
+    const userData = responseGetUser.data.getUser;
+    console.log(userData);
+
+    const uriUser = await getPhotoInBucket(userData.photo);
+    setCurrentUserData({ ...userData, uriUser });
+
     if (expoPushToken) {
       //console.log(expoPushToken);
       const actualPushToken = responseGetUser.data.getUser.pushToken;
@@ -74,7 +81,7 @@ const AuthContextProvider = ({ children }) => {
         );
       }
     }
-    setCurrentUserData(responseGetUser.data.getUser);
+    //setCurrentUserData(responseGetUser.data.getUser);
   };
 
   const fetchKidsData = async (userEmail) => {

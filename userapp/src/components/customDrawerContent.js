@@ -10,7 +10,8 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import ConfirmationModal from "./ConfirmationModal";
 import User from "../../assets/user.jpeg";
 
-export default function CustomDrawerContent(props: any) {
+export default function CustomDrawerContent(props) {
+  const { currentUserData } = props;
   const [isConfirmationModalVisible, setConfirmationModalVisible] =
     useState(false);
 
@@ -36,8 +37,11 @@ export default function CustomDrawerContent(props: any) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.userContent}>
-        <Image source={User} style={styles.userPic}></Image>
-        <Text style={styles.userName}>Rodrigo Carvalho</Text>
+        <Image
+          source={{ uri: currentUserData?.uriUser }}
+          style={styles.userPic}
+        ></Image>
+        <Text style={styles.userName}>{currentUserData?.name}</Text>
       </View>
       <DrawerContentScrollView {...props}>
         <DrawerItemList {...props} />

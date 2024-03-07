@@ -23,12 +23,14 @@ import {
 } from "@expo/vector-icons";
 
 import { useRouteContext } from "../contexts/RouteContext";
-import customDrawerContent from "../components/customDrawerContent";
-// import { usePushNotificationsContext } from "../contexts/PushNotificationsContext";
+import CustomDrawerContent from "../components/CustomDrawerContent";
+import { usePushNotificationsContext } from "../contexts/PushNotificationsContext";
 
 const RootNavigator = () => {
-  const { dbUser, loading } = useAuthContext();
+  const { dbUser, loading, currentUserData } = useAuthContext();
   const { isRouteInProgress } = useRouteContext();
+  // const { isRouteInProgress } = useRouteContext();
+  const { permissionMessage } = usePushNotificationsContext();
   //const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const Stack = createNativeStackNavigator();
@@ -37,7 +39,9 @@ const RootNavigator = () => {
   const DrawerNav = () => {
     return (
       <Drawer.Navigator
-        drawerContent={customDrawerContent}
+        drawerContent={(props) => (
+          <CustomDrawerContent {...props} currentUserData={currentUserData} />
+        )}
         screenOptions={{
           // headerShown: false,
           drawerStyle: {
@@ -140,9 +144,6 @@ const RootNavigator = () => {
       </Stack.Navigator>
     );
   };
-
-  // const { isRouteInProgress } = useRouteContext();
-  // const { permissionMessage } = usePushNotificationsContext();
 
   if (loading) {
     return <ActivityIndicator size="large" color="gray" />;
