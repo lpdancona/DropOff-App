@@ -75,7 +75,7 @@ const ChatScreen = () => {
                 <Text style={{ color: "white" }}>{getInitials(user.name)}</Text>
               </View>
             )}
-            {unreadCount > 0 && ( // Render the unread count only if it's greater than 0
+            {unreadCount > 0 && (
               <View style={styles.unreadCountContainer}>
                 <Text style={styles.unreadCountText}>{unreadCount}</Text>
               </View>

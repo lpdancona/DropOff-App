@@ -3,28 +3,29 @@ export default StyleSheet.create({
   container: {
     flex: 1,
   },
-  // containerMenu: {
-  //   flexDirection: "row",
-  //   justifyContent: "space-between",
-  //   alignItems: "center",
-  //   backgroundColor: "#FF7276",
-  //   padding: 10,
-  // },
-  // containerMenu: {
-  //   justifyContent: "space-between",
-  //   alignItems: "center",
-  //   flexDirection: "row",
-  //   backgroundColor: "#FF7276",
-  //   padding: 20,
-  //   maxHeight: "25%",
-  //   paddingTop: 40,
-  //   gap: "100%",
-  // },
   swiper: {
-    height: "50%",
+    //height: "10%",
     marginTop: "15%",
   },
+  paginationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 5,
+    backgroundColor: "#ccc",
+  },
+  activeDot: {
+    backgroundColor: "blue",
+  },
   welcomeContainer: {
+    //flex: 1,
+    //flexGrow: 1,
     marginTop: 20,
     marginLeft: 10,
   },
@@ -73,7 +74,7 @@ export default StyleSheet.create({
   eventName: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 6,
     color: "#333",
   },
   eventDate: {
@@ -122,6 +123,21 @@ export default StyleSheet.create({
   },
   kidName: {
     fontSize: 16,
+    fontWeight: "bold",
+  },
+  unreadCountContainer: {
+    position: "absolute",
+    top: -10,
+    right: -10,
+    backgroundColor: "red",
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  unreadCountText: {
+    color: "white",
     fontWeight: "bold",
   },
 });

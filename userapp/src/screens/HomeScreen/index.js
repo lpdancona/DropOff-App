@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Image, Linking, FlatList, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  Linking,
+  FlatList,
+  Pressable,
+  ScrollView,
+} from "react-native";
 import Swiper from "react-native-swiper";
 import { API, graphqlOperation } from "aws-amplify";
 import { listEvents } from "../../graphql/queries";
@@ -7,12 +15,16 @@ import styles from "./styles";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { format, getDay } from "date-fns";
 import { usePicturesContext } from "../../contexts/PicturesContext";
+import { useMessageContext } from "../../contexts/MessageContext";
 
 const HomeScreen = () => {
-  const [events, setEvents] = useState([]);
   const { kids, dbUser } = useAuthContext();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { unreadMessages } = useMessageContext();
   const { getPhotoInBucket } = usePicturesContext();
+  //
+  const [events, setEvents] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [unreadCounts, setUnreadCounts] = useState({});
   const swiperRef = useRef(null);
 
   useEffect(() => {
@@ -45,6 +57,33 @@ const HomeScreen = () => {
     fetchEvents();
   }, []);
 
+  useEffect(() => {
+    // Function to calculate unread count for each kid
+    const calculateUnreadCounts = () => {
+      const counts = {};
+
+      // Iterate over each kid
+      kids.forEach((kid) => {
+        // Filter unread messages for the current kid
+        const unreadForKid = unreadMessages.filter(
+          (message) =>
+            !message.isRead &&
+            message.receiverIDs.includes(kid.id) &&
+            message.senderID !== kid.id
+        );
+
+        // Store the count of unread messages for the current kid
+        counts[kid.id] = unreadForKid.length;
+      });
+
+      // Update state with the counts
+      setUnreadCounts(counts);
+    };
+
+    // Call the function to calculate unread counts
+    calculateUnreadCounts();
+  }, [unreadMessages, kids]);
+
   const handleEventPress = (link) => {
     if (link) {
       const urlWithoutParams = link.split("?")[0];
@@ -60,8 +99,13 @@ const HomeScreen = () => {
   };
 
   const handleIndexChanged = (index) => {
-    console.log(currentIndex);
+    //console.log(currentIndex);
     setCurrentIndex(index);
+  };
+
+  const handleKidPress = (kid) => {
+    console.log(kid.name);
+    //navigation.navigate('KidDetails', { kid });
   };
 
   const renderEvent = (item) => {
@@ -83,10 +127,6 @@ const HomeScreen = () => {
     );
   };
 
-  // const toggleSideDrawer = () => {
-  //   setSideDrawerVisible(!isSideDrawerVisible);
-  // };
-
   const today = new Date();
   const dayOfWeekNumber = getDay(today) + 1;
   const formattedDate = format(today, "EEEE, MMMM d");
@@ -99,49 +139,53 @@ const HomeScreen = () => {
   };
 
   return (
-    <View style={styles.welcomeContainer}>
+    <ScrollView style={styles.welcomeContainer}>
       <Text style={styles.date}>{formattedDate}</Text>
       <Text style={styles.welcomeText}>Welcome, {dbUser.name} </Text>
       <View style={styles.kidsContainer}>
         <Text style={styles.sectionTitle}>Your Kids</Text>
-        <FlatList
-          data={kids}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
+        {kids.map((kid) => (
+          <Pressable key={kid.id} onPress={() => handleKidPress(kid)}>
             <View style={styles.kidItem}>
               <View style={styles.kidImageContainer}>
-                {item.uriKid ? (
-                  <Image
-                    source={{ uri: item.uriKid }}
-                    style={styles.kidImage}
-                  />
+                {kid.uriKid ? (
+                  <Image source={{ uri: kid.uriKid }} style={styles.kidImage} />
                 ) : (
                   <View style={styles.placeholderImage}>
                     <Text style={styles.placeholderText}>
-                      {getInitials(item.name)}
+                      {getInitials(kid.name)}
+                    </Text>
+                  </View>
+                )}
+                {unreadCounts[kid.id] > 0 && (
+                  <View style={styles.unreadCountContainer}>
+                    <Text style={styles.unreadCountText}>
+                      {unreadCounts[kid.id]}
                     </Text>
                   </View>
                 )}
               </View>
-              <Text style={styles.kidName}>{item.name}</Text>
+              <Text style={styles.kidName}>{kid.name}</Text>
             </View>
-          )}
-        />
+          </Pressable>
+        ))}
       </View>
       <View style={styles.swiper}>
         <Text style={styles.eventHeader}>Upcoming Events</Text>
         <Swiper
           ref={swiperRef}
           autoplay={true}
-          autoplayTimeout={2}
+          autoplayTimeout={10}
           loop={true}
           index={currentIndex}
           onIndexChanged={handleIndexChanged}
+          height={"100%"}
+          showsPagination={false}
         >
           {events.map(renderEvent)}
         </Swiper>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
