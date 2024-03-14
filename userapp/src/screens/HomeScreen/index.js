@@ -16,6 +16,7 @@ import { useAuthContext } from "../../contexts/AuthContext";
 import { format, getDay } from "date-fns";
 import { usePicturesContext } from "../../contexts/PicturesContext";
 import { useMessageContext } from "../../contexts/MessageContext";
+import { AntDesign } from "@expo/vector-icons";
 
 const HomeScreen = () => {
   const { kids, dbUser } = useAuthContext();
@@ -157,15 +158,16 @@ const HomeScreen = () => {
                     </Text>
                   </View>
                 )}
+                <Text style={styles.kidName}>{kid.name}</Text>
                 {unreadCounts[kid.id] > 0 && (
-                  <View style={styles.unreadCountContainer}>
+                  <View style={styles.updatesContainer}>
+                    <AntDesign name="message1" size={24} color="gray" />
                     <Text style={styles.unreadCountText}>
                       {unreadCounts[kid.id]}
                     </Text>
                   </View>
                 )}
               </View>
-              <Text style={styles.kidName}>{kid.name}</Text>
             </View>
           </Pressable>
         ))}

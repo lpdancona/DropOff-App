@@ -16,7 +16,7 @@ export default StyleSheet.create({
     backgroundColor: "white",
     padding: 10,
     borderRadius: 10,
-    marginLeft: "50%",
+    //marginLeft: "50%",
   },
   card: {
     borderRadius: 12,

@@ -18,11 +18,14 @@ import { useAuthContext } from "../../../src/contexts/AuthContext";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Auth } from "aws-amplify";
 import { useMessageContext } from "../../contexts/MessageContext";
+import { useKidsContext } from "../../contexts/KidsContext";
 
 const HomeScreen = () => {
   const { routesData, updateRoutesData } = useRouteContext();
   const { currentUserData } = useAuthContext();
-  const { unreadMessages, setUnreadMessages } = useMessageContext();
+  const { unreadMessages  } = useMessageContext();
+  const { kids } = useKidsContext();
+
 
   const [images, setImages] = useState({});
   const navigation = useNavigation();
@@ -33,19 +36,19 @@ const HomeScreen = () => {
 
   // useEffect to fetch and update the message count
   useEffect(() => {
-    if (unreadMessages) {
+    if (unreadMessages && kids) {
       // Count the number of unread messages
       try {
-        const unreadCount = unreadMessages.filter(
-          (message) => !message.isRead
+        const unreadCount = unreadMessages.filter(message =>
+          kids.some(kid => !message.isRead && message.senderID === kid.id)
         ).length;
-        console.log("unreadMessages", unreadCount);
+        //console.log("unreadMessages", unreadCount);
         setMsgsCount(unreadCount);
       } catch (error) {
         console.log("error updating the unread Message", error);
       }
     }
-  }, [unreadMessages]);
+  }, [unreadMessages,kids]);
 
   const fetchImage = async (imageURL) => {
     try {
