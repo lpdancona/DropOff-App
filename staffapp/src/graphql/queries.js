@@ -1,6 +1,168 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getCheckInOut = /* GraphQL */ `
+  query GetCheckInOut($id: ID!) {
+    getCheckInOut(id: $id) {
+      id
+      state
+      userIdState
+      dateState
+      TimeState
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listCheckInOuts = /* GraphQL */ `
+  query ListCheckInOuts(
+    $filter: ModelCheckInOutFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listCheckInOuts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        state
+        userIdState
+        dateState
+        TimeState
+        kidID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const checkInOutsByKidID = /* GraphQL */ `
+  query CheckInOutsByKidID(
+    $kidID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelCheckInOutFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    checkInOutsByKidID(
+      kidID: $kidID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        state
+        userIdState
+        dateState
+        TimeState
+        kidID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getKidsSchedule = /* GraphQL */ `
+  query GetKidsSchedule($id: ID!) {
+    getKidsSchedule(id: $id) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        currentStateId
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const listKidsSchedules = /* GraphQL */ `
+  query ListKidsSchedules(
+    $filter: ModelKidsScheduleFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listKidsSchedules(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        Monday
+        Tuesday
+        Wednesday
+        Thursday
+        Friday
+        createdAt
+        updatedAt
+        kidsScheduleKidId
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getPictures = /* GraphQL */ `
+  query GetPictures($id: ID!) {
+    getPictures(id: $id) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listPictures = /* GraphQL */ `
+  query ListPictures(
+    $filter: ModelPicturesFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listPictures(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        picture
+        kidID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getEvents = /* GraphQL */ `
   query GetEvents($id: ID!) {
     getEvents(id: $id) {
@@ -137,6 +299,7 @@ export const getAddressList = /* GraphQL */ `
         routeID
         checkedIn
         lastCheckIn
+        currentStateId
         createdAt
         updatedAt
         __typename
@@ -336,6 +499,11 @@ export const getKid = /* GraphQL */ `
       routeID
       checkedIn
       lastCheckIn
+      currentStateId
+      CheckInOuts {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -365,6 +533,7 @@ export const listKids = /* GraphQL */ `
         routeID
         checkedIn
         lastCheckIn
+        currentStateId
         createdAt
         updatedAt
         __typename
@@ -405,6 +574,7 @@ export const kidsByRouteID = /* GraphQL */ `
         routeID
         checkedIn
         lastCheckIn
+        currentStateId
         createdAt
         updatedAt
         __typename

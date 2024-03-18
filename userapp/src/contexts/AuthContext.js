@@ -2,7 +2,12 @@ import { createContext, useState, useEffect, useContext } from "react";
 import { ActivityIndicator } from "react-native";
 import { Auth } from "aws-amplify";
 import { API } from "aws-amplify";
-import { listUsers, listKids, getUser } from "../graphql/queries";
+import {
+  listUsers,
+  listKids,
+  getUser,
+  getCheckInOut,
+} from "../graphql/queries";
 import { usePushNotificationsContext } from "./PushNotificationsContext";
 import { usePicturesContext } from "./PicturesContext";
 import { updateUser } from "../graphql/mutations";
@@ -66,7 +71,7 @@ const AuthContextProvider = ({ children }) => {
     });
 
     const userData = responseGetUser.data.getUser;
-    console.log(userData);
+    //console.log(userData);
 
     const uriUser = await getPhotoInBucket(userData.photo);
     setCurrentUserData({ ...userData, uriUser });
@@ -100,14 +105,22 @@ const AuthContextProvider = ({ children }) => {
           variables: variables,
         });
         const fetchedKids = response.data.listKids.items;
-        //console.log(fetchedKids);
+        //console.log("fetchedKids", fetchedKids);
 
         if (fetchedKids.length === 0) {
-          navigation.navigate("Wait");
+          //navigation.navigate("Wait");
           //await Auth.signOut();
         } else {
-          const kidsWithPhotos = await Promise.all(
+          const completeKids = await Promise.all(
             fetchedKids.map(async (kid) => {
+              if (kid.currentStateId !== null) {
+                const currentStateData = await API.graphql({
+                  query: getCheckInOut,
+                  variables: { id: kid.currentStateId },
+                });
+
+                kid.CurrentState = currentStateData.data.getCheckInOut;
+              }
               if (kid.photo) {
                 const uriKid = await getPhotoInBucket(kid.photo);
                 return { ...kid, uriKid };
@@ -118,7 +131,7 @@ const AuthContextProvider = ({ children }) => {
           );
 
           // Set the kids state if there is data
-          setKids(kidsWithPhotos);
+          setKids(completeKids);
         }
         // setKids(response.data.listKids.items);
       } catch (error) {

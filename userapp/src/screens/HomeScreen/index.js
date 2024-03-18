@@ -4,9 +4,9 @@ import {
   Text,
   Image,
   Linking,
-  FlatList,
   Pressable,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import Swiper from "react-native-swiper";
 import { API, graphqlOperation } from "aws-amplify";
@@ -17,16 +17,21 @@ import { format, getDay } from "date-fns";
 import { usePicturesContext } from "../../contexts/PicturesContext";
 import { useMessageContext } from "../../contexts/MessageContext";
 import { AntDesign } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import InfoModal from "../../components/InfoModal";
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
   const { kids, dbUser } = useAuthContext();
   const { unreadMessages } = useMessageContext();
   const { getPhotoInBucket } = usePicturesContext();
   //
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [unreadCounts, setUnreadCounts] = useState({});
   const swiperRef = useRef(null);
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [selectedKid, setSelectedKid] = useState(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -54,9 +59,12 @@ const HomeScreen = () => {
         console.error("Error fetching events:", error);
       }
     };
-
-    fetchEvents();
-  }, []);
+    if (!events) {
+      //console.log("fetching events....");
+      fetchEvents();
+    }
+    console.log("kids", kids);
+  }, [events]);
 
   useEffect(() => {
     // Function to calculate unread count for each kid
@@ -66,7 +74,7 @@ const HomeScreen = () => {
       // Iterate over each kid
       kids.forEach((kid) => {
         // Filter unread messages for the current kid
-        const unreadForKid = unreadMessages.filter(
+        const unreadForKid = unreadMessages?.filter(
           (message) =>
             !message.isRead &&
             message.receiverIDs.includes(kid.id) &&
@@ -74,13 +82,13 @@ const HomeScreen = () => {
         );
 
         // Store the count of unread messages for the current kid
-        counts[kid.id] = unreadForKid.length;
+        counts[kid.id] = unreadForKid?.length;
       });
 
       // Update state with the counts
       setUnreadCounts(counts);
     };
-
+    //console.log("kids", kids);
     // Call the function to calculate unread counts
     calculateUnreadCounts();
   }, [unreadMessages, kids]);
@@ -104,9 +112,18 @@ const HomeScreen = () => {
     setCurrentIndex(index);
   };
 
+  const handleMsgPress = (kid) => {
+    const idUserChat = kid.id;
+    navigation.navigate("ChatUser", { id: idUserChat });
+  };
+
+  const handleCheckInPress = (kid) => {
+    setSelectedKid(kid);
+    setShowCheckInModal(true);
+  };
+
   const handleKidPress = (kid) => {
     console.log(kid.name);
-    //navigation.navigate('KidDetails', { kid });
   };
 
   const renderEvent = (item) => {
@@ -139,6 +156,9 @@ const HomeScreen = () => {
       .toUpperCase();
   };
 
+  if (!events) {
+    return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
+  }
   return (
     <ScrollView style={styles.welcomeContainer}>
       <Text style={styles.date}>{formattedDate}</Text>
@@ -160,14 +180,30 @@ const HomeScreen = () => {
                 )}
                 <Text style={styles.kidName}>{kid.name}</Text>
                 {unreadCounts[kid.id] > 0 && (
-                  <View style={styles.updatesContainer}>
-                    <AntDesign name="message1" size={24} color="gray" />
-                    <Text style={styles.unreadCountText}>
-                      {unreadCounts[kid.id]}
-                    </Text>
-                  </View>
+                  <Pressable
+                    style={styles.updatesContainer}
+                    onPress={() => handleMsgPress(kid)}
+                  >
+                    <AntDesign name="message1" size={30} color="gray" />
+                    <View style={styles.unreadCountContainer}>
+                      <Text style={styles.unreadCountText}>
+                        {unreadCounts[kid.id]}
+                      </Text>
+                    </View>
+                  </Pressable>
                 )}
               </View>
+              {kid.CurrentState?.state === "CHECK_IN" && (
+                <Pressable
+                  style={{ padding: 12 }}
+                  onPress={() => handleCheckInPress(kid)}
+                >
+                  <AntDesign name="checksquare" size={30} color="green" />
+                </Pressable>
+                // <Text style={{ backgroundColor: "green" }}>
+                //   {kid.CurrentState.state}
+                // </Text>
+              )}
             </View>
           </Pressable>
         ))}
@@ -187,6 +223,17 @@ const HomeScreen = () => {
           {events.map(renderEvent)}
         </Swiper>
       </View>
+      {showCheckInModal && (
+        <InfoModal
+          isVisible={true}
+          onClose={() => setShowCheckInModal(false)}
+          infoItems={[
+            { label: "Time", value: selectedKid.CurrentState.TimeState },
+            { label: "Date", value: selectedKid.CurrentState.dateState },
+            { label: "Checked By", value: "Geovanni Driver" },
+          ]}
+        />
+      )}
     </ScrollView>
   );
 };

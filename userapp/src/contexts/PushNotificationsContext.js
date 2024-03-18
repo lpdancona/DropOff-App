@@ -43,16 +43,16 @@ const PushNotificationsContextProvider = ({ children }) => {
     });
   }
 
-  async function schedulePushNotification(title, body) {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: title, //"You've got mail! 📬",
-        body: body, //"Here is the notification body",
-        //data: { data: "goes here" },
-      },
-      trigger: { seconds: 2 },
-    });
-  }
+  // async function schedulePushNotification(title, body) {
+  //   await Notifications.scheduleNotificationAsync({
+  //     content: {
+  //       title: title, //"You've got mail! 📬",
+  //       body: body, //"Here is the notification body",
+  //       //data: { data: "goes here" },
+  //     },
+  //     trigger: { seconds: 2 },
+  //   });
+  // }
 
   async function registerForPushNotificationsAsync() {
     let token;
@@ -104,7 +104,7 @@ const PushNotificationsContextProvider = ({ children }) => {
       token = await Notifications.getExpoPushTokenAsync({
         projectId: Constants.expoConfig.extra.eas.projectId,
       });
-      // console.log(token);
+      //console.log("token", token);
     } else {
       alert("Must use a physical device for Push Notifications");
       return;
@@ -124,11 +124,11 @@ const PushNotificationsContextProvider = ({ children }) => {
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
     );
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        //console.log("listener noti", notification);
-        setNotification(notification);
-      });
+    // notificationListener.current =
+    //   Notifications.addNotificationReceivedListener((notification) => {
+    //     //console.log("listener notication", notification);
+    //     setNotification(notification);
+    //   });
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
@@ -159,7 +159,6 @@ const PushNotificationsContextProvider = ({ children }) => {
     <PushNotificationsContext.Provider
       value={{
         registerForPushNotificationsAsync,
-        schedulePushNotification,
         sendPushNotification,
         expoPushToken,
         permissionMessage,

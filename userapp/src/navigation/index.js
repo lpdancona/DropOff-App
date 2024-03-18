@@ -1,7 +1,6 @@
 import React from "react";
 // import { SafeAreaView } from "react-native-safe-area-context";
 // import { useNavigation } from "@react-navigation/native";
-//import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, View } from "react-native";
@@ -24,13 +23,13 @@ import {
 
 import { useRouteContext } from "../contexts/RouteContext";
 import CustomDrawerContent from "../components/CustomDrawerContent";
-import { usePushNotificationsContext } from "../contexts/PushNotificationsContext";
+//import { usePushNotificationsContext } from "../contexts/PushNotificationsContext";
 
 const RootNavigator = () => {
   const { dbUser, loading, currentUserData } = useAuthContext();
   const { isRouteInProgress } = useRouteContext();
   // const { isRouteInProgress } = useRouteContext();
-  const { permissionMessage } = usePushNotificationsContext();
+  //const { permissionMessage } = usePushNotificationsContext();
   //const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const Stack = createNativeStackNavigator();
@@ -125,6 +124,7 @@ const RootNavigator = () => {
   };
 
   const StackNav = () => {
+    //console.log("calls stacknav");
     //const navigation = useNavigation();
 
     return (

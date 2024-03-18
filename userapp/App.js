@@ -1,5 +1,5 @@
 //import 'core-js/full/symbol/async-iterator';
-import { StatusBar } from "expo-status-bar";
+//import { StatusBar } from "expo-status-bar";
 import RootNavigator from "./src/navigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -34,14 +34,14 @@ function App() {
   } = useTheme();
   const myTheme = getTheme();
   return (
-    <ThemeProvider theme={myTheme}>
-      <Authenticator.Provider>
-        <Authenticator
-          Header={CustomHeader}
-          Footer={CustomFooter}
-          //Container={(props) => <Authenticator.Container {...props} />}
-        >
-          <NavigationContainer>
+    <NavigationContainer>
+      <ThemeProvider theme={myTheme}>
+        <Authenticator.Provider>
+          <Authenticator
+            Header={CustomHeader}
+            Footer={CustomFooter}
+            //Container={(props) => <Authenticator.Container {...props} />}
+          >
             <PushNotificationsContextProvider>
               <PicturesContextProvider>
                 <AuthContextProvider>
@@ -59,10 +59,10 @@ function App() {
                 </AuthContextProvider>
               </PicturesContextProvider>
             </PushNotificationsContextProvider>
-          </NavigationContainer>
-        </Authenticator>
-      </Authenticator.Provider>
-    </ThemeProvider>
+          </Authenticator>
+        </Authenticator.Provider>
+      </ThemeProvider>
+    </NavigationContainer>
   );
 }
 

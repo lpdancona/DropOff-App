@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useRef, useContext } from "react";
-import { Text, View, Button, Platform } from "react-native";
+import { Platform, Linking, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
@@ -18,6 +18,7 @@ const PushNotificationsContextProvider = ({ children }) => {
 
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
+  const [permissionMessage, setPermissionMessage] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
   const navigation = useNavigation();
@@ -30,7 +31,6 @@ const PushNotificationsContextProvider = ({ children }) => {
       body: body,
       data: data,
     };
-    console.log("message", message);
 
     await fetch("https://exp.host/--/api/v2/push/send", {
       method: "POST",
@@ -43,16 +43,16 @@ const PushNotificationsContextProvider = ({ children }) => {
     });
   }
 
-  async function schedulePushNotification(title, body) {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: title, //"You've got mail! 📬",
-        body: body, //"Here is the notification body",
-        //data: { data: "goes here" },
-      },
-      trigger: { seconds: 2 },
-    });
-  }
+  // async function schedulePushNotification(title, body) {
+  //   await Notifications.scheduleNotificationAsync({
+  //     content: {
+  //       title: title, //"You've got mail! 📬",
+  //       body: body, //"Here is the notification body",
+  //       //data: { data: "goes here" },
+  //     },
+  //     trigger: { seconds: 2 },
+  //   });
+  // }
 
   async function registerForPushNotificationsAsync() {
     let token;
@@ -69,35 +69,66 @@ const PushNotificationsContextProvider = ({ children }) => {
     if (Device.isDevice) {
       const { status: existingStatus } =
         await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
+
       if (existingStatus !== "granted") {
         const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
+
+        if (status !== "granted") {
+          setPermissionMessage(true);
+          // The user denied permission, show a confirmation dialog
+          Alert.alert(
+            "Permission Required",
+            "To receive route updates, enable push notifications for this app in your device settings.",
+            [
+              {
+                text: "Cancel",
+                style: "cancel",
+                onPress: async () => {
+                  setPermissionMessage(false);
+                },
+              },
+              {
+                text: "Open Settings",
+                onPress: async () => {
+                  await Linking.openSettings();
+                  setPermissionMessage(false);
+                },
+              },
+            ]
+          );
+
+          return;
+        }
       }
-      if (finalStatus !== "granted") {
-        alert(
-          "Push Notification permission required! to receive route updates, please, enable push notifications your device settings."
-        );
-        return;
-      }
+
       token = await Notifications.getExpoPushTokenAsync({
         projectId: Constants.expoConfig.extra.eas.projectId,
       });
-      //console.log(token);
+      //console.log("token", token);
     } else {
-      //alert("Must use physical device for Push Notifications");
+      alert("Must use a physical device for Push Notifications");
+      return;
     }
+
+    // Check if the user has granted push notification permissions
+    // if (token) {
+    //   alert(
+    //     "Push notifications enabled! You'll receive updates on route uploads."
+    //   );
+    // }
 
     return token;
   }
+
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
     );
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-      });
+    // notificationListener.current =
+    //   Notifications.addNotificationReceivedListener((notification) => {
+    //     //console.log("listener notication", notification);
+    //     setNotification(notification);
+    //   });
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
@@ -128,9 +159,9 @@ const PushNotificationsContextProvider = ({ children }) => {
     <PushNotificationsContext.Provider
       value={{
         registerForPushNotificationsAsync,
-        schedulePushNotification,
         sendPushNotification,
         expoPushToken,
+        permissionMessage,
       }}
     >
       {children}

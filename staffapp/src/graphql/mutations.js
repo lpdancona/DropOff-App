@@ -1,6 +1,225 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createCheckInOut = /* GraphQL */ `
+  mutation CreateCheckInOut(
+    $input: CreateCheckInOutInput!
+    $condition: ModelCheckInOutConditionInput
+  ) {
+    createCheckInOut(input: $input, condition: $condition) {
+      id
+      state
+      userIdState
+      dateState
+      TimeState
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateCheckInOut = /* GraphQL */ `
+  mutation UpdateCheckInOut(
+    $input: UpdateCheckInOutInput!
+    $condition: ModelCheckInOutConditionInput
+  ) {
+    updateCheckInOut(input: $input, condition: $condition) {
+      id
+      state
+      userIdState
+      dateState
+      TimeState
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteCheckInOut = /* GraphQL */ `
+  mutation DeleteCheckInOut(
+    $input: DeleteCheckInOutInput!
+    $condition: ModelCheckInOutConditionInput
+  ) {
+    deleteCheckInOut(input: $input, condition: $condition) {
+      id
+      state
+      userIdState
+      dateState
+      TimeState
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createKidsSchedule = /* GraphQL */ `
+  mutation CreateKidsSchedule(
+    $input: CreateKidsScheduleInput!
+    $condition: ModelKidsScheduleConditionInput
+  ) {
+    createKidsSchedule(input: $input, condition: $condition) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        currentStateId
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const updateKidsSchedule = /* GraphQL */ `
+  mutation UpdateKidsSchedule(
+    $input: UpdateKidsScheduleInput!
+    $condition: ModelKidsScheduleConditionInput
+  ) {
+    updateKidsSchedule(input: $input, condition: $condition) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        currentStateId
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const deleteKidsSchedule = /* GraphQL */ `
+  mutation DeleteKidsSchedule(
+    $input: DeleteKidsScheduleInput!
+    $condition: ModelKidsScheduleConditionInput
+  ) {
+    deleteKidsSchedule(input: $input, condition: $condition) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        currentStateId
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const createPictures = /* GraphQL */ `
+  mutation CreatePictures(
+    $input: CreatePicturesInput!
+    $condition: ModelPicturesConditionInput
+  ) {
+    createPictures(input: $input, condition: $condition) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updatePictures = /* GraphQL */ `
+  mutation UpdatePictures(
+    $input: UpdatePicturesInput!
+    $condition: ModelPicturesConditionInput
+  ) {
+    updatePictures(input: $input, condition: $condition) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deletePictures = /* GraphQL */ `
+  mutation DeletePictures(
+    $input: DeletePicturesInput!
+    $condition: ModelPicturesConditionInput
+  ) {
+    deletePictures(input: $input, condition: $condition) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createEvents = /* GraphQL */ `
   mutation CreateEvents(
     $input: CreateEventsInput!
@@ -187,6 +406,7 @@ export const createAddressList = /* GraphQL */ `
         routeID
         checkedIn
         lastCheckIn
+        currentStateId
         createdAt
         updatedAt
         __typename
@@ -226,6 +446,7 @@ export const updateAddressList = /* GraphQL */ `
         routeID
         checkedIn
         lastCheckIn
+        currentStateId
         createdAt
         updatedAt
         __typename
@@ -265,6 +486,7 @@ export const deleteAddressList = /* GraphQL */ `
         routeID
         checkedIn
         lastCheckIn
+        currentStateId
         createdAt
         updatedAt
         __typename
@@ -493,6 +715,11 @@ export const createKid = /* GraphQL */ `
       routeID
       checkedIn
       lastCheckIn
+      currentStateId
+      CheckInOuts {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -520,6 +747,11 @@ export const updateKid = /* GraphQL */ `
       routeID
       checkedIn
       lastCheckIn
+      currentStateId
+      CheckInOuts {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -547,6 +779,11 @@ export const deleteKid = /* GraphQL */ `
       routeID
       checkedIn
       lastCheckIn
+      currentStateId
+      CheckInOuts {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename

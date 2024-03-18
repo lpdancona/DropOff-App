@@ -1,6 +1,210 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateCheckInOut = /* GraphQL */ `
+  subscription OnCreateCheckInOut(
+    $filter: ModelSubscriptionCheckInOutFilterInput
+  ) {
+    onCreateCheckInOut(filter: $filter) {
+      id
+      state
+      userIdState
+      dateState
+      TimeState
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateCheckInOut = /* GraphQL */ `
+  subscription OnUpdateCheckInOut(
+    $filter: ModelSubscriptionCheckInOutFilterInput
+  ) {
+    onUpdateCheckInOut(filter: $filter) {
+      id
+      state
+      userIdState
+      dateState
+      TimeState
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteCheckInOut = /* GraphQL */ `
+  subscription OnDeleteCheckInOut(
+    $filter: ModelSubscriptionCheckInOutFilterInput
+  ) {
+    onDeleteCheckInOut(filter: $filter) {
+      id
+      state
+      userIdState
+      dateState
+      TimeState
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateKidsSchedule = /* GraphQL */ `
+  subscription OnCreateKidsSchedule(
+    $filter: ModelSubscriptionKidsScheduleFilterInput
+  ) {
+    onCreateKidsSchedule(filter: $filter) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        currentStateId
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const onUpdateKidsSchedule = /* GraphQL */ `
+  subscription OnUpdateKidsSchedule(
+    $filter: ModelSubscriptionKidsScheduleFilterInput
+  ) {
+    onUpdateKidsSchedule(filter: $filter) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        currentStateId
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const onDeleteKidsSchedule = /* GraphQL */ `
+  subscription OnDeleteKidsSchedule(
+    $filter: ModelSubscriptionKidsScheduleFilterInput
+  ) {
+    onDeleteKidsSchedule(filter: $filter) {
+      id
+      Monday
+      Tuesday
+      Wednesday
+      Thursday
+      Friday
+      Kid {
+        id
+        name
+        parent1Email
+        parent2Email
+        dropOffAddress
+        lat
+        lng
+        birthDate
+        photo
+        Parent1ID
+        Parent2ID
+        vanID
+        routeID
+        checkedIn
+        lastCheckIn
+        currentStateId
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      kidsScheduleKidId
+      __typename
+    }
+  }
+`;
+export const onCreatePictures = /* GraphQL */ `
+  subscription OnCreatePictures($filter: ModelSubscriptionPicturesFilterInput) {
+    onCreatePictures(filter: $filter) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdatePictures = /* GraphQL */ `
+  subscription OnUpdatePictures($filter: ModelSubscriptionPicturesFilterInput) {
+    onUpdatePictures(filter: $filter) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeletePictures = /* GraphQL */ `
+  subscription OnDeletePictures($filter: ModelSubscriptionPicturesFilterInput) {
+    onDeletePictures(filter: $filter) {
+      id
+      picture
+      kidID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateEvents = /* GraphQL */ `
   subscription OnCreateEvents($filter: ModelSubscriptionEventsFilterInput) {
     onCreateEvents(filter: $filter) {
@@ -165,6 +369,7 @@ export const onCreateAddressList = /* GraphQL */ `
         routeID
         checkedIn
         lastCheckIn
+        currentStateId
         createdAt
         updatedAt
         __typename
@@ -203,6 +408,7 @@ export const onUpdateAddressList = /* GraphQL */ `
         routeID
         checkedIn
         lastCheckIn
+        currentStateId
         createdAt
         updatedAt
         __typename
@@ -241,6 +447,7 @@ export const onDeleteAddressList = /* GraphQL */ `
         routeID
         checkedIn
         lastCheckIn
+        currentStateId
         createdAt
         updatedAt
         __typename
@@ -448,6 +655,11 @@ export const onCreateKid = /* GraphQL */ `
       routeID
       checkedIn
       lastCheckIn
+      currentStateId
+      CheckInOuts {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -472,6 +684,11 @@ export const onUpdateKid = /* GraphQL */ `
       routeID
       checkedIn
       lastCheckIn
+      currentStateId
+      CheckInOuts {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -496,6 +713,11 @@ export const onDeleteKid = /* GraphQL */ `
       routeID
       checkedIn
       lastCheckIn
+      currentStateId
+      CheckInOuts {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
