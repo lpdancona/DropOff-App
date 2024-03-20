@@ -12,19 +12,21 @@ import Swiper from "react-native-swiper";
 import { API, graphqlOperation } from "aws-amplify";
 import { listEvents } from "../../graphql/queries";
 import styles from "./styles";
-import { useAuthContext } from "../../contexts/AuthContext";
 import { format, getDay } from "date-fns";
-import { usePicturesContext } from "../../contexts/PicturesContext";
-import { useMessageContext } from "../../contexts/MessageContext";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import InfoModal from "../../components/InfoModal";
+import { useAuthContext } from "../../contexts/AuthContext";
+import { usePicturesContext } from "../../contexts/PicturesContext";
+import { useMessageContext } from "../../contexts/MessageContext";
+import { useStaffContext } from "../../contexts/StaffContext";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const { kids, dbUser } = useAuthContext();
   const { unreadMessages } = useMessageContext();
   const { getPhotoInBucket } = usePicturesContext();
+  const { staff } = useStaffContext();
   //
   const [events, setEvents] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,6 +34,37 @@ const HomeScreen = () => {
   const swiperRef = useRef(null);
   const [showCheckInModal, setShowCheckInModal] = useState(false);
   const [selectedKid, setSelectedKid] = useState(null);
+  const [checkInData, setCheckInData] = useState(null);
+
+  useEffect(() => {
+    if (kids && staff) {
+      const checkInDataArray = [];
+
+      kids.forEach((kid) => {
+        console.log(kid);
+        //console.log(staff);
+        if (kid.CurrentState.state === "CHECK_IN") {
+          const associatedStaff = staff.find(
+            (member) => member.id === kid.CurrentState.userIdState
+          );
+          //console.log("associatedStaff", associatedStaff);
+          if (associatedStaff) {
+            const checkInInfo = {
+              //kidId:
+              userId: kid.CurrentState.userIdState,
+              userName: associatedStaff.name,
+              checkInTime: kid.CurrentState.TimeState,
+              checkInDate: kid.CurrentState.dateState,
+            };
+            checkInDataArray.push(checkInInfo);
+          }
+        }
+      });
+
+      //console.log("checkInDataArray", checkInDataArray);
+      setCheckInData(checkInDataArray);
+    }
+  }, [staff, kids]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -63,7 +96,7 @@ const HomeScreen = () => {
       //console.log("fetching events....");
       fetchEvents();
     }
-    console.log("kids", kids);
+    console.log("chekin data", checkInData);
   }, [events]);
 
   useEffect(() => {
@@ -230,7 +263,7 @@ const HomeScreen = () => {
           infoItems={[
             { label: "Time", value: selectedKid.CurrentState.TimeState },
             { label: "Date", value: selectedKid.CurrentState.dateState },
-            { label: "Checked By", value: "Geovanni Driver" },
+            { label: "Checked By", value: checkInData.userName },
           ]}
         />
       )}
