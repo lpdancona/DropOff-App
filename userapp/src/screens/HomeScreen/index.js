@@ -33,38 +33,37 @@ const HomeScreen = () => {
   const [unreadCounts, setUnreadCounts] = useState({});
   const swiperRef = useRef(null);
   const [showCheckInModal, setShowCheckInModal] = useState(false);
-  const [selectedKid, setSelectedKid] = useState(null);
-  const [checkInData, setCheckInData] = useState(null);
+  const [selectedKidCheckIn, setSelectedKidCheckIn] = useState(null);
+  const [lastCheckInData, setLastCheckInData] = useState(null);
 
   useEffect(() => {
     if (kids && staff) {
-      const checkInDataArray = [];
+      const lastCheckInDataArray = [];
 
       kids.forEach((kid) => {
-        console.log(kid);
-        //console.log(staff);
+        //console.log(kid);
         if (kid.CurrentState.state === "CHECK_IN") {
           const associatedStaff = staff.find(
             (member) => member.id === kid.CurrentState.userIdState
           );
           //console.log("associatedStaff", associatedStaff);
-          if (associatedStaff) {
-            const checkInInfo = {
-              //kidId:
-              userId: kid.CurrentState.userIdState,
-              userName: associatedStaff.name,
-              checkInTime: kid.CurrentState.TimeState,
-              checkInDate: kid.CurrentState.dateState,
-            };
-            checkInDataArray.push(checkInInfo);
-          }
+          // if (associatedStaff) {
+          const checkInInfo = {
+            kidId: kid.id,
+            userId: kid.CurrentState.userIdState,
+            userName: associatedStaff?.name,
+            kidName: kid.name,
+            checkInTime: kid.CurrentState.TimeState,
+            checkInDate: kid.CurrentState.dateState,
+          };
+          //console.log(checkInInfo);
+          lastCheckInDataArray.push(checkInInfo);
+          // }
         }
+        setLastCheckInData(lastCheckInDataArray);
       });
-
-      //console.log("checkInDataArray", checkInDataArray);
-      setCheckInData(checkInDataArray);
     }
-  }, [staff, kids]);
+  }, []);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -92,11 +91,11 @@ const HomeScreen = () => {
         console.error("Error fetching events:", error);
       }
     };
+    //console.log("lastCheckInData", lastCheckInData);
     if (!events) {
       //console.log("fetching events....");
       fetchEvents();
     }
-    console.log("chekin data", checkInData);
   }, [events]);
 
   useEffect(() => {
@@ -121,7 +120,7 @@ const HomeScreen = () => {
       // Update state with the counts
       setUnreadCounts(counts);
     };
-    //console.log("kids", kids);
+
     // Call the function to calculate unread counts
     calculateUnreadCounts();
   }, [unreadMessages, kids]);
@@ -132,7 +131,7 @@ const HomeScreen = () => {
 
       Linking.openURL(urlWithoutParams)
         .then((result) => {
-          console.log("Link opened successfully:", result);
+          //console.log("Link opened successfully:", result);
         })
         .catch((error) => {
           console.error("Error opening link:", error);
@@ -150,8 +149,17 @@ const HomeScreen = () => {
     navigation.navigate("ChatUser", { id: idUserChat });
   };
 
-  const handleCheckInPress = (kid) => {
-    setSelectedKid(kid);
+  useEffect(() => {
+    if (showCheckInModal && selectedKidCheckIn) {
+      setShowCheckInModal(true);
+    }
+  }, [showCheckInModal, selectedKidCheckIn]);
+
+  const handleCheckInPress = async (kid) => {
+    const checkInSelectedKid = lastCheckInData.filter(
+      (checkIn) => checkIn.kidId === kid.id
+    );
+    setSelectedKidCheckIn(checkInSelectedKid[checkInSelectedKid.length - 1]);
     setShowCheckInModal(true);
   };
 
@@ -192,6 +200,10 @@ const HomeScreen = () => {
   if (!events) {
     return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
   }
+  if (!lastCheckInData) {
+    return <ActivityIndicator style={{ padding: 50 }} size={"large"} />;
+  }
+
   return (
     <ScrollView style={styles.welcomeContainer}>
       <Text style={styles.date}>{formattedDate}</Text>
@@ -261,9 +273,9 @@ const HomeScreen = () => {
           isVisible={true}
           onClose={() => setShowCheckInModal(false)}
           infoItems={[
-            { label: "Time", value: selectedKid.CurrentState.TimeState },
-            { label: "Date", value: selectedKid.CurrentState.dateState },
-            { label: "Checked By", value: checkInData.userName },
+            { label: "Time", value: selectedKidCheckIn.checkInTime },
+            { label: "Date", value: selectedKidCheckIn.checkInDate },
+            { label: "Checked By", value: selectedKidCheckIn.userName },
           ]}
         />
       )}

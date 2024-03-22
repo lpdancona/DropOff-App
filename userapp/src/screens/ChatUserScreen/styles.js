@@ -8,8 +8,8 @@ export default StyleSheet.create({
   goBackIcon: {
     position: "absolute",
     alignItems: "center",
-    top: 22,
-    left: 10,
+    top: 45,
+    left: -15,
     zIndex: 1,
   },
   containerMenu: {
@@ -21,6 +21,24 @@ export default StyleSheet.create({
     maxHeight: "25%",
     paddingTop: 40,
     //gap: "100%",
+  },
+  headerContainer: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    backgroundColor: "#FF7276",
+    padding: 20,
+    paddingTop: 20,
+  },
+  titleContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+  kidNameText: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "bold",
+    position: "absolute",
   },
   bubbleWrapperRight: {
     backgroundColor: "#2e64e5",

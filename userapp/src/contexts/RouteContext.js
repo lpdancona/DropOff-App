@@ -18,7 +18,7 @@ const RouteContextProvider = ({ children }) => {
   const [currentRouteData, setCurrentRouteData] = useState(null);
   //const navigation = useNavigation();
   const [routesData, setRoutesData] = useState(null);
-  const [noKidsAvailable, setNoKidsAvailable] = useState(false);
+  //const [noKidsAvailable, setNoKidsAvailable] = useState(false);
   const [dropOffLatLng, setDropLatLng] = useState(null);
   const [dropOffAddress, setDropOffAddress] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -241,9 +241,9 @@ const RouteContextProvider = ({ children }) => {
     if (routesData && kids) {
       // Check kids in routes after fetching initial data
       if (!checkKidsInRoutes()) {
-        console.log("noKidsAvailadsdable", noKidsAvailable);
+        //console.log("noKidsAvailadsdable", noKidsAvailable);
         setIsLoading(false);
-        setNoKidsAvailable(true);
+        //setNoKidsAvailable(true);
         setIsRouteInProgress(false);
       }
     }
@@ -383,7 +383,7 @@ const RouteContextProvider = ({ children }) => {
         dropOffLatLng,
         dropOffAddress,
         currentRouteData,
-        noKidsAvailable,
+        //noKidsAvailable,
         matchingKids,
         driver,
         helper,

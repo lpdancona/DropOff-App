@@ -20,8 +20,8 @@ import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import { useRouteContext } from "../../contexts/RouteContext";
 import { Auth } from "aws-amplify";
-import houseIcon from "../../docs/icon-house.png";
-import vanIcon from "../../docs/van.png";
+import houseIcon from "../../../assets/icon-house.png";
+import vanIcon from "../../../assets/van.png";
 //import SideDrawer from "../SideDrawer/SideDrawer";
 
 const DropOffRouteScreen = () => {
@@ -36,7 +36,7 @@ const DropOffRouteScreen = () => {
     busLocation,
     isLoading,
     isRouteInProgress,
-    noKidsAvailable,
+    //noKidsAvailable,
     addressList,
   } = useRouteContext();
 
@@ -163,13 +163,14 @@ const DropOffRouteScreen = () => {
     // Render the loading screen while data is being fetched
     return <LoadingScreen />;
   }
-  if (noKidsAvailable) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>No kids available for today.</Text>
-      </View>
-    );
-  }
+
+  // if (noKidsAvailable) {
+  //   return (
+  //     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+  //       <Text>No kids available for today.</Text>
+  //     </View>
+  //   );
+  // }
 
   const waypoints = addressList.map((address) => ({
     latitude: address.latitude,

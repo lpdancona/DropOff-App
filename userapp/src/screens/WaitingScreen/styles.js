@@ -41,7 +41,7 @@ export default StyleSheet.create({
   parallelogram2: {
     width: "100%",
     height: 120,
-    marginTop: -145,
+    marginTop: -125,
   },
   callBtn: {
     display: "flex",

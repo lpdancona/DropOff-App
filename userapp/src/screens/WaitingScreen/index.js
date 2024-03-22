@@ -50,17 +50,17 @@ const WaitingScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Image
-        source={require("../../docs/ondacima.png")}
+        source={require("../../../assets/ondacima.png")}
         style={[styles.waveImage, { top: 0, height: 115, width: 480 }]}
       />
       <Image
-        source={require("../../docs/afterlogo.png")}
+        source={require("../../../assets/afterlogo.png")}
         style={{ height: 200, width: 400, marginTop: -20 }}
       />
       <View style={styles.centeredTextWrapper}>
         <Text style={[funTextStyle, styles.centeredText]}>
-          Hello {currentUserData?.name}, We don't have a route for your little
-          champ yet. You will be notified when we do
+          Hello {currentUserData?.name}, We don't have a Drop-off route for your
+          little champ yet. You will be notified when we do
         </Text>
         <View style={styles.parallelogramContainer}>
           <View style={styles.parallelogram1}></View>
@@ -104,12 +104,12 @@ const WaitingScreen = () => {
         </TouchableOpacity>
       </View>
       {/* Logout Button */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => setConfirmationModalVisible(true)}
         style={styles.logoutButton}
       >
         <Text style={{ color: "white", fontSize: 20 }}>Logout</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* Logout Confirmation Modal */}
       <Modal
@@ -142,7 +142,7 @@ const WaitingScreen = () => {
       </Modal>
 
       <Image
-        source={require("../../docs/ondabaixo.png")}
+        source={require("../../../assets/ondabaixo.png")}
         style={[styles.waveImage, { bottom: 0, height: 102, width: 500 }]}
       />
     </SafeAreaView>

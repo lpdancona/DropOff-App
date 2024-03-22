@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, TouchableOpacity, ActivityIndicator, Text } from "react-native";
 import { Bubble, GiftedChat, Send } from "react-native-gifted-chat";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -14,6 +14,7 @@ import { useAuthContext } from "../../contexts/AuthContext";
 import { useMessageContext } from "../../contexts/MessageContext";
 import { useStaffContext } from "../../contexts/StaffContext";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ChatUserScreen = () => {
   const route = useRoute();
@@ -344,12 +345,17 @@ const ChatUserScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.containerMenu}>
-        <TouchableOpacity style={styles.goBackIcon} onPress={() => goBack()}>
-          <Entypo name="chevron-left" size={30} color="white" />
-        </TouchableOpacity>
+      <View style={styles.headerContainer}>
+        <View style={styles.containerMenu}>
+          <TouchableOpacity style={styles.goBackIcon} onPress={() => goBack()}>
+            <Entypo name="chevron-left" size={30} color="white" />
+          </TouchableOpacity>
+          <View style={styles.titleContainer}>
+            <Text style={styles.kidNameText}>{currentKidData?.name}</Text>
+          </View>
+        </View>
       </View>
-      <View style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
         <GiftedChat
           messages={messages}
           infiniteScroll={true}
@@ -365,12 +371,29 @@ const ChatUserScreen = () => {
           renderSend={renderSend}
           showUserAvatar
           showAvatarForEveryMessage
+          renderChatEmpty={() => (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  transform: [{ scaleY: -1 }],
+                }}
+              >
+                No messages yet
+              </Text>
+            </View>
+          )}
           // onLoadEarlier={handleLoadEarlier}
           // isLoadingEarlier={isLoadingEarlier}
           scrollToBottom
           scrollToBottomComponent={scrollToBottomComponent}
         />
-      </View>
+      </SafeAreaView>
     </View>
   );
 };

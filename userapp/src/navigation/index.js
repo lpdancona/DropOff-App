@@ -85,7 +85,7 @@ const RootNavigator = () => {
         <Drawer.Screen
           name={isRouteInProgress ? "DropOffRoute" : "Wait"}
           options={{
-            drawerLabel: "DropOffRoute",
+            drawerLabel: "Drop-Off",
             title: "Drop Off",
             drawerIcon: () => (
               <FontAwesome5 name="bus" size={20} color="#808080" />
@@ -96,8 +96,8 @@ const RootNavigator = () => {
         <Drawer.Screen
           name="Pick"
           options={{
-            drawerLabel: "Pick",
-            title: "Kid Info",
+            drawerLabel: "Kids Info",
+            title: "Kids Info",
             drawerIcon: () => (
               <AntDesign name="profile" size={20} color="#808080" />
             ),
@@ -140,7 +140,11 @@ const RootNavigator = () => {
           <Stack.Screen name="ParentLogin" component={ProfileScreen} />
         )}
         <Stack.Screen name="Wait" component={WaitingScreen} />
-        <Stack.Screen name="ChatUser" component={ChatUserScreen} />
+        <Stack.Screen
+          name="ChatUser"
+          component={ChatUserScreen}
+          //headerStyle={{ backgroundColor: "#FF7276" }}
+        />
       </Stack.Navigator>
     );
   };
