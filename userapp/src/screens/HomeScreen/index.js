@@ -164,7 +164,8 @@ const HomeScreen = () => {
   };
 
   const handleKidPress = (kid) => {
-    console.log(kid.name);
+    //console.log(kid.name);
+    navigation.navigate("Feed", { id: kid.id });
   };
 
   const renderEvent = (item) => {

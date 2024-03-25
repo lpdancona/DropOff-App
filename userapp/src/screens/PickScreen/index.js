@@ -171,7 +171,7 @@ const PickScreen = () => {
           },
         },
       });
-      console.log("Backend updated:", response.data.updateKid);
+      //console.log("Backend updated:", response.data.updateKid);
     } catch (error) {
       console.error("Error updating backend:", error);
     }

@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, TouchableOpacity, ActivityIndicator, Text } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+  Text,
+  SafeAreaView,
+} from "react-native";
 import { Bubble, GiftedChat, Send } from "react-native-gifted-chat";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -14,7 +20,7 @@ import { useAuthContext } from "../../contexts/AuthContext";
 import { useMessageContext } from "../../contexts/MessageContext";
 import { useStaffContext } from "../../contexts/StaffContext";
 import { usePushNotificationsContext } from "../../contexts/PushNotificationsContext";
-import { SafeAreaView } from "react-native-safe-area-context";
+//import { SafeAreaView } from "react-native-safe-area-context";
 
 const ChatUserScreen = () => {
   const route = useRoute();

@@ -12,6 +12,8 @@ import ChatScreen from "../screens/ChatScreen";
 import ChatUserScreen from "../screens/ChatUserScreen";
 import PickScreen from "../screens/PickScreen";
 import GalleryScreen from "../screens/GalleryScreen";
+import FeedScreen from "../screens/FeedScreen";
+
 //import SideDrawer from "../screens/SideDrawer/SideDrawer";
 import { useAuthContext } from "../contexts/AuthContext";
 import {
@@ -136,10 +138,12 @@ const RootNavigator = () => {
           // ) : (
           <Stack.Screen name="DrawerNav" component={DrawerNav} />
         ) : (
-          // )
+          // <Stack.Screen name="Feed" component={FeedScreen} />
           <Stack.Screen name="ParentLogin" component={ProfileScreen} />
+          // )
         )}
         <Stack.Screen name="Wait" component={WaitingScreen} />
+        <Stack.Screen name="Feed" component={FeedScreen} />
         <Stack.Screen
           name="ChatUser"
           component={ChatUserScreen}

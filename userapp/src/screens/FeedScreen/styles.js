@@ -5,13 +5,6 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  goBackIcon: {
-    position: "absolute",
-    alignItems: "center",
-    top: 45,
-    left: -15,
-    zIndex: 1,
-  },
   containerMenu: {
     justifyContent: "space-between",
     alignItems: "center",
@@ -34,24 +27,45 @@ export default StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  kidNameText: {
-    color: "#fff",
-    fontSize: 17,
-    fontWeight: "bold",
+  goBackIcon: {
     position: "absolute",
+    alignItems: "center",
+    top: 45,
+    left: -15,
+    zIndex: 1,
   },
-  bubbleWrapperRight: {
-    backgroundColor: "#2e64e5",
+  kidImageContainer: {
+    alignItems: "center",
+    marginBottom: 20,
   },
-  bubbleTextRight: {
-    color: "#fff",
+
+  kidImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
-  sendIcon: {
-    marginBottom: 5,
-    marginRight: 5,
+  iconsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 20,
   },
-  scrollToBottomIcon: {
-    fontSize: 22,
-    color: "#333",
+  icon: {
+    marginRight: 20,
+  },
+  eventContainer: {
+    marginBottom: 10,
+  },
+  imageContainer: {
+    position: "relative",
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
+  },
+  date: {
+    marginTop: 5,
+    fontStyle: "italic",
+    color: "gray",
   },
 });

@@ -1,3 +1,19 @@
+enum FeedType {
+  ATTENDANCE
+  PHOTO
+  PROMOTION
+  ACTIVITY
+}
+
+type Feed @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  type: FeedType
+  dateTime: AWSDateTime
+  userID: ID
+  photoName: String
+  text: String
+}
+
 enum StatesCheckInOut {
   CHECK_IN
   CHECK_OUT
